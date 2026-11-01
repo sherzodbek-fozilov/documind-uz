@@ -74,3 +74,44 @@ Short records: what was chosen, the alternatives, and why. One entry per stage.
   a law published in uz and ru is one group, so its two versions never straddle train/test.
 - **Open:** no real document could be included: lex.uz and other sources are blocked from
   the build environment, so their terms could not be read.
+
+## Stage 2: retrieval baselines (2026-11-01)
+
+- **BM25: own small implementation (Okapi, k1 = 1.2, b = 0.75) with selectable analyzers.**
+  Alternatives: rank_bm25, Elasticsearch/OpenSearch, PostgreSQL full-text search.
+  Why: a few dozen lines, no extra service on the CPU server, and full control over
+  tokenization, which matters most for Uzbek.
+- **Analyzer `fold+stem6` as default:** apostrophes removed, Cyrillic mapped to Latin with
+  OCR-confusable letters merged (қ/к, ҳ/х, ғ/г, ў/о), tokens cut to 6 characters.
+  Compared on the **train** split only (synthetic set; plain, fold, ±stem5/stem6): with
+  stemming Recall@5 rose from 0.949 to 1.000 and MRR from 0.864 to 0.907; fold vs plain
+  differed little. Caveat: the synthetic set is near saturation and scripts are not
+  mixed between query and document there, so this must be re-checked on real questions.
+  Alternatives: Snowball stemmers (no Uzbek), a morphological analyzer (Apertium uzb).
+- **Dense: multilingual-e5-small as ONNX, run with onnxruntime; model revision pinned.**
+  Alternatives: sentence-transformers with PyTorch; e5-base / bge-m3 (larger, slower on
+  CPU). Why: no PyTorch on the server, ~10 ms per query on 4 CPU cores in this
+  environment, 384-dim vectors. The fine-tuned model from Kaggle (stage 5) must be
+  exported to ONNX the same way.
+- **Vector store: Qdrant, in-process (`:memory:`) for evaluation and tests, server via
+  `DOCUMIND_QDRANT_URL` in deployment; same code path.** Alternatives: pgvector, FAISS,
+  plain numpy. Why: Qdrant is the planned deployment component; filters by document
+  are needed for "ask about this file".
+- **Hybrid: reciprocal rank fusion, k = 60, 100 candidates from each retriever.**
+  Alternatives: weighted score fusion (needs score normalization and tuning).
+  Why: parameter-light and robust when the two score scales differ.
+- **Evaluation: Recall@1/5/10 and MRR@10 per question set, 95% bootstrap confidence
+  intervals, per-language breakdown; real and synthetic sets are separate files, separate
+  corpora and separate README tables.** Settings are chosen on the train split and
+  reported on the test split.
+- **Synthetic questions use "document" scope (search within the gold document).**
+  Why: the synthetic contracts are near-identical templates, so a question without names
+  has many equally correct answers across documents. This makes the synthetic numbers
+  a pipeline sanity check only. Real questions use "corpus" scope.
+- **Question drafting without an LLM** (heading-based and number-based drafts), with a
+  review step that refuses unedited drafts. Alternatives: LLM-generated questions (better
+  wording, but they need the API budget guard from stage 3 and tend to copy the passage).
+  Why: drafts only save typing; the questions you write decide the result.
+- **Observation (synthetic test set):** BM25 is weakest on Russian (Recall@1 0.66) and e5
+  is weakest on uz-Cyrl (Recall@1 0.73; the uz-Cyrl text is machine-transliterated);
+  hybrid evens this out. Differences overall are within the confidence intervals.

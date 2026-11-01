@@ -21,7 +21,9 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [x] Source registry (`data/sources.json`) with a terms gate, fetch script, generated
       table in `docs/data.md`
 - [x] Split stratified by kind (real / synthetic) and language
-- [ ] Check lex.uz terms of use and robots.txt; record the result per source
+- [x] lex.uz robots.txt checked (none); terms checked by Sherzodbek (no statement on
+      automated download or copying), recorded per source
+- [ ] Decide approval and the license field for lex.uz sources (GitHub issue #3)
 - [ ] Confirm the copyright-law article on official documents (ZRU-42)
 - [ ] Find and verify URLs: Civil Code part 2 (rent, sale, construction contract),
       Labor Code 2022, consumer protection law (uz and ru), official model contracts
@@ -29,12 +31,14 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [ ] Label real evaluation questions (`data/eval/questions.jsonl`)
 
 ## Stage 2: retrieval baselines
-- [ ] BM25 baseline
-- [ ] multilingual-e5-small dense retrieval with Qdrant
-- [ ] Hybrid retrieval with reciprocal rank fusion
+- [x] BM25 baseline
+- [x] multilingual-e5-small dense retrieval with Qdrant
+- [x] Hybrid retrieval with reciprocal rank fusion
 - [ ] Optional cross-encoder reranker (CPU latency must be measured)
-- [ ] Eval script: Recall@1/5/10, MRR on `data/eval/questions.jsonl`
-- [ ] Question-drafting tool for manual review
+- [ ] Real-set results (blocked on real documents and labeled questions)
+- [ ] Re-check the BM25 analyzer choice on real train-split questions (GitHub issue #7)
+- [x] Eval script: Recall@1/5/10, MRR on `data/eval/questions.jsonl`
+- [x] Question-drafting tool for manual review
 
 ## Stage 3: API
 - [ ] FastAPI: upload, ask, answer with citations

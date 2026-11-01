@@ -7,8 +7,9 @@ The language model only *phrases* answers from retrieved passages. The actual wo
 project is in **retrieval**, **evaluation** and **fine-tuning an embedding model**, and every
 number below is produced by a script in this repository.
 
-> **Status:** work in progress. Stages 0–1 (skeleton, ingestion) are implemented.
-> Retrieval, API, UI and fine-tuning are not built yet, so most metrics are `TBD`.
+> **Status:** work in progress. Stages 0–2 (skeleton, ingestion, retrieval baselines)
+> are implemented. No real documents are included yet, so the main (real) retrieval
+> table is `TBD`; the synthetic table is only a pipeline sanity check.
 > The OCR numbers are measured on **synthetic, mildly degraded** scans and are an
 > optimistic lower bound for real documents.
 
@@ -110,6 +111,25 @@ Optional: run the PostgreSQL test with
 | Chunk | new chunk at each article / chapter / section heading; ≤ 180 words; no overlap; each chunk is an exact span of the document text |
 | Label | language per chunk (uz-Latn / uz-Cyrl / ru), document split (train / test) by document group |
 | Store | PostgreSQL tables `documents`, `pages` (with block offsets and boxes), `chunks`; original file by sha256 |
+
+## Retrieval and evaluation
+
+| Method | Details |
+|---|---|
+| BM25 | Okapi BM25 (k1 1.2, b 0.75); analyzer `fold+stem6`: apostrophes removed, Cyrillic → Latin with OCR-confusable letters merged, tokens cut to 6 characters |
+| Dense | multilingual-e5-small, ONNX on CPU (pinned revision), Qdrant |
+| Hybrid | reciprocal rank fusion (k = 60) of the top 100 from each |
+
+```bash
+python scripts/download_model.py          # e5-small ONNX into models/ (git-ignored)
+python scripts/make_synthetic_questions.py # SYNTHETIC sanity questions
+python scripts/eval_retrieval.py           # writes results/retrieval_<method>_<set>.json
+python scripts/draft_questions.py          # drafts for real test documents, for review
+```
+
+Recall@k = share of questions whose gold chunk is in the top k; MRR = mean reciprocal
+rank of the gold chunk (cut at 10). Settings are tuned on the train split and reported
+on the test split.
 
 ## Configuration
 
