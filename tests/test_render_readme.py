@@ -10,7 +10,7 @@ spec.loader.exec_module(render_readme)
 
 def _readme(tmp_path: Path) -> Path:
     path = tmp_path / "README.md"
-    path.write_text(f"intro\n{render_readme.BEGIN}\nold\n{render_readme.END}\noutro\n")
+    path.write_text(f"intro\n{render_readme.BEGIN}\nPLACEHOLDER_XYZ\n{render_readme.END}\noutro\n")
     return path
 
 
@@ -18,19 +18,25 @@ def test_missing_results_render_as_tbd(tmp_path):
     readme = _readme(tmp_path)
     render_readme.update_readme(readme, tmp_path / "empty")
     text = readme.read_text()
-    assert "| BM25 | TBD | TBD | TBD | TBD | TBD |" in text
-    assert "old" not in text and text.startswith("intro") and text.rstrip().endswith("outro")
+    assert text.count("| BM25 | TBD | TBD | TBD | TBD | TBD |") == 2  # real and synthetic
+    assert "PLACEHOLDER_XYZ" not in text
+    assert text.startswith("intro") and text.rstrip().endswith("outro")
 
 
 def test_values_come_from_result_files(tmp_path):
     results = tmp_path / "results"
     results.mkdir()
-    (results / "retrieval_bm25.json").write_text(json.dumps(
-        {"metrics": {"recall@1": 0.25, "recall@5": 0.5, "mrr": 0.3333}, "n": 12}))
+    (results / "retrieval_bm25_real.json").write_text(json.dumps(
+        {"metrics": {"recall@1": 0.25, "recall@5": 0.5, "mrr": 0.3333}, "n": 12,
+         "ci95": {"recall@1": [0.1, 0.4]}}))
     readme = _readme(tmp_path)
     render_readme.update_readme(readme, results)
-    # recall@10 is absent from the file, so it must stay TBD
-    assert "| BM25 | 0.250 | 0.500 | TBD | 0.333 | 12 |" in readme.read_text()
+    text = readme.read_text()
+    real, synthetic = text.split("SYNTHETIC sanity set")
+    # recall@10 is absent from the file, so it must stay TBD; CI shown when present
+    assert "| BM25 | 0.250 (0.10–0.40) | 0.500 | TBD | 0.333 | 12 |" in real
+    # a real result never fills the synthetic table
+    assert "| BM25 | TBD | TBD | TBD | TBD | TBD |" in synthetic
 
 
 def test_repo_readme_has_markers():
