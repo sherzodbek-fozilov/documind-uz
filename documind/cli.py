@@ -76,6 +76,8 @@ def cmd_stats(args) -> int:
             "documents": len(docs),
             "chunks": n_chunks,
             "by_split": Counter(d.split for d in docs),
+            "by_kind_and_split": Counter(
+                f"{'synthetic' if d.is_synthetic else 'real'}/{d.split}" for d in docs),
             "by_language": Counter(d.language for d in docs),
             "synthetic": sum(d.is_synthetic for d in docs),
             "documents_with_ocr": sum(d.n_ocr_pages > 0 for d in docs),
@@ -88,17 +90,25 @@ def cmd_stats(args) -> int:
 
 
 def cmd_split(args) -> int:
-    """Write a language-stratified split to the splits file and apply it to the database."""
+    """Write a split stratified by kind (real / synthetic) and language; apply it to the DB.
+
+    Real and synthetic documents get separate strata, so the real test set has its own
+    ~test_fraction share per language and real results never depend on synthetic data.
+    """
     settings = get_settings()
     Session = make_session_factory(settings.database_url)
     existing = {} if args.reset else load_overrides(settings.splits_file)
     with Session() as s:
         docs = s.scalars(select(models.Document)).all()
-        groups: dict[str, Counter] = {}
+        groups: dict[str, tuple[set[str], set[str]]] = {}
         for d in docs:
-            groups.setdefault(d.group_id, Counter())[d.language] += 1
-        # stratum of a group = its most common document language
-        strata = {g: c.most_common(1)[0][0] for g, c in groups.items()}
+            kinds, langs = groups.setdefault(d.group_id, (set(), set()))
+            kinds.add("synthetic" if d.is_synthetic else "real")
+            langs.add(d.language)
+        # stratum = kind + the set of languages in the group (e.g. "real/ru+uz-Latn" for
+        # an act available in two languages)
+        strata = {g: f"{'+'.join(sorted(k))}/{'+'.join(sorted(lang))}"
+                  for g, (k, lang) in groups.items()}
         splits = stratified_split(strata, settings.test_fraction, existing)
         changed = 0
         for d in docs:

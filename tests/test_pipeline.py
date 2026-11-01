@@ -114,3 +114,34 @@ def test_postgres_roundtrip(tmp_path, settings):
         doc = _check_consistency(s, res.doc_id)
         assert doc.chunks[0].language == "uz-Cyrl"
         assert isinstance(doc.script_stats, dict) and doc.pages[0].blocks[0]["kind"] == "heading"
+
+
+def test_cli_split_stratifies_real_and_synthetic(tmp_path, settings, monkeypatch, capsys):
+    import json
+
+    from documind.config import get_settings
+
+    for key, value in [("DATABASE_URL", settings.database_url),
+                       ("STORAGE_DIR", str(settings.storage_dir)),
+                       ("SPLITS_FILE", str(settings.splits_file)),
+                       ("TEST_FRACTION", "0.5")]:
+        monkeypatch.setenv(f"DOCUMIND_{key}", value)
+    get_settings.cache_clear()
+    Session = make_session_factory(settings.database_url)
+    with Session() as s:
+        for i in range(4):
+            for synthetic in (True, False):
+                d = docx.Document()
+                d.add_paragraph(f"Ushbu hujjat {i} {synthetic} boʻyicha tuzildi.")
+                path = tmp_path / f"{'syn' if synthetic else 'real'}-{i}.docx"
+                d.save(path)
+                ingest_file(path, s, get_settings(), is_synthetic=synthetic)
+    assert cli_main(["split"]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["groups"] == {"real/uz-Latn/test": 2, "real/uz-Latn/train": 2,
+                             "synthetic/uz-Latn/test": 2, "synthetic/uz-Latn/train": 2}
+    assert cli_main(["stats"]) == 0
+    stats = json.loads(capsys.readouterr().out)
+    assert stats["by_kind_and_split"] == {"real/test": 2, "real/train": 2,
+                                          "synthetic/test": 2, "synthetic/train": 2}
+    get_settings.cache_clear()
