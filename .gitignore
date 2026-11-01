@@ -15,3 +15,7 @@ data/synthetic/*
 data/store/
 *.sqlite
 node_modules/
+# downloaded model weights
+models/
+# embedding cache
+data/cache/
