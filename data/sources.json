@@ -1,0 +1,103 @@
+{
+  "_comment": "Registry of real (non-synthetic) document sources. scripts/fetch_sources.py downloads ONLY entries with terms.status == 'approved', and renders the table in docs/data.md from this file. 'candidate_url' values come from web search results and have not been opened or verified. Set download_url only after checking the page. Entries with the same group_id (e.g. uz and ru versions of one act) always share a train/test split.",
+  "sources": [
+    {
+      "id": "civil-code-part2-ru",
+      "title": "Гражданский кодекс Республики Узбекистан, часть вторая (аренда, купля-продажа, подряд, строительный подряд)",
+      "language": "ru",
+      "kind": "law",
+      "group_id": "civil-code-part2",
+      "publisher": "National Database of Legislation (lex.uz)",
+      "candidate_url": null,
+      "download_url": null,
+      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
+                "notes": "lex.uz and its terms page are blocked from the build environment (network policy, 2026-11-01); page id not verified"},
+      "accessed_on": null,
+      "sha256": null
+    },
+    {
+      "id": "civil-code-part2-uz",
+      "title": "Oʻzbekiston Respublikasining Fuqarolik kodeksi, ikkinchi qism (ijara, oldi-sotdi, pudrat, qurilish pudrati)",
+      "language": "uz-Latn",
+      "kind": "law",
+      "group_id": "civil-code-part2",
+      "publisher": "National Database of Legislation (lex.uz)",
+      "candidate_url": null,
+      "download_url": null,
+      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
+                "notes": "as above"},
+      "accessed_on": null,
+      "sha256": null
+    },
+    {
+      "id": "labor-code-2022-ru",
+      "title": "Трудовой кодекс Республики Узбекистан (ЗРУ-798 от 28.10.2022)",
+      "language": "ru",
+      "kind": "law",
+      "group_id": "labor-code-2022",
+      "publisher": "National Database of Legislation (lex.uz)",
+      "candidate_url": "https://lex.uz/ru/acts/-142859",
+      "download_url": null,
+      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
+                "notes": "candidate_url from web search (2026-11-01), not opened"},
+      "accessed_on": null,
+      "sha256": null
+    },
+    {
+      "id": "labor-code-2022-uz",
+      "title": "Oʻzbekiston Respublikasining Mehnat kodeksi (OʻRQ-798, 28.10.2022)",
+      "language": "uz-Latn",
+      "kind": "law",
+      "group_id": "labor-code-2022",
+      "publisher": "National Database of Legislation (lex.uz)",
+      "candidate_url": "https://lex.uz/uz/acts/-142859",
+      "download_url": null,
+      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
+                "notes": "candidate_url from web search (2026-11-01), not opened"},
+      "accessed_on": null,
+      "sha256": null
+    },
+    {
+      "id": "consumer-protection-ru",
+      "title": "Закон Республики Узбекистан «О защите прав потребителей» (№ 221-I от 26.04.1996, с изменениями)",
+      "language": "ru",
+      "kind": "law",
+      "group_id": "consumer-protection",
+      "publisher": "National Database of Legislation (lex.uz)",
+      "candidate_url": "https://lex.uz/acts/14643",
+      "download_url": null,
+      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
+                "notes": "candidate_url from web search (2026-11-01), not opened; current consolidated edition to confirm"},
+      "accessed_on": null,
+      "sha256": null
+    },
+    {
+      "id": "consumer-protection-uz",
+      "title": "«Isteʼmolchilarning huquqlarini himoya qilish toʻgʻrisida»gi Oʻzbekiston Respublikasi Qonuni",
+      "language": "uz-Latn",
+      "kind": "law",
+      "group_id": "consumer-protection",
+      "publisher": "National Database of Legislation (lex.uz)",
+      "candidate_url": null,
+      "download_url": null,
+      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
+                "notes": "Uzbek page id not found yet"},
+      "accessed_on": null,
+      "sha256": null
+    },
+    {
+      "id": "model-employment-contract",
+      "title": "Official model (namunaviy) employment contract, uz and ru",
+      "language": "uz-Latn",
+      "kind": "model_contract",
+      "group_id": "model-employment-contract",
+      "publisher": "to find (government decision published on lex.uz)",
+      "candidate_url": null,
+      "download_url": null,
+      "terms": {"status": "needs review", "url": null, "license": null, "checked_by": null, "checked_on": null,
+                "notes": "source not identified yet"},
+      "accessed_on": null,
+      "sha256": null
+    }
+  ]
+}
