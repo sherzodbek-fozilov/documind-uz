@@ -8,6 +8,7 @@ Result file format (written by the eval scripts):
     {
       "metrics": {"recall@1": 0.41, ...},
       "n": 120,                     # number of evaluated items (questions, pages, ...)
+      "n_by_metric": {"cer_ru": 8}, # optional per-metric n (e.g. per language subsets)
       "dataset": "...",             # short description of what was evaluated
       "generated_at": "ISO-8601", "git_commit": "...", "script": "..."
     }
@@ -73,7 +74,7 @@ def render_tables(results_dir: Path) -> str:
               "|---|---|---|---|"]
     for label, fname, key, kind in OTHER_ROWS:
         data = _load(results_dir, fname) or {}
-        n = data.get("n")
+        n = data.get("n_by_metric", {}).get(key, data.get("n"))
         lines.append(f"| {label} | {_fmt(data.get('metrics', {}).get(key), kind)} | "
                      f"{n if n is not None else 'TBD'} | `results/{fname}` |")
     return "\n".join(lines)

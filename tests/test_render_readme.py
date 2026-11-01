@@ -36,3 +36,13 @@ def test_values_come_from_result_files(tmp_path):
 def test_repo_readme_has_markers():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     assert render_readme.BEGIN in text and render_readme.END in text
+
+
+def test_per_metric_n(tmp_path):
+    results = tmp_path / "results"
+    results.mkdir()
+    (results / "ocr_synthetic.json").write_text(json.dumps(
+        {"metrics": {"cer_ru": 0.01}, "n": 24, "n_by_metric": {"cer_ru": 8}}))
+    readme = _readme(tmp_path)
+    render_readme.update_readme(readme, results)
+    assert "| OCR CER, synthetic scans, ru | 1.0% | 8 |" in readme.read_text()

@@ -104,6 +104,8 @@ def main() -> None:
     payload = {
         "metrics": metrics,
         "n": main_cfg["all"]["pages"],
+        "n_by_metric": {f"cer_{KEY[lang]}": main_cfg[lang]["pages"]
+                        for lang in ORACLE if lang in main_cfg},
         "dataset": "synthetic-contracts-v1 simulated scans (SYNTHETIC, mild degradation)",
         "unit": "pages",
         "config": {"multi_langs": settings.ocr_langs, "dpi": settings.ocr_dpi,
