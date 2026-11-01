@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.5", "reportlab>=4"]
+dev = ["pytest>=8", "ruff>=0.5", "reportlab>=4", "rapidfuzz>=3"]
 
 [project.scripts]
 documind = "documind.cli:main"
