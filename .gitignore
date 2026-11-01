@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.env
+# raw and generated documents are never committed (licenses / size); see docs/data.md
+data/raw/*
+!data/raw/.gitkeep
+data/synthetic/*
+!data/synthetic/README.md
+data/store/
+*.sqlite
+node_modules/
