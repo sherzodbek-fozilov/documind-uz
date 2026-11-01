@@ -6,6 +6,11 @@
     "cer_all": 0.0045720506191318545
   },
   "n": 24,
+  "n_by_metric": {
+    "cer_uz_latn": 8,
+    "cer_uz_cyrl": 8,
+    "cer_ru": 8
+  },
   "dataset": "synthetic-contracts-v1 simulated scans (SYNTHETIC, mild degradation)",
   "unit": "pages",
   "config": {
@@ -66,7 +71,7 @@
       }
     }
   },
-  "generated_at": "2026-11-01T09:39:47+00:00",
-  "git_commit": "980cb11",
+  "generated_at": "2026-11-01T09:42:53+00:00",
+  "git_commit": "600217c",
   "script": "scripts/eval_ocr.py"
 }

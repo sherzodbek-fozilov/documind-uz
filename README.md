@@ -33,9 +33,9 @@ The tables are regenerated with `python scripts/render_readme.py`; missing value
 
 | Measurement | Value | n | Source file |
 |---|---|---|---|
-| OCR CER, synthetic scans, uz-Latn | 0.1% | 24 | `results/ocr_synthetic.json` |
-| OCR CER, synthetic scans, uz-Cyrl | 0.7% | 24 | `results/ocr_synthetic.json` |
-| OCR CER, synthetic scans, ru | 0.6% | 24 | `results/ocr_synthetic.json` |
+| OCR CER, synthetic scans, uz-Latn | 0.1% | 8 | `results/ocr_synthetic.json` |
+| OCR CER, synthetic scans, uz-Cyrl | 0.7% | 8 | `results/ocr_synthetic.json` |
+| OCR CER, synthetic scans, ru | 0.6% | 8 | `results/ocr_synthetic.json` |
 | Citation correctness | TBD | TBD | `results/citations.json` |
 | Answer latency p50, CPU (s) | TBD | TBD | `results/latency.json` |
 <!-- END METRICS -->
