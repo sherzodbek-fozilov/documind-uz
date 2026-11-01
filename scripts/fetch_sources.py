@@ -8,6 +8,9 @@ Rules enforced here:
     ``data/raw/<id>.pdf|.docx``. For a hand-placed file, ``accessed_on`` must be set in
     the registry; for a download it is set to today.
   * The sha256 of every used file is written back to the registry.
+  * Politeness: robots.txt of each host is read first and respected (a URL it disallows
+    is skipped); requests are made one at a time with a pause between them
+    (``--delay``, default 10 s) and a User-Agent that names this project.
 
 Outputs:
   data/raw/<id>.pdf|.docx     the documents (git-ignored)
@@ -27,9 +30,13 @@ import hashlib
 import json
 import re
 import sys
+import time
+import urllib.error
 import urllib.request
+import urllib.robotparser
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 REGISTRY = ROOT / "data/sources.json"
@@ -43,6 +50,8 @@ LANGUAGES = {"uz-Latn", "uz-Cyrl", "ru"}
 CONTENT_TYPES = {"application/pdf": ".pdf",
                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx"}
 SUFFIXES = (".pdf", ".docx")
+USER_AGENT = ("documind-uz research fetcher (non-commercial portfolio project; "
+              "https://github.com/sherzodbek-fozilov/documind-uz)")
 
 
 def load_registry(path: Path = REGISTRY) -> dict:
@@ -82,8 +91,44 @@ def local_file(sid: str, raw: Path) -> Path | None:
     return None
 
 
+class Politeness:
+    """robots.txt check per host and a minimum pause between consecutive requests."""
+
+    def __init__(self, delay: float):
+        self.delay = delay
+        self._last = 0.0
+        self._robots: dict[str, urllib.robotparser.RobotFileParser] = {}
+
+    def wait(self) -> None:
+        pause = self._last + self.delay - time.monotonic()
+        if self._last and pause > 0:
+            time.sleep(pause)
+        self._last = time.monotonic()
+
+    def allowed(self, url: str) -> bool:
+        parts = urlsplit(url)
+        host = f"{parts.scheme}://{parts.netloc}"
+        if host not in self._robots:
+            rp = urllib.robotparser.RobotFileParser(f"{host}/robots.txt")
+            self.wait()
+            try:
+                req = urllib.request.Request(f"{host}/robots.txt",
+                                             headers={"User-Agent": USER_AGENT})
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    body = resp.read().decode("utf-8", "replace")
+                    is_robots = resp.headers.get_content_type() == "text/plain"
+            except urllib.error.HTTPError as exc:
+                body, is_robots = "", False
+                if exc.code in (401, 403):  # access to robots.txt denied: assume disallow
+                    body, is_robots = "User-agent: *\nDisallow: /", True
+            # a missing robots.txt (404, or a redirect to an HTML error page) means no rules
+            rp.parse(body.splitlines() if is_robots else [])
+            self._robots[host] = rp
+        return self._robots[host].can_fetch(USER_AGENT, url)
+
+
 def download(url: str, dest_stem: Path) -> Path:
-    req = urllib.request.Request(url, headers={"User-Agent": "documind-uz research fetcher"})
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(req, timeout=60) as resp:
         ctype = resp.headers.get_content_type()
         if ctype not in CONTENT_TYPES:
@@ -97,10 +142,11 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def collect(registry: dict, raw: Path, allow_download: bool,
-            today: str) -> tuple[list[dict], list[str]]:
+def collect(registry: dict, raw: Path, allow_download: bool, today: str,
+            polite: Politeness | None = None) -> tuple[list[dict], list[str]]:
     """Return manifest rows for usable approved entries, and log messages. Mutates registry."""
     rows, log = [], []
+    polite = polite or Politeness(delay=10.0)
     for s in registry["sources"]:
         status = s["terms"]["status"]
         if status != "approved":
@@ -112,7 +158,11 @@ def collect(registry: dict, raw: Path, allow_download: bool,
                 log.append(f"skip {s['id']}: hand-placed file but accessed_on is empty")
                 continue
         elif allow_download and s.get("download_url"):
+            if not polite.allowed(s["download_url"]):
+                log.append(f"skip {s['id']}: disallowed by robots.txt")
+                continue
             raw.mkdir(parents=True, exist_ok=True)
+            polite.wait()
             path = download(s["download_url"], raw / s["id"])
             s["accessed_on"] = today
             log.append(f"downloaded {s['id']} -> {path.name}")
@@ -164,6 +214,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--no-download", action="store_true")
     ap.add_argument("--render-only", action="store_true")
+    ap.add_argument("--delay", type=float, default=10.0,
+                    help="seconds between requests to the same site (default 10)")
     args = ap.parse_args()
 
     registry = load_registry()
@@ -173,7 +225,8 @@ def main() -> None:
 
     included: set[str] = set()
     if not args.render_only:
-        rows, log = collect(registry, RAW, not args.no_download, date.today().isoformat())
+        rows, log = collect(registry, RAW, not args.no_download, date.today().isoformat(),
+                            Politeness(args.delay))
         print("\n".join(log), file=sys.stderr)
         included = {r["doc_id"] for r in rows}
         if rows:

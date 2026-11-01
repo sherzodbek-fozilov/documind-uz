@@ -64,3 +64,17 @@ def test_data_md_table_is_up_to_date():
     text = (ROOT / "docs/data.md").read_text(encoding="utf-8")
     table = fetch_sources.render_table(registry, included)
     assert fetch_sources.update_data_md(text, table) == text
+
+
+def test_politeness_respects_robots_and_pauses(monkeypatch):
+    polite = fetch_sources.Politeness(delay=0.2)
+    rp = fetch_sources.urllib.robotparser.RobotFileParser()
+    rp.parse(["User-agent: *", "Disallow: /private/"])
+    polite._robots["https://example.org"] = rp
+    assert polite.allowed("https://example.org/docs/1.pdf")
+    assert not polite.allowed("https://example.org/private/1.pdf")
+    import time
+    polite.wait()
+    start = time.monotonic()
+    polite.wait()
+    assert time.monotonic() - start >= 0.15

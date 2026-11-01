@@ -10,8 +10,14 @@
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": null,
       "download_url": null,
-      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
-                "notes": "lex.uz and its terms page are blocked from the build environment (network policy, 2026-11-01); page id not verified"},
+      "terms": {
+        "status": "needs review",
+        "url": "https://lex.uz",
+        "license": null,
+        "checked_by": "Sherzodbek",
+        "checked_on": "2026-11-01",
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). page id not verified"
+      },
       "accessed_on": null,
       "sha256": null
     },
@@ -24,8 +30,14 @@
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": null,
       "download_url": null,
-      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
-                "notes": "as above"},
+      "terms": {
+        "status": "needs review",
+        "url": "https://lex.uz",
+        "license": null,
+        "checked_by": "Sherzodbek",
+        "checked_on": "2026-11-01",
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01)."
+      },
       "accessed_on": null,
       "sha256": null
     },
@@ -38,8 +50,14 @@
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": "https://lex.uz/ru/acts/-142859",
       "download_url": null,
-      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
-                "notes": "candidate_url from web search (2026-11-01), not opened"},
+      "terms": {
+        "status": "needs review",
+        "url": "https://lex.uz",
+        "license": null,
+        "checked_by": "Sherzodbek",
+        "checked_on": "2026-11-01",
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). candidate_url from web search (2026-11-01), not opened"
+      },
       "accessed_on": null,
       "sha256": null
     },
@@ -52,8 +70,14 @@
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": "https://lex.uz/uz/acts/-142859",
       "download_url": null,
-      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
-                "notes": "candidate_url from web search (2026-11-01), not opened"},
+      "terms": {
+        "status": "needs review",
+        "url": "https://lex.uz",
+        "license": null,
+        "checked_by": "Sherzodbek",
+        "checked_on": "2026-11-01",
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). candidate_url from web search (2026-11-01), not opened"
+      },
       "accessed_on": null,
       "sha256": null
     },
@@ -66,8 +90,14 @@
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": "https://lex.uz/acts/14643",
       "download_url": null,
-      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
-                "notes": "candidate_url from web search (2026-11-01), not opened; current consolidated edition to confirm"},
+      "terms": {
+        "status": "needs review",
+        "url": "https://lex.uz",
+        "license": null,
+        "checked_by": "Sherzodbek",
+        "checked_on": "2026-11-01",
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). candidate_url from web search (2026-11-01), not opened; current consolidated edition to confirm"
+      },
       "accessed_on": null,
       "sha256": null
     },
@@ -80,8 +110,14 @@
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": null,
       "download_url": null,
-      "terms": {"status": "needs review", "url": "https://lex.uz", "license": null, "checked_by": null, "checked_on": null,
-                "notes": "Uzbek page id not found yet"},
+      "terms": {
+        "status": "needs review",
+        "url": "https://lex.uz",
+        "license": null,
+        "checked_by": "Sherzodbek",
+        "checked_on": "2026-11-01",
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). Uzbek page id not found yet"
+      },
       "accessed_on": null,
       "sha256": null
     },
@@ -94,8 +130,14 @@
       "publisher": "to find (government decision published on lex.uz)",
       "candidate_url": null,
       "download_url": null,
-      "terms": {"status": "needs review", "url": null, "license": null, "checked_by": null, "checked_on": null,
-                "notes": "source not identified yet"},
+      "terms": {
+        "status": "needs review",
+        "url": null,
+        "license": null,
+        "checked_by": null,
+        "checked_on": null,
+        "notes": "source not identified yet"
+      },
       "accessed_on": null,
       "sha256": null
     }
