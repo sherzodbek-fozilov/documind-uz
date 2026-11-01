@@ -1,0 +1,1014 @@
+{
+  "metrics": {
+    "recall@1": 0.7969924812030075,
+    "recall@5": 0.9849624060150376,
+    "recall@10": 1.0,
+    "mrr": 0.8803258145363408
+  },
+  "n": 133,
+  "ci95": {
+    "recall@1": [
+      0.7293233082706767,
+      0.8646616541353384
+    ],
+    "recall@5": [
+      0.9624060150375939,
+      1.0
+    ],
+    "recall@10": [
+      1.0,
+      1.0
+    ],
+    "mrr": [
+      0.8383458646616542,
+      0.9197994987468672
+    ]
+  },
+  "by_language": {
+    "ru": {
+      "n": 44,
+      "recall@1": 0.6590909090909091,
+      "recall@5": 0.9545454545454546,
+      "recall@10": 1.0,
+      "mrr": 0.7859848484848485
+    },
+    "uz-Cyrl": {
+      "n": 45,
+      "recall@1": 0.8666666666666667,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.9296296296296297
+    },
+    "uz-Latn": {
+      "n": 44,
+      "recall@1": 0.8636363636363636,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.9242424242424242
+    }
+  },
+  "set": "synthetic",
+  "split": "test",
+  "dataset": "SYNTHETIC contracts (synthetic-contracts-v1), template questions",
+  "scope": {
+    "document": 133
+  },
+  "corpus": {
+    "chunks": 300,
+    "documents": 36,
+    "chunker_versions": [
+      "struct-v1-w180"
+    ]
+  },
+  "question_counts": {
+    "used": 133,
+    "other_split": 275
+  },
+  "config": {
+    "method": "bm25",
+    "bm25_analyzer": "fold+stem6",
+    "embed_model": null,
+    "rrf_k": null,
+    "depth": null
+  },
+  "latency_s": {
+    "p50": 0.0,
+    "max": 0.0001
+  },
+  "per_question": [
+    {
+      "line": 49,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0001",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 50,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 51,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-xizmat-000#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 52,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0002",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 53,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0003",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 54,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 55,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 56,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0005",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 57,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 58,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0007",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 59,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-000#c0007",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 93,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 94,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 95,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 96,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 97,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 98,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 99,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 100,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0005",
+      "latency_s": 0.0
+    },
+    {
+      "line": 101,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 102,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 103,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-000#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 115,
+      "language": "uz-Latn",
+      "rank": 3,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 116,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 117,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 118,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 119,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 120,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 121,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 122,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0005",
+      "latency_s": 0.0
+    },
+    {
+      "line": 123,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 124,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 125,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 126,
+      "language": "uz-Latn",
+      "rank": 3,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 127,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 128,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 129,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 130,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 131,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 132,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 133,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0005",
+      "latency_s": 0.0
+    },
+    {
+      "line": 134,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 135,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 136,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-003#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 149,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0001",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 150,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-001#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 151,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 152,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 153,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 154,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0003",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 155,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 156,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 157,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0005",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 158,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 159,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 160,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-001#c0007",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 196,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-xizmat-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 197,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 198,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-xizmat-001#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 199,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 200,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 201,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 202,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 203,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 204,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 205,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 206,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-001#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 207,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 208,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0001",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 209,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-xizmat-002#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 210,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0002",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 211,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0003",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 212,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 213,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 214,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0005",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 215,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 216,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 217,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 251,
+      "language": "uz-Cyrl",
+      "rank": 3,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 252,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 253,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 254,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 255,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 256,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 257,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 258,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0005",
+      "latency_s": 0.0
+    },
+    {
+      "line": 259,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 260,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 261,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 332,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 333,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 334,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-xizmat-001#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 335,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 336,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 337,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0002",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 338,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 339,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-xizmat-001#c0006",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 340,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0005",
+      "latency_s": 0.0
+    },
+    {
+      "line": 341,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-xizmat-001#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 342,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-001#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 343,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-002#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 344,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-002#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 345,
+      "language": "ru",
+      "rank": 8,
+      "top1": "syn-ru-xizmat-002#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 346,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-xizmat-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 347,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 348,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 349,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-002#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 350,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-xizmat-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 351,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-002#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 352,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-xizmat-002#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 353,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-002#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 354,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-003#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 355,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-003#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 356,
+      "language": "ru",
+      "rank": 8,
+      "top1": "syn-ru-xizmat-003#c0001",
+      "latency_s": 0.0
+    },
+    {
+      "line": 357,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-xizmat-003#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 358,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-003#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 359,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-003#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 360,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-003#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 361,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-xizmat-003#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 362,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-003#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 363,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-xizmat-003#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 364,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-003#c0007",
+      "latency_s": 0.0
+    },
+    {
+      "line": 387,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-oldi-sotdi-002#c0000",
+      "latency_s": 0.0
+    },
+    {
+      "line": 388,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-002#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 389,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-002#c0002",
+      "latency_s": 0.0
+    },
+    {
+      "line": 390,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 391,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 392,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 393,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-002#c0004",
+      "latency_s": 0.0
+    },
+    {
+      "line": 394,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-oldi-sotdi-002#c0007",
+      "latency_s": 0.0001
+    },
+    {
+      "line": 395,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-002#c0006",
+      "latency_s": 0.0
+    },
+    {
+      "line": 396,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-oldi-sotdi-002#c0003",
+      "latency_s": 0.0
+    },
+    {
+      "line": 397,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-002#c0007",
+      "latency_s": 0.0
+    }
+  ],
+  "generated_at": "2026-11-01T10:49:32+00:00",
+  "git_commit": "0f65cf3",
+  "script": "scripts/eval_retrieval.py"
+}

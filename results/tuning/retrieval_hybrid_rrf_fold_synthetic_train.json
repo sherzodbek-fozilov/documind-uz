@@ -1,0 +1,2008 @@
+{
+  "metrics": {
+    "recall@1": 0.8363636363636363,
+    "recall@5": 0.9927272727272727,
+    "recall@10": 1.0,
+    "mrr": 0.9066666666666667
+  },
+  "n": 275,
+  "ci95": {
+    "recall@1": [
+      0.7927272727272727,
+      0.88
+    ],
+    "recall@5": [
+      0.9818181818181818,
+      1.0
+    ],
+    "recall@10": [
+      1.0,
+      1.0
+    ],
+    "mrr": [
+      0.8806060606060606,
+      0.933030303030303
+    ]
+  },
+  "by_language": {
+    "ru": {
+      "n": 92,
+      "recall@1": 0.8152173913043478,
+      "recall@5": 0.9782608695652174,
+      "recall@10": 1.0,
+      "mrr": 0.8849637681159421
+    },
+    "uz-Cyrl": {
+      "n": 91,
+      "recall@1": 0.8021978021978022,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.8891941391941393
+    },
+    "uz-Latn": {
+      "n": 92,
+      "recall@1": 0.8913043478260869,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.9456521739130435
+    }
+  },
+  "set": "synthetic",
+  "split": "train",
+  "dataset": "SYNTHETIC contracts (synthetic-contracts-v1), template questions",
+  "scope": {
+    "document": 275
+  },
+  "corpus": {
+    "chunks": 300,
+    "documents": 36,
+    "chunker_versions": [
+      "struct-v1-w180"
+    ]
+  },
+  "question_counts": {
+    "used": 275,
+    "other_split": 133
+  },
+  "config": {
+    "method": "hybrid_rrf",
+    "bm25_analyzer": "fold",
+    "embed_model": "614241f622f5",
+    "rrf_k": 60,
+    "depth": 100
+  },
+  "latency_s": {
+    "p50": 0.0103,
+    "max": 0.0238
+  },
+  "per_question": [
+    {
+      "line": 1,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0001",
+      "latency_s": 0.0127
+    },
+    {
+      "line": 2,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-ijara-000#c0003",
+      "latency_s": 0.0111
+    },
+    {
+      "line": 3,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0002",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 4,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0002",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 5,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0002",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 6,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0003",
+      "latency_s": 0.0119
+    },
+    {
+      "line": 7,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0003",
+      "latency_s": 0.0098
+    },
+    {
+      "line": 8,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0004",
+      "latency_s": 0.0105
+    },
+    {
+      "line": 9,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0005",
+      "latency_s": 0.0115
+    },
+    {
+      "line": 10,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0006",
+      "latency_s": 0.0102
+    },
+    {
+      "line": 11,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0007",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 12,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-000#c0007",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 13,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0001",
+      "latency_s": 0.0102
+    },
+    {
+      "line": 14,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-ijara-001#c0003",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 15,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0002",
+      "latency_s": 0.009
+    },
+    {
+      "line": 16,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0002",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 17,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0002",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 18,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0003",
+      "latency_s": 0.0107
+    },
+    {
+      "line": 19,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0003",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 20,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0004",
+      "latency_s": 0.0095
+    },
+    {
+      "line": 21,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0005",
+      "latency_s": 0.0119
+    },
+    {
+      "line": 22,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0006",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 23,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0007",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 24,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-001#c0007",
+      "latency_s": 0.0097
+    },
+    {
+      "line": 25,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0001",
+      "latency_s": 0.0093
+    },
+    {
+      "line": 26,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-ijara-002#c0003",
+      "latency_s": 0.009
+    },
+    {
+      "line": 27,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0002",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 28,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0002",
+      "latency_s": 0.0093
+    },
+    {
+      "line": 29,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0002",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 30,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0003",
+      "latency_s": 0.0098
+    },
+    {
+      "line": 31,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0003",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 32,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0004",
+      "latency_s": 0.0191
+    },
+    {
+      "line": 33,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0005",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 34,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0006",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 35,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0007",
+      "latency_s": 0.0105
+    },
+    {
+      "line": 36,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-002#c0007",
+      "latency_s": 0.0105
+    },
+    {
+      "line": 37,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0001",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 38,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-ijara-003#c0003",
+      "latency_s": 0.01
+    },
+    {
+      "line": 39,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0002",
+      "latency_s": 0.0094
+    },
+    {
+      "line": 40,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0002",
+      "latency_s": 0.01
+    },
+    {
+      "line": 41,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0002",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 42,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0003",
+      "latency_s": 0.0135
+    },
+    {
+      "line": 43,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0003",
+      "latency_s": 0.0114
+    },
+    {
+      "line": 44,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0004",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 45,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0005",
+      "latency_s": 0.0108
+    },
+    {
+      "line": 46,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0006",
+      "latency_s": 0.0089
+    },
+    {
+      "line": 47,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0007",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 48,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-ijara-003#c0007",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 60,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0001",
+      "latency_s": 0.01
+    },
+    {
+      "line": 61,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0001",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 62,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0001",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 63,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0001",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 64,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-xizmat-001#c0001",
+      "latency_s": 0.0135
+    },
+    {
+      "line": 65,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0002",
+      "latency_s": 0.0102
+    },
+    {
+      "line": 66,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0003",
+      "latency_s": 0.0128
+    },
+    {
+      "line": 67,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0004",
+      "latency_s": 0.0108
+    },
+    {
+      "line": 68,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0005",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 69,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0006",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 70,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-001#c0006",
+      "latency_s": 0.01
+    },
+    {
+      "line": 71,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0001",
+      "latency_s": 0.0121
+    },
+    {
+      "line": 72,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0001",
+      "latency_s": 0.0095
+    },
+    {
+      "line": 73,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-xizmat-002#c0001",
+      "latency_s": 0.0085
+    },
+    {
+      "line": 74,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0002",
+      "latency_s": 0.0107
+    },
+    {
+      "line": 75,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-xizmat-002#c0001",
+      "latency_s": 0.0101
+    },
+    {
+      "line": 76,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0003",
+      "latency_s": 0.0105
+    },
+    {
+      "line": 77,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0004",
+      "latency_s": 0.0094
+    },
+    {
+      "line": 78,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0005",
+      "latency_s": 0.0101
+    },
+    {
+      "line": 79,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0006",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 80,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0007",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 81,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-002#c0007",
+      "latency_s": 0.0089
+    },
+    {
+      "line": 82,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0001",
+      "latency_s": 0.0089
+    },
+    {
+      "line": 83,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0001",
+      "latency_s": 0.0097
+    },
+    {
+      "line": 84,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-xizmat-003#c0001",
+      "latency_s": 0.0094
+    },
+    {
+      "line": 85,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0002",
+      "latency_s": 0.0113
+    },
+    {
+      "line": 86,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0003",
+      "latency_s": 0.0121
+    },
+    {
+      "line": 87,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0003",
+      "latency_s": 0.019
+    },
+    {
+      "line": 88,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0004",
+      "latency_s": 0.0134
+    },
+    {
+      "line": 89,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0005",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 90,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0006",
+      "latency_s": 0.01
+    },
+    {
+      "line": 91,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0007",
+      "latency_s": 0.0121
+    },
+    {
+      "line": 92,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-xizmat-003#c0007",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 104,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0003",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 105,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0002",
+      "latency_s": 0.0135
+    },
+    {
+      "line": 106,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0002",
+      "latency_s": 0.01
+    },
+    {
+      "line": 107,
+      "language": "uz-Latn",
+      "rank": 2,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0003",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 108,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0003",
+      "latency_s": 0.0114
+    },
+    {
+      "line": 109,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0003",
+      "latency_s": 0.0144
+    },
+    {
+      "line": 110,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0004",
+      "latency_s": 0.0111
+    },
+    {
+      "line": 111,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0005",
+      "latency_s": 0.0113
+    },
+    {
+      "line": 112,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0006",
+      "latency_s": 0.013
+    },
+    {
+      "line": 113,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0007",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 114,
+      "language": "uz-Latn",
+      "rank": 1,
+      "top1": "syn-uz-latn-oldi-sotdi-001#c0007",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 137,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0001",
+      "latency_s": 0.0121
+    },
+    {
+      "line": 138,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-000#c0003",
+      "latency_s": 0.0121
+    },
+    {
+      "line": 139,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0002",
+      "latency_s": 0.0125
+    },
+    {
+      "line": 140,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0002",
+      "latency_s": 0.0122
+    },
+    {
+      "line": 141,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0002",
+      "latency_s": 0.0119
+    },
+    {
+      "line": 142,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-000#c0001",
+      "latency_s": 0.011
+    },
+    {
+      "line": 143,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0003",
+      "latency_s": 0.0105
+    },
+    {
+      "line": 144,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0004",
+      "latency_s": 0.0134
+    },
+    {
+      "line": 145,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0005",
+      "latency_s": 0.0137
+    },
+    {
+      "line": 146,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0006",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 147,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0007",
+      "latency_s": 0.0114
+    },
+    {
+      "line": 148,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-000#c0007",
+      "latency_s": 0.0114
+    },
+    {
+      "line": 161,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0001",
+      "latency_s": 0.0101
+    },
+    {
+      "line": 162,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-002#c0002",
+      "latency_s": 0.0102
+    },
+    {
+      "line": 163,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0001",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 164,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0001",
+      "latency_s": 0.011
+    },
+    {
+      "line": 165,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0001",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 166,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-002#c0001",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 167,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-002#c0004",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 168,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0003",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 169,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0004",
+      "latency_s": 0.0136
+    },
+    {
+      "line": 170,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0004",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 171,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0004",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 172,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-002#c0004",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 173,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0001",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 174,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-003#c0003",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 175,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0002",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 176,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0002",
+      "latency_s": 0.0126
+    },
+    {
+      "line": 177,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0002",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 178,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-ijara-003#c0001",
+      "latency_s": 0.0117
+    },
+    {
+      "line": 179,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0003",
+      "latency_s": 0.0119
+    },
+    {
+      "line": 180,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0004",
+      "latency_s": 0.0107
+    },
+    {
+      "line": 181,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0005",
+      "latency_s": 0.016
+    },
+    {
+      "line": 182,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0006",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 183,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0007",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 184,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-ijara-003#c0007",
+      "latency_s": 0.0113
+    },
+    {
+      "line": 185,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0001",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 186,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0001",
+      "latency_s": 0.0116
+    },
+    {
+      "line": 187,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-xizmat-000#c0001",
+      "latency_s": 0.0098
+    },
+    {
+      "line": 188,
+      "language": "uz-Cyrl",
+      "rank": 3,
+      "top1": "syn-uz-cyrl-xizmat-000#c0001",
+      "latency_s": 0.0115
+    },
+    {
+      "line": 189,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0003",
+      "latency_s": 0.0124
+    },
+    {
+      "line": 190,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0003",
+      "latency_s": 0.0134
+    },
+    {
+      "line": 191,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0004",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 192,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0005",
+      "latency_s": 0.0158
+    },
+    {
+      "line": 193,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0006",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 194,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0007",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 195,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-000#c0007",
+      "latency_s": 0.0126
+    },
+    {
+      "line": 218,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0001",
+      "latency_s": 0.0101
+    },
+    {
+      "line": 219,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0001",
+      "latency_s": 0.0107
+    },
+    {
+      "line": 220,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-xizmat-003#c0001",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 221,
+      "language": "uz-Cyrl",
+      "rank": 4,
+      "top1": "syn-uz-cyrl-xizmat-003#c0004",
+      "latency_s": 0.0121
+    },
+    {
+      "line": 222,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0003",
+      "latency_s": 0.013
+    },
+    {
+      "line": 223,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0003",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 224,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0004",
+      "latency_s": 0.0111
+    },
+    {
+      "line": 225,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0005",
+      "latency_s": 0.0129
+    },
+    {
+      "line": 226,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0006",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 227,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0007",
+      "latency_s": 0.0097
+    },
+    {
+      "line": 228,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-xizmat-003#c0007",
+      "latency_s": 0.0114
+    },
+    {
+      "line": 229,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0003",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 230,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0002",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 231,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0001",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 232,
+      "language": "uz-Cyrl",
+      "rank": 3,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0003",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 233,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0003",
+      "latency_s": 0.0115
+    },
+    {
+      "line": 234,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0003",
+      "latency_s": 0.0107
+    },
+    {
+      "line": 235,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0004",
+      "latency_s": 0.0116
+    },
+    {
+      "line": 236,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0005",
+      "latency_s": 0.0204
+    },
+    {
+      "line": 237,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0006",
+      "latency_s": 0.0121
+    },
+    {
+      "line": 238,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0006",
+      "latency_s": 0.0125
+    },
+    {
+      "line": 239,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-000#c0006",
+      "latency_s": 0.0171
+    },
+    {
+      "line": 240,
+      "language": "uz-Cyrl",
+      "rank": 3,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0003",
+      "latency_s": 0.0127
+    },
+    {
+      "line": 241,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0002",
+      "latency_s": 0.0129
+    },
+    {
+      "line": 242,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0002",
+      "latency_s": 0.0117
+    },
+    {
+      "line": 243,
+      "language": "uz-Cyrl",
+      "rank": 3,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0000",
+      "latency_s": 0.0141
+    },
+    {
+      "line": 244,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0003",
+      "latency_s": 0.0136
+    },
+    {
+      "line": 245,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0003",
+      "latency_s": 0.0129
+    },
+    {
+      "line": 246,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0004",
+      "latency_s": 0.0139
+    },
+    {
+      "line": 247,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0005",
+      "latency_s": 0.0162
+    },
+    {
+      "line": 248,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0006",
+      "latency_s": 0.012
+    },
+    {
+      "line": 249,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0007",
+      "latency_s": 0.0131
+    },
+    {
+      "line": 250,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-001#c0007",
+      "latency_s": 0.0136
+    },
+    {
+      "line": 262,
+      "language": "uz-Cyrl",
+      "rank": 2,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0003",
+      "latency_s": 0.0122
+    },
+    {
+      "line": 263,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0002",
+      "latency_s": 0.0108
+    },
+    {
+      "line": 264,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0002",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 265,
+      "language": "uz-Cyrl",
+      "rank": 3,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0000",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 266,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0003",
+      "latency_s": 0.0114
+    },
+    {
+      "line": 267,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0003",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 268,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0004",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 269,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0005",
+      "latency_s": 0.0145
+    },
+    {
+      "line": 270,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0006",
+      "latency_s": 0.0101
+    },
+    {
+      "line": 271,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0006",
+      "latency_s": 0.0101
+    },
+    {
+      "line": 272,
+      "language": "uz-Cyrl",
+      "rank": 1,
+      "top1": "syn-uz-cyrl-oldi-sotdi-003#c0006",
+      "latency_s": 0.011
+    },
+    {
+      "line": 273,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-ijara-000#c0000",
+      "latency_s": 0.0086
+    },
+    {
+      "line": 274,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-ijara-000#c0003",
+      "latency_s": 0.0097
+    },
+    {
+      "line": 275,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0002",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 276,
+      "language": "ru",
+      "rank": 6,
+      "top1": "syn-ru-ijara-000#c0007",
+      "latency_s": 0.01
+    },
+    {
+      "line": 277,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0002",
+      "latency_s": 0.0095
+    },
+    {
+      "line": 278,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0003",
+      "latency_s": 0.0102
+    },
+    {
+      "line": 279,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0003",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 280,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0004",
+      "latency_s": 0.0095
+    },
+    {
+      "line": 281,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0005",
+      "latency_s": 0.0098
+    },
+    {
+      "line": 282,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0006",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 283,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0007",
+      "latency_s": 0.0082
+    },
+    {
+      "line": 284,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-000#c0007",
+      "latency_s": 0.0083
+    },
+    {
+      "line": 285,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-ijara-001#c0000",
+      "latency_s": 0.0095
+    },
+    {
+      "line": 286,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-ijara-001#c0003",
+      "latency_s": 0.0238
+    },
+    {
+      "line": 287,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0002",
+      "latency_s": 0.01
+    },
+    {
+      "line": 288,
+      "language": "ru",
+      "rank": 6,
+      "top1": "syn-ru-ijara-001#c0007",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 289,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0002",
+      "latency_s": 0.0109
+    },
+    {
+      "line": 290,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0003",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 291,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0003",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 292,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0004",
+      "latency_s": 0.011
+    },
+    {
+      "line": 293,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0005",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 294,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0006",
+      "latency_s": 0.0094
+    },
+    {
+      "line": 295,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0007",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 296,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-001#c0007",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 297,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-ijara-002#c0000",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 298,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0001",
+      "latency_s": 0.0114
+    },
+    {
+      "line": 299,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0001",
+      "latency_s": 0.0108
+    },
+    {
+      "line": 300,
+      "language": "ru",
+      "rank": 4,
+      "top1": "syn-ru-ijara-002#c0005",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 301,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0001",
+      "latency_s": 0.01
+    },
+    {
+      "line": 302,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0001",
+      "latency_s": 0.0128
+    },
+    {
+      "line": 303,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0001",
+      "latency_s": 0.0108
+    },
+    {
+      "line": 304,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0002",
+      "latency_s": 0.0117
+    },
+    {
+      "line": 305,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0003",
+      "latency_s": 0.0112
+    },
+    {
+      "line": 306,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0004",
+      "latency_s": 0.0093
+    },
+    {
+      "line": 307,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0005",
+      "latency_s": 0.0081
+    },
+    {
+      "line": 308,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-002#c0005",
+      "latency_s": 0.0094
+    },
+    {
+      "line": 309,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-ijara-003#c0000",
+      "latency_s": 0.009
+    },
+    {
+      "line": 310,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-ijara-003#c0003",
+      "latency_s": 0.009
+    },
+    {
+      "line": 311,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0002",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 312,
+      "language": "ru",
+      "rank": 4,
+      "top1": "syn-ru-ijara-003#c0007",
+      "latency_s": 0.0094
+    },
+    {
+      "line": 313,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0002",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 314,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0003",
+      "latency_s": 0.0095
+    },
+    {
+      "line": 315,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0003",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 316,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0004",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 317,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0005",
+      "latency_s": 0.0102
+    },
+    {
+      "line": 318,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0006",
+      "latency_s": 0.0093
+    },
+    {
+      "line": 319,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0007",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 320,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-ijara-003#c0007",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 321,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0001",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 322,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0001",
+      "latency_s": 0.009
+    },
+    {
+      "line": 323,
+      "language": "ru",
+      "rank": 4,
+      "top1": "syn-ru-xizmat-000#c0001",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 324,
+      "language": "ru",
+      "rank": 3,
+      "top1": "syn-ru-xizmat-000#c0001",
+      "latency_s": 0.0125
+    },
+    {
+      "line": 325,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0003",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 326,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0003",
+      "latency_s": 0.0103
+    },
+    {
+      "line": 327,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0004",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 328,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0005",
+      "latency_s": 0.0106
+    },
+    {
+      "line": 329,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0006",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 330,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0007",
+      "latency_s": 0.0085
+    },
+    {
+      "line": 331,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-xizmat-000#c0007",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 365,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0001",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 366,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0002",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 367,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-oldi-sotdi-000#c0003",
+      "latency_s": 0.0104
+    },
+    {
+      "line": 368,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0002",
+      "latency_s": 0.0086
+    },
+    {
+      "line": 369,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0003",
+      "latency_s": 0.009
+    },
+    {
+      "line": 370,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0003",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 371,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0004",
+      "latency_s": 0.0094
+    },
+    {
+      "line": 372,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0005",
+      "latency_s": 0.0097
+    },
+    {
+      "line": 373,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0005",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 374,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0006",
+      "latency_s": 0.0099
+    },
+    {
+      "line": 375,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-000#c0006",
+      "latency_s": 0.0085
+    },
+    {
+      "line": 376,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0001",
+      "latency_s": 0.0082
+    },
+    {
+      "line": 377,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0002",
+      "latency_s": 0.0086
+    },
+    {
+      "line": 378,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-oldi-sotdi-001#c0003",
+      "latency_s": 0.0082
+    },
+    {
+      "line": 379,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0002",
+      "latency_s": 0.0086
+    },
+    {
+      "line": 380,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0003",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 381,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0003",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 382,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0004",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 383,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0005",
+      "latency_s": 0.0101
+    },
+    {
+      "line": 384,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0006",
+      "latency_s": 0.0093
+    },
+    {
+      "line": 385,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0007",
+      "latency_s": 0.0091
+    },
+    {
+      "line": 386,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-001#c0007",
+      "latency_s": 0.0088
+    },
+    {
+      "line": 398,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0001",
+      "latency_s": 0.0081
+    },
+    {
+      "line": 399,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0002",
+      "latency_s": 0.0082
+    },
+    {
+      "line": 400,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-oldi-sotdi-003#c0003",
+      "latency_s": 0.0089
+    },
+    {
+      "line": 401,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0002",
+      "latency_s": 0.0087
+    },
+    {
+      "line": 402,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0003",
+      "latency_s": 0.0092
+    },
+    {
+      "line": 403,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0003",
+      "latency_s": 0.0086
+    },
+    {
+      "line": 404,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0004",
+      "latency_s": 0.0089
+    },
+    {
+      "line": 405,
+      "language": "ru",
+      "rank": 2,
+      "top1": "syn-ru-oldi-sotdi-003#c0006",
+      "latency_s": 0.0096
+    },
+    {
+      "line": 406,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0005",
+      "latency_s": 0.0098
+    },
+    {
+      "line": 407,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0006",
+      "latency_s": 0.0085
+    },
+    {
+      "line": 408,
+      "language": "ru",
+      "rank": 1,
+      "top1": "syn-ru-oldi-sotdi-003#c0006",
+      "latency_s": 0.0087
+    }
+  ],
+  "generated_at": "2026-11-01T10:48:57+00:00",
+  "git_commit": "0f65cf3",
+  "script": "scripts/eval_retrieval.py"
+}
