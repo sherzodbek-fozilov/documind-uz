@@ -17,6 +17,17 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [x] Document-level train/test split
 - [x] Synthetic document generator and OCR error-rate script
 
+## Stage 2 prep: real documents
+- [x] Source registry (`data/sources.json`) with a terms gate, fetch script, generated
+      table in `docs/data.md`
+- [x] Split stratified by kind (real / synthetic) and language
+- [ ] Check lex.uz terms of use and robots.txt; record the result per source
+- [ ] Confirm the copyright-law article on official documents (ZRU-42)
+- [ ] Find and verify URLs: Civil Code part 2 (rent, sale, construction contract),
+      Labor Code 2022, consumer protection law (uz and ru), official model contracts
+- [ ] Download approved sources, ingest, re-run `documind split`
+- [ ] Label real evaluation questions (`data/eval/questions.jsonl`)
+
 ## Stage 2: retrieval baselines
 - [ ] BM25 baseline
 - [ ] multilingual-e5-small dense retrieval with Qdrant

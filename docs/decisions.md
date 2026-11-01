@@ -59,3 +59,18 @@ Short records: what was chosen, the alternatives, and why. One entry per stage.
   writing separate Cyrillic templates. Why: less effort, consistent content. Bias: real
   Cyrillic documents differ in spelling and vocabulary, so uz-Cyrl results on synthetic
   data are optimistic.
+
+## Stage 2 prep: real documents (2026-11-01)
+
+- **Chosen:** a source registry (`data/sources.json`) as the single source of truth;
+  `scripts/fetch_sources.py` downloads only entries marked `approved` (license, who
+  checked, when) and generates the table in `docs/data.md`. Files can also be placed by
+  hand in `data/raw/`. **Alternatives:** a hand-maintained list in `docs/data.md`; a
+  scraper. **Why:** the terms check becomes a hard gate in code, and the documentation
+  cannot drift from what was actually downloaded (sha256 recorded).
+- **Chosen:** split strata = kind (real / synthetic) + languages of the group.
+  **Alternatives:** one pool for all documents; excluding synthetic documents from the
+  split. **Why:** real results must not depend on how many synthetic documents exist, and
+  a law published in uz and ru is one group, so its two versions never straddle train/test.
+- **Open:** no real document could be included: lex.uz and other sources are blocked from
+  the build environment, so their terms could not be read.
