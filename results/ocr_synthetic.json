@@ -1,0 +1,77 @@
+{
+  "metrics": {
+    "cer_uz_latn": 0.0006267627702914447,
+    "cer_uz_cyrl": 0.007308363092766381,
+    "cer_ru": 0.006030150753768844,
+    "cer_all": 0.0045720506191318545
+  },
+  "n": 24,
+  "n_by_metric": {
+    "cer_uz_latn": 8,
+    "cer_uz_cyrl": 8,
+    "cer_ru": 8
+  },
+  "dataset": "synthetic-contracts-v1 simulated scans (SYNTHETIC, mild degradation)",
+  "unit": "pages",
+  "config": {
+    "multi_langs": "uzb+uzb_cyrl+rus",
+    "dpi": 300,
+    "tesseract": "5.3.4",
+    "metric": "micro CER over whitespace-collapsed page text"
+  },
+  "by_config": {
+    "multi": {
+      "ru": {
+        "cer": 0.006030150753768844,
+        "pages": 8,
+        "chars": 11940,
+        "mean_word_confidence": 94.83135258951907
+      },
+      "uz-Cyrl": {
+        "cer": 0.007308363092766381,
+        "pages": 8,
+        "chars": 12041,
+        "mean_word_confidence": 94.2077914353654
+      },
+      "uz-Latn": {
+        "cer": 0.0006267627702914447,
+        "pages": 8,
+        "chars": 12764,
+        "mean_word_confidence": 95.21296947777087
+      },
+      "all": {
+        "cer": 0.0045720506191318545,
+        "pages": 24,
+        "chars": 36745
+      }
+    },
+    "oracle": {
+      "ru": {
+        "cer": 0.03559463986599665,
+        "pages": 8,
+        "chars": 11940,
+        "mean_word_confidence": 92.00886133953348
+      },
+      "uz-Cyrl": {
+        "cer": 0.007059214350967528,
+        "pages": 8,
+        "chars": 12041,
+        "mean_word_confidence": 93.60187193086523
+      },
+      "uz-Latn": {
+        "cer": 0.0007834534628643058,
+        "pages": 8,
+        "chars": 12764,
+        "mean_word_confidence": 95.20600213258281
+      },
+      "all": {
+        "cer": 0.014151585249693836,
+        "pages": 24,
+        "chars": 36745
+      }
+    }
+  },
+  "generated_at": "2026-11-01T09:42:53+00:00",
+  "git_commit": "600217c",
+  "script": "scripts/eval_ocr.py"
+}
