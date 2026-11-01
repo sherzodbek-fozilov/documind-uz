@@ -9,6 +9,8 @@ number below is produced by a script in this repository.
 
 > **Status:** work in progress. Stages 0–1 (skeleton, ingestion) are implemented.
 > Retrieval, API, UI and fine-tuning are not built yet, so most metrics are `TBD`.
+> The OCR numbers are measured on **synthetic, mildly degraded** scans and are an
+> optimistic lower bound for real documents.
 
 ## Results
 
@@ -31,9 +33,9 @@ The tables are regenerated with `python scripts/render_readme.py`; missing value
 
 | Measurement | Value | n | Source file |
 |---|---|---|---|
-| OCR character error rate, synthetic scans, uz-Latn | TBD | TBD | `results/ocr_synthetic.json` |
-| OCR character error rate, synthetic scans, uz-Cyrl | TBD | TBD | `results/ocr_synthetic.json` |
-| OCR character error rate, synthetic scans, ru | TBD | TBD | `results/ocr_synthetic.json` |
+| OCR CER, synthetic scans, uz-Latn | 0.1% | 24 | `results/ocr_synthetic.json` |
+| OCR CER, synthetic scans, uz-Cyrl | 0.7% | 24 | `results/ocr_synthetic.json` |
+| OCR CER, synthetic scans, ru | 0.6% | 24 | `results/ocr_synthetic.json` |
 | Citation correctness | TBD | TBD | `results/citations.json` |
 | Answer latency p50, CPU (s) | TBD | TBD | `results/latency.json` |
 <!-- END METRICS -->
@@ -74,10 +76,27 @@ pip install -e ".[dev]"
 sudo apt-get install tesseract-ocr tesseract-ocr-uzb tesseract-ocr-uzb-cyrl tesseract-ocr-rus
 cp .env.example .env          # set DOCUMIND_DATABASE_URL; SQLite works for local experiments
 python scripts/make_synthetic_docs.py      # synthetic contracts (clearly marked synthetic)
-documind ingest data/synthetic --synthetic
-documind stats
-pytest
+documind ingest data/synthetic           # reads data/synthetic/manifest.jsonl
+documind split                           # language-stratified split, frozen in data/splits.json
+documind stats                           # counts per split/language + leakage check
+python scripts/eval_ocr.py               # writes results/ocr_synthetic.json
+python scripts/render_readme.py          # regenerates the tables above
+python -m pytest
 ```
+
+Optional: run the PostgreSQL test with
+`TEST_DATABASE_URL=postgresql+psycopg://user:pass@localhost/db_test python -m pytest -m postgres`.
+
+## Ingestion
+
+| Step | What happens |
+|---|---|
+| Parse | PDF text layer (PyMuPDF blocks with bounding boxes); DOCX paragraphs, headings, tables; PNG/JPEG/TIFF |
+| OCR | PDF pages with fewer than 30 text characters are rendered at 300 dpi and OCR'd with tesseract `uzb+uzb_cyrl+rus` |
+| Normalize | NFC, whitespace, Uzbek apostrophe variants → ʻ / ʼ |
+| Chunk | new chunk at each article / chapter / section heading; ≤ 180 words; no overlap; each chunk is an exact span of the document text |
+| Label | language per chunk (uz-Latn / uz-Cyrl / ru), document split (train / test) by document group |
+| Store | PostgreSQL tables `documents`, `pages` (with block offsets and boxes), `chunks`; original file by sha256 |
 
 ## Configuration
 

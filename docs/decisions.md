@@ -17,3 +17,45 @@ Short records: what was chosen, the alternatives, and why. One entry per stage.
   (`DOCUMIND_` prefix), `.env` git-ignored, `.env.example` committed.
   **Alternatives:** YAML config files. **Why:** the API key must stay out of git, and
   Docker Compose passes env vars natively.
+
+## Stage 1: ingestion (2026-11-01)
+
+- **PDF parsing: PyMuPDF text blocks.** Alternatives: pdfplumber, pypdf, unstructured.
+  Why: fast on CPU, gives paragraph blocks with bounding boxes (needed for highlighting
+  in stage 4), and renders pages for OCR with the same library. Note: PyMuPDF is AGPL;
+  this matters if the service is offered to third parties (open question in issues).
+- **Scan detection: a page with < 30 extracted characters is OCR'd.** Alternatives:
+  image-area ratio, OCR everything. Why: simple and cheap; pages with a broken text layer
+  (garbage characters) are not detected yet (open issue).
+- **OCR: tesseract with the combined `uzb+uzb_cyrl+rus` model at 300 dpi.** Alternatives:
+  one model per page after language detection; EasyOCR / PaddleOCR (heavier on CPU, weaker
+  Uzbek support). Measured on synthetic scans (`results/ocr_synthetic.json`): the combined
+  model had lower CER than the single "correct" model, most visibly for Russian (0.60% vs
+  3.56%), because Russian contracts in Uzbekistan contain Latin-script names that the
+  `rus` model garbles. Caveat: synthetic, mildly degraded scans; real scans will be worse.
+- **Normalization: Uzbek apostrophe variants unified to ʻ (after o/g) and ʼ (elsewhere),
+  one-to-one character replacement.** Alternatives: ASCII apostrophe everywhere; no
+  normalization. Why: the same word appears as oʻ, o', o‘, o` in real documents and OCR
+  output; matching needs one form, and the stored text stays human-readable.
+- **Language detection: script majority, then Uzbek-only letters (ў қ ғ ҳ) vs Russian-only
+  letters (ы щ), plus function words.** Alternatives: fastText lid / langdetect. Why: those
+  models handle uz-Cyrl poorly and confuse it with Russian/Kazakh; the rule is transparent.
+  Function words were added after OCR was seen to turn ў/қ/ҳ into у/к/х on some uz-Cyrl
+  pages, which made those chunks look Russian.
+- **Chunking: structure-aware (articles, chapters, numbered upper-case sections), greedy
+  packing up to 180 words, no overlap, chunks never cross sections, each chunk is an exact
+  span of the document text.** Alternatives: fixed-size token windows with overlap;
+  semantic chunking with embeddings. Why: legal answers usually live in one article;
+  exact spans make citation checks trivial; no overlap keeps `gold_chunk` labels
+  unambiguous. 180 words keeps chunks under the 512-token limit of multilingual-e5-small.
+- **Document ids from file names (or a manifest), not content hashes; sha256 for
+  deduplication.** Why: eval labels reference `gold_doc`, so ids must survive
+  regeneration of a file whose bytes change (e.g. DOCX timestamps).
+- **Split by document group, stratified by language, frozen in `data/splits.json`.**
+  Alternatives: pure hash split (kept as the default for new documents); random split.
+  Why: translations of the same act must not end up in train and test (leakage); with a
+  small corpus the hash split was unbalanced (1 of 12 uz-Cyrl documents in test).
+- **Synthetic uz-Cyrl text is transliterated from the uz-Latn templates.** Alternative:
+  writing separate Cyrillic templates. Why: less effort, consistent content. Bias: real
+  Cyrillic documents differ in spelling and vocabulary, so uz-Cyrl results on synthetic
+  data are optimistic.
