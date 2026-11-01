@@ -19,3 +19,5 @@ node_modules/
 models/
 # embedding cache
 data/cache/
+# question drafts under review (working files)
+data/eval/drafts/
