@@ -62,7 +62,7 @@ def evaluate(retriever, questions, chunk_ids: set[str]) -> tuple[list, list]:
         results = retriever.search(q.question, k=MAX_K,
                                    doc_id=q.gold_doc if q.scope == "document" else None)
         latency = time.perf_counter() - start
-        r = rank_of(q.gold_chunk, results)
+        r = rank_of(q.gold_chunks, results)
         ranks.append(r)
         per_q.append({"line": q.line, "language": q.language, "rank": r,
                       "top1": results[0] if results else None, "latency_s": round(latency, 4)})
@@ -102,10 +102,11 @@ def main() -> None:
         for q in questions:
             if q.status == "draft":
                 counts["skipped_unreviewed_draft"] += 1
-            elif q.gold_chunk not in by_id or by_id[q.gold_chunk].doc_id != q.gold_doc:
+            elif (any(g not in by_id for g in q.gold_chunks)
+                  or by_id[q.gold_chunk].doc_id != q.gold_doc):
                 counts["skipped_gold_not_found"] += 1
-                print(f"WARNING [{kind}] line {q.line}: gold {q.gold_chunk} not in corpus "
-                      f"or not in {q.gold_doc}", file=sys.stderr)
+                print(f"WARNING [{kind}] line {q.line}: a gold chunk of {q.gold_chunks} is not "
+                      f"in the corpus, or {q.gold_chunk} is not in {q.gold_doc}", file=sys.stderr)
             elif by_id[q.gold_chunk].split != args.split:
                 counts["other_split"] += 1
             else:

@@ -34,3 +34,18 @@ def test_load_questions_reports_problems(tmp_path):
     assert len(qs) == 2 and len(problems) == 3
     assert qs[1].scope == "document" and qs[1].status == "draft"
     assert load_questions(tmp_path / "missing.jsonl") == ([], [])
+
+
+def test_multiple_gold_chunks(tmp_path):
+    p = tmp_path / "q.jsonl"
+    p.write_text("\n".join([
+        json.dumps({"question": "Q?", "language": "ru", "gold_doc": "d", "gold_chunk": "d#c1",
+                    "gold_chunks": ["d#c1", "d#c2"]}),
+        json.dumps({"question": "Q?", "language": "ru", "gold_doc": "d", "gold_chunk": "d#c9",
+                    "gold_chunks": ["d#c1", "d#c2"]}),
+    ]), encoding="utf-8")
+    qs, problems = load_questions(p)
+    assert len(qs) == 1 and qs[0].gold_chunks == ("d#c1", "d#c2") and len(problems) == 1
+    assert rank_of(qs[0].gold_chunks, ["x", "d#c2", "d#c1"]) == 2
+    single, _ = load_questions(tmp_path / "missing.jsonl")
+    assert single == []
