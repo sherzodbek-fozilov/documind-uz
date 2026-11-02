@@ -4,9 +4,11 @@ Rules enforced here:
   * Only entries with ``terms.status == "approved"`` are used, and only if
     ``terms.license``, ``terms.checked_by``, ``terms.checked_on`` are filled in.
     "needs review" and "rejected" entries are never downloaded or ingested.
-  * A file can come from ``download_url`` (PDF or DOCX only) or be placed by hand at
-    ``data/raw/<id>.pdf|.docx``. For a hand-placed file, ``accessed_on`` must be set in
-    the registry; for a download it is set to today.
+  * A file can come from ``download_url`` (PDF, DOCX, or a lex.uz act page as HTML) or be
+    placed by hand at ``data/raw/<id>.pdf|.docx|.html``. For lex.uz HTML the page title
+    and the edition date shown on the page are recorded in the registry. For a
+    hand-placed file, ``accessed_on`` must be set in the registry; for a download it is
+    set to today.
   * The sha256 of every used file is written back to the registry.
   * Politeness: robots.txt of each host is read first and respected (a URL it disallows
     is skipped); requests are made one at a time with a pause between them
@@ -47,9 +49,9 @@ END = "<!-- END SOURCES -->"
 
 STATUSES = {"approved", "needs review", "rejected"}
 LANGUAGES = {"uz-Latn", "uz-Cyrl", "ru"}
-CONTENT_TYPES = {"application/pdf": ".pdf",
+CONTENT_TYPES = {"application/pdf": ".pdf", "text/html": ".html",
                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx"}
-SUFFIXES = (".pdf", ".docx")
+SUFFIXES = (".pdf", ".docx", ".html")
 USER_AGENT = ("documind-uz research fetcher (non-commercial portfolio project; "
               "https://github.com/sherzodbek-fozilov/documind-uz)")
 
@@ -132,7 +134,7 @@ def download(url: str, dest_stem: Path) -> Path:
     with urllib.request.urlopen(req, timeout=60) as resp:
         ctype = resp.headers.get_content_type()
         if ctype not in CONTENT_TYPES:
-            raise ValueError(f"{url}: unsupported content type {ctype} (need PDF or DOCX)")
+            raise ValueError(f"{url}: unsupported content type {ctype} (need PDF, DOCX or HTML)")
         dest = dest_stem.with_suffix(CONTENT_TYPES[ctype])
         dest.write_bytes(resp.read())
     return dest
@@ -140,6 +142,16 @@ def download(url: str, dest_stem: Path) -> Path:
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def html_meta(path: Path) -> dict | None:
+    """Title and edition date of a lex.uz act page, or None if it is not one."""
+    sys.path.insert(0, str(ROOT))
+    from documind.ingestion.lexuz_html import is_lexuz_html, parse_lexuz_html
+
+    if not is_lexuz_html(path):
+        return None
+    return parse_lexuz_html(path).meta
 
 
 def collect(registry: dict, raw: Path, allow_download: bool, today: str,
@@ -169,6 +181,13 @@ def collect(registry: dict, raw: Path, allow_download: bool, today: str,
         else:
             log.append(f"skip {s['id']}: no file in data/raw and no download_url")
             continue
+        if path.suffix == ".html":
+            meta = html_meta(path)
+            if meta is None:
+                log.append(f"skip {s['id']}: HTML is not a lex.uz act page")
+                continue
+            s["page_title"], s["edition"] = meta["title"], meta["edition"]
+            log.append(f"{s['id']}: page title {meta['title']!r}, edition {meta['edition']}")
         digest = sha256(path)
         if s.get("sha256") and s["sha256"] != digest:
             log.append(f"note {s['id']}: content changed since last fetch (sha256 differs)")
@@ -176,7 +195,9 @@ def collect(registry: dict, raw: Path, allow_download: bool, today: str,
         rows.append({"file": path.name, "doc_id": s["id"], "group_id": s["group_id"],
                      "synthetic": False, "source": s.get("download_url") or s["terms"]["url"],
                      "language": s["language"], "kind": s["kind"],
-                     "license": s["terms"]["license"], "accessed_on": s["accessed_on"]})
+                     "license": s["terms"]["license"], "accessed_on": s["accessed_on"],
+                     "split_unit": s.get("split_unit", "document"),
+                     "edition": s.get("edition"), "source_page": s.get("page_title")})
     return rows, log
 
 
