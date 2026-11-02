@@ -18,11 +18,12 @@ from ..storage import models
 from .chunking import chunk_document, chunker_version
 from .docx_parser import parse_docx
 from .image import IMAGE_MIMES, parse_image
+from .lexuz_html import is_lexuz_html, parse_lexuz_html
 from .pdf import parse_pdf
 from .text import script_counts
 from .types import ParsedDocument
 
-SUPPORTED_SUFFIXES = {".pdf", ".docx", *IMAGE_MIMES}
+SUPPORTED_SUFFIXES = {".pdf", ".docx", ".html", *IMAGE_MIMES}
 
 
 @dataclass
@@ -59,6 +60,10 @@ def parse_file(path: Path, settings: Settings, *, force_ocr: bool = False) -> Pa
         return parse_docx(path)
     if suffix in IMAGE_MIMES:
         return parse_image(path, ocr_langs=settings.ocr_langs)
+    if suffix == ".html":
+        if not is_lexuz_html(path):
+            raise ValueError(f"{path.name}: only lex.uz act pages are supported as HTML")
+        return parse_lexuz_html(path)
     raise ValueError(f"unsupported file type: {path.name} (supported: "
                      f"{', '.join(sorted(SUPPORTED_SUFFIXES))})")
 
