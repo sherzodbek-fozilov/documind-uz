@@ -78,3 +78,12 @@ def test_politeness_respects_robots_and_pauses(monkeypatch):
     start = time.monotonic()
     polite.wait()
     assert time.monotonic() - start >= 0.15
+
+
+def test_url_cell_shows_verification_state():
+    reg = _registry()
+    entry = reg["sources"][0]
+    entry["candidate_url"] = "https://example.org/doc/1"
+    assert "(candidate, unverified)" in fetch_sources.render_table(reg, set())
+    entry["url_verified_on"] = "2026-11-02"
+    assert "(page verified 2026-11-02; not downloaded)" in fetch_sources.render_table(reg, set())

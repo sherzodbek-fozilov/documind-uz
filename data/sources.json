@@ -1,82 +1,86 @@
 {
-  "_comment": "Registry of real (non-synthetic) document sources. scripts/fetch_sources.py downloads ONLY entries with terms.status == 'approved', and renders the table in docs/data.md from this file. 'candidate_url' values come from web search results and have not been opened or verified. Set download_url only after checking the page. Entries with the same group_id (e.g. uz and ru versions of one act) always share a train/test split.",
+  "_comment": "Registry of real (non-synthetic) document sources. scripts/fetch_sources.py downloads ONLY entries with terms.status == 'approved', and renders the table in docs/data.md from this file. 'candidate_url' is the page for the source; 'url_verified_on' is set once the page was opened and its title and language checked (otherwise the URL is an unverified search result). Set download_url only after checking the page. Entries with the same group_id (e.g. uz and ru versions of one act) always share a train/test split.",
   "sources": [
     {
       "id": "civil-code-part2-ru",
-      "title": "Гражданский кодекс Республики Узбекистан, часть вторая (аренда, купля-продажа, подряд, строительный подряд)",
+      "title": "Гражданский кодекс Республики Узбекистан (часть вторая), 29.08.1996",
       "language": "ru",
       "kind": "law",
       "group_id": "civil-code-part2",
       "publisher": "National Database of Legislation (lex.uz)",
-      "candidate_url": null,
+      "candidate_url": "https://lex.uz/ru/docs/180550",
+      "url_verified_on": "2026-11-02",
       "download_url": null,
       "terms": {
         "status": "needs review",
         "url": "https://lex.uz",
-        "license": null,
+        "license": "No license stated; no statement on automated download or copying found (checked 2026-11-01 by Sherzodbek)",
         "checked_by": "Sherzodbek",
         "checked_on": "2026-11-01",
-        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). page id not verified"
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). Verification: page opened 2026-11-02: title '29.08.1996. Гражданский кодекс Республики Узбекистан (часть вторая)', Russian text; 94 headings / 811 articles; chapters 29 (купля-продажа, incl. поставка), 34 (аренда), 37 (подряд, incl. строительный подряд) present; no PDF link, Word only via a JavaScript button."
       },
       "accessed_on": null,
       "sha256": null
     },
     {
       "id": "civil-code-part2-uz",
-      "title": "Oʻzbekiston Respublikasining Fuqarolik kodeksi, ikkinchi qism (ijara, oldi-sotdi, pudrat, qurilish pudrati)",
-      "language": "uz-Latn",
+      "title": "Ўзбекистон Республикасининг Фуқаролик кодекси (иккинчи қисм), 29.08.1996",
+      "language": "uz-Cyrl",
       "kind": "law",
       "group_id": "civil-code-part2",
       "publisher": "National Database of Legislation (lex.uz)",
-      "candidate_url": null,
+      "candidate_url": "https://lex.uz/ru/docs/180552",
+      "url_verified_on": "2026-11-02",
       "download_url": null,
       "terms": {
         "status": "needs review",
         "url": "https://lex.uz",
-        "license": null,
+        "license": "No license stated; no statement on automated download or copying found (checked 2026-11-01 by Sherzodbek)",
         "checked_by": "Sherzodbek",
         "checked_on": "2026-11-01",
-        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01)."
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). Verification: page opened 2026-11-02: title '29.08.1996. Ўзбекистон Республикасининг Фуқаролик кодекси (иккинчи қисм)', Uzbek Cyrillic; same structure as the ru version (94 headings / 811 articles); no PDF link. A Latin-script version exists at https://lex.uz/ru/docs/-180552 (not opened)."
       },
       "accessed_on": null,
       "sha256": null
     },
     {
       "id": "labor-code-2022-ru",
-      "title": "Трудовой кодекс Республики Узбекистан (ЗРУ-798 от 28.10.2022)",
+      "title": "Трудовой кодекс Республики Узбекистан, 28.10.2022",
       "language": "ru",
       "kind": "law",
       "group_id": "labor-code-2022",
       "publisher": "National Database of Legislation (lex.uz)",
-      "candidate_url": "https://lex.uz/ru/acts/-142859",
+      "candidate_url": "https://lex.uz/ru/docs/6257291",
+      "url_verified_on": "2026-11-02",
       "download_url": null,
       "terms": {
         "status": "needs review",
         "url": "https://lex.uz",
-        "license": null,
+        "license": "No license stated; no statement on automated download or copying found (checked 2026-11-01 by Sherzodbek)",
         "checked_by": "Sherzodbek",
         "checked_on": "2026-11-01",
-        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). candidate_url from web search (2026-11-01), not opened"
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). Verification: page opened 2026-11-02: title '28.10.2022. Трудовой кодекс Республики Узбекистан', Russian text; 95 headings / 593 articles; PDF link /ru/pdfs/6257291 (not downloaded). The earlier search candidate /ru/acts/-142859 was wrong: it is the 1995 code, Uzbek text, marked as no longer in force since 30.04.2023."
       },
       "accessed_on": null,
       "sha256": null
     },
     {
       "id": "labor-code-2022-uz",
-      "title": "Oʻzbekiston Respublikasining Mehnat kodeksi (OʻRQ-798, 28.10.2022)",
-      "language": "uz-Latn",
+      "title": "Ўзбекистон Республикасининг Меҳнат кодекси, 28.10.2022",
+      "language": "uz-Cyrl",
       "kind": "law",
       "group_id": "labor-code-2022",
       "publisher": "National Database of Legislation (lex.uz)",
-      "candidate_url": "https://lex.uz/uz/acts/-142859",
+      "candidate_url": "https://lex.uz/ru/docs/6257288",
+      "url_verified_on": "2026-11-02",
       "download_url": null,
       "terms": {
         "status": "needs review",
         "url": "https://lex.uz",
-        "license": null,
+        "license": "No license stated; no statement on automated download or copying found (checked 2026-11-01 by Sherzodbek)",
         "checked_by": "Sherzodbek",
         "checked_on": "2026-11-01",
-        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). candidate_url from web search (2026-11-01), not opened"
+        "notes": "Terms checked by Sherzodbek on 2026-11-01: no statement found about automated download or copying (this is not a statement that it is permitted). robots.txt: none; https://lex.uz/robots.txt and https://www.lex.uz/robots.txt both redirect to the 404 page (checked 2026-11-01). Verification: page opened 2026-11-02: title '28.10.2022. Ўзбекистон Республикасининг Меҳнат кодекси', Uzbek Cyrillic; 95 headings / 593 articles; PDF link /ru/pdfs/6257288 (not downloaded). Latin-script version at https://lex.uz/ru/docs/-6257288 (opened: title '28.10.2022. Oʻzbekiston Respublikasining Mehnat kodeksi', same structure, no PDF link)."
       },
       "accessed_on": null,
       "sha256": null
@@ -89,6 +93,7 @@
       "group_id": "consumer-protection",
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": "https://lex.uz/acts/14643",
+      "url_verified_on": null,
       "download_url": null,
       "terms": {
         "status": "needs review",
@@ -109,6 +114,7 @@
       "group_id": "consumer-protection",
       "publisher": "National Database of Legislation (lex.uz)",
       "candidate_url": null,
+      "url_verified_on": null,
       "download_url": null,
       "terms": {
         "status": "needs review",
@@ -129,6 +135,7 @@
       "group_id": "model-employment-contract",
       "publisher": "to find (government decision published on lex.uz)",
       "candidate_url": null,
+      "url_verified_on": null,
       "download_url": null,
       "terms": {
         "status": "needs review",

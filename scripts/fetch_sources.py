@@ -190,8 +190,14 @@ def render_table(registry: dict, included: set[str]) -> str:
     for s in registry["sources"]:
         t = s["terms"]
         url = s.get("download_url") or s.get("candidate_url")
-        url_cell = f"{url}" + ("" if s.get("download_url") else " (candidate, unverified)") \
-            if url else "—"
+        if not url:
+            url_cell = "—"
+        elif s.get("download_url"):
+            url_cell = url
+        elif s.get("url_verified_on"):
+            url_cell = f"{url} (page verified {s['url_verified_on']}; not downloaded)"
+        else:
+            url_cell = f"{url} (candidate, unverified)"
         checked = f"{t.get('checked_on')} by {t.get('checked_by')}" if t.get("checked_on") else "—"
         lines.append(" | ".join([
             f"| `{s['id']}`", cell(s["title"]), s["language"], cell(url_cell),
