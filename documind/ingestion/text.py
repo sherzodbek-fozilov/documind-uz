@@ -33,13 +33,52 @@ def normalize_apostrophes(text: str) -> str:
     return _TUTUQ_RE.sub(TUTUQ, text)
 
 
+# Latin letters that look like Cyrillic ones (same glyph in common fonts), one to one.
+_LATIN_LOOKALIKES = "aceopxykACEOPXYKBHMT"
+_CYRILLIC_EQUIVALENTS = "асеорхукАСЕОРХУКВНМТ"
+_LAT2CYR = str.maketrans(_LATIN_LOOKALIKES, _CYRILLIC_EQUIVALENTS)
+_LOOKALIKE_SET = frozenset(_LATIN_LOOKALIKES)
+_WORD_RE = re.compile(r"[^\W\d_]+")
+
+
+def _is_cyrillic(ch: str) -> bool:
+    return "\u0400" <= ch <= "\u04ff"
+
+
+def _is_latin(ch: str) -> bool:
+    return "a" <= ch.lower() <= "z"
+
+
+def fix_cyrillic_homoglyphs(text: str) -> str:
+    """Replace Latin look-alike letters with Cyrillic ones inside mixed-script words.
+
+    Only words that contain at least one Cyrillic letter are touched, and only when every
+    Latin letter in the word has a Cyrillic look-alike (e.g. "пеpвой" with a Latin "p"
+    becomes "первой"). Purely Latin words ("Ijarachi", company names) and words with other
+    Latin letters (e.g. "Тexno", which has an "n") are left as they are. One character is
+    replaced by one character, so lengths and offsets do not change.
+    """
+    def fix(m: re.Match) -> str:
+        w = m.group(0)
+        latin = [c for c in w if _is_latin(c)]
+        if not latin or not any(_is_cyrillic(c) for c in w):
+            return w
+        if not all(c in _LOOKALIKE_SET for c in latin):
+            return w
+        return w.translate(_LAT2CYR)
+
+    return _WORD_RE.sub(fix, text)
+
+
 def normalize_block(text: str) -> str:
-    """Normalize one paragraph: NFC, no zero-width chars, single spaces, no line breaks."""
+    """Normalize one paragraph: NFC, no zero-width chars, single spaces, no line breaks,
+    Latin look-alikes inside Cyrillic words fixed, Uzbek apostrophes unified."""
     text = unicodedata.normalize("NFC", text)
     text = _ZERO_WIDTH_RE.sub("", text)
     text = text.replace("\r", "\n")
     text = " ".join(line.strip() for line in text.split("\n") if line.strip())
     text = _SPACES_RE.sub(" ", text).strip()
+    text = fix_cyrillic_homoglyphs(text)
     return normalize_apostrophes(text)
 
 
