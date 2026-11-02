@@ -154,3 +154,8 @@ Short records: what was chosen, the alternatives, and why. One entry per stage.
   Recorded in `data/splits.json`. **Limitation:** the Civil Code test set covers only
   three chapters (sale, rent, construction work), so results may not generalize to other
   parts of the code.
+- **Version check before labeling:** `scripts/compare_versions.py` compares the uz-Latn
+  and ru Civil Code article by article (paragraph count and the numbers in the text,
+  because the two pages show different edition dates). One article (888) differs; it is
+  listed in `docs/data.md` and should not be used for questions. Wording changes that
+  keep all numbers are not detected.
