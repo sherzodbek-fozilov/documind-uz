@@ -38,6 +38,14 @@ _NUMBERED_RE = re.compile(r"^\d{1,2}\.?\s+\S")  # "1. PREDMET" (but not "1.1. ..
 # split after . ! ? ; : preceded by a letter, so clause numbers like "1.1." stay attached
 _SENTENCE_END_RE = re.compile(r"(?<=[^\W\d_][.!?;:])\s+(?=\S)")
 MAX_HEADING_CHARS = 120
+# numbered chapters: "29-bob", "29-боб", "Глава 29" (chapter-group split, citations)
+_CHAPTER_RE = re.compile(r"^\s*(?:(\d{1,3})\s*-\s*(?:bob|боб)\b|глава\s+(\d{1,3})\b)",
+                         re.IGNORECASE)
+
+
+def chapter_number(text: str) -> int | None:
+    m = _CHAPTER_RE.match(text)
+    return int(m.group(1) or m.group(2)) if m else None
 
 
 def _upper_ratio(text: str) -> float:
@@ -63,6 +71,7 @@ class _Unit:
     end: int
     words: int
     heading: bool
+    chapter: int | None = None  # chapter in force at this unit
 
 
 def assemble(doc: ParsedDocument) -> tuple[str, list[PageSpan], list[_Unit]]:
@@ -71,6 +80,7 @@ def assemble(doc: ParsedDocument) -> tuple[str, list[PageSpan], list[_Unit]]:
     pos = 0
     spans: list[PageSpan] = []
     units: list[_Unit] = []
+    chapter: int | None = None
     for page in doc.pages:
         page_start = pos
         block_meta: list[dict] = []
@@ -83,11 +93,15 @@ def assemble(doc: ParsedDocument) -> tuple[str, list[PageSpan], list[_Unit]]:
             start, end = pos, pos + len(block.text)
             parts.append(block.text)
             pos = end
-            block_meta.append({"start": start - page_start, "end": end - page_start,
-                               "kind": block.kind,
-                               "bbox": list(block.bbox) if block.bbox else None})
-            units.append(_Unit(start, end, word_count(block.text),
-                               is_heading(block.text, block.kind)))
+            meta = {"start": start - page_start, "end": end - page_start, "kind": block.kind,
+                    "bbox": list(block.bbox) if block.bbox else None}
+            if block.anchor:
+                meta["anchor"] = block.anchor
+            block_meta.append(meta)
+            heading = is_heading(block.text, block.kind)
+            if heading and (n := chapter_number(block.text)) is not None:
+                chapter = n
+            units.append(_Unit(start, end, word_count(block.text), heading, chapter))
         spans.append(PageSpan(page.page_no, page_start, pos if block_meta else page_start,
                               block_meta))
     return "".join(parts), spans, units
@@ -108,7 +122,7 @@ def _split_long(text: str, unit: _Unit, max_words: int) -> list[_Unit]:
         for i in range(0, len(words), max_words):
             group = words[i:i + max_words]
             ws, we = s + group[0].start(), s + group[-1].end()
-            out.append(_Unit(unit.start + ws, unit.start + we, len(group), False))
+            out.append(_Unit(unit.start + ws, unit.start + we, len(group), False, unit.chapter))
     return out
 
 
@@ -165,7 +179,7 @@ def chunk_document(doc: ParsedDocument, max_words: int = 180) -> tuple[str, list
             chunks.append(Chunk(idx=len(chunks), char_start=start, char_end=end, text=body,
                                 page_start=page_at(start), page_end=page_at(end - 1),
                                 section_title=title, language=detect_language(body),
-                                n_words=word_count(body)))
+                                n_words=word_count(body), chapter=group[-1].chapter))
             group = [u] if u is not None else []
     return text, spans, chunks
 
