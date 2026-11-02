@@ -159,3 +159,22 @@ Short records: what was chosen, the alternatives, and why. One entry per stage.
   because the two pages show different edition dates). One article (888) differs; it is
   listed in `docs/data.md` and should not be used for questions. Wording changes that
   keep all numbers are not detected.
+
+## Fix: Latin homoglyphs in Cyrillic words (2026-11-02)
+
+- **Found:** the Russian Civil Code page from lex.uz contains 141 words in 85 chunks with
+  Latin letters inside Cyrillic words ("пеpвой" with a Latin "p", "cтоимоcть" with a Latin
+  "c"). Such words do not match their normal spelling in BM25 and tokenize differently
+  for the embedding model. The other three documents had none.
+- **Chosen:** a normalization step (`fix_cyrillic_homoglyphs` in
+  `documind/ingestion/text.py`) that replaces Latin look-alike letters
+  (a c e o p x y k and A B C E H K M O P T X Y) with their Cyrillic equivalents, **only in
+  words that already contain a Cyrillic letter, and only if every Latin letter in the
+  word has a look-alike**. Purely Latin words (uz-Latn text, company names) and words
+  with other Latin letters (e.g. "Тexno") are left unchanged. Alternatives: fixing the
+  documents by hand (not reproducible); folding in the BM25 analyzer only (would not help
+  the embedding model or the displayed text).
+- **One character for one character**, so offsets are unchanged. After re-ingesting the
+  Russian Civil Code: 0 mixed-script words (was 141); chunk ids, offsets, chapters,
+  word counts, languages and the train/test split are identical; only the letters
+  p→р and c→с changed in 85 chunks; the synthetic eval results are identical.

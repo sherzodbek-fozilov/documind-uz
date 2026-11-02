@@ -70,6 +70,10 @@ Compared uz-Latn (edition 19.07.2026, 809 articles) with ru (edition 08.08.2026,
 | 888 | numbers | 379 vs 79 |
 <!-- END VERSION DIFF civil-code-part2 -->
 
+- **Latin homoglyphs in the Russian Civil Code:** the lex.uz page has 141 words in which
+  Latin letters stand inside Cyrillic words (Latin "p" and "c"). Ingestion replaces them
+  with the Cyrillic letters (one for one, only in mixed-script words; see
+  `docs/decisions.md`). The downloaded file itself is not changed.
 - Not redistributed: `data/raw/` is git-ignored; only `data/raw/manifest.jsonl`
   (ids, URLs, license text, edition, sha256) and `data/sources.json` are committed.
 
