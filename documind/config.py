@@ -20,6 +20,14 @@ class Settings(BaseSettings):
 
     chunk_max_words: int = Field(180, ge=20)
 
+    # retrieval (stage 2)
+    embed_model_dir: Path = Path("models/multilingual-e5-small")
+    embed_cache_dir: Path = Path("data/cache")
+    qdrant_url: str | None = None  # None = in-process Qdrant (eval, tests)
+    bm25_analyzer: str = "fold+stem6"
+    rrf_k: int = Field(60, ge=1)
+    retrieval_depth: int = Field(100, ge=10)  # candidates per retriever before fusion
+
     test_fraction: float = Field(0.3, ge=0.0, le=1.0)
     splits_file: Path = Path("data/splits.json")
 

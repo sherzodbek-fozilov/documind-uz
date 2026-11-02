@@ -17,13 +17,30 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [x] Document-level train/test split
 - [x] Synthetic document generator and OCR error-rate script
 
+## Stage 2 prep: real documents
+- [x] Source registry (`data/sources.json`) with a terms gate, fetch script, generated
+      table in `docs/data.md`
+- [x] Split stratified by kind (real / synthetic) and language
+- [x] lex.uz robots.txt checked (none); terms checked by Sherzodbek (no statement on
+      automated download or copying), recorded per source
+- [x] Approval and license field for the four lex.uz sources (GitHub issue #3)
+- [ ] Confirm the copyright-law article on official documents (ZRU-42)
+- [x] Find and verify URLs: Civil Code part 2, Labor Code 2022 (uz-Latn and ru)
+- [ ] Find and verify URLs: consumer protection law (uz and ru), official model contracts
+- [x] Download approved sources, ingest, re-run `documind split` (chapter-group split)
+- [ ] Held-out third act (consumer protection law) as an out-of-domain test set, never
+      used for tuning or fine-tuning
+- [ ] Label real evaluation questions (`data/eval/questions.jsonl`)
+
 ## Stage 2: retrieval baselines
-- [ ] BM25 baseline
-- [ ] multilingual-e5-small dense retrieval with Qdrant
-- [ ] Hybrid retrieval with reciprocal rank fusion
+- [x] BM25 baseline
+- [x] multilingual-e5-small dense retrieval with Qdrant
+- [x] Hybrid retrieval with reciprocal rank fusion
 - [ ] Optional cross-encoder reranker (CPU latency must be measured)
-- [ ] Eval script: Recall@1/5/10, MRR on `data/eval/questions.jsonl`
-- [ ] Question-drafting tool for manual review
+- [ ] Real-set results (blocked on real documents and labeled questions)
+- [ ] Re-check the BM25 analyzer choice on real train-split questions (GitHub issue #7)
+- [x] Eval script: Recall@1/5/10, MRR on `data/eval/questions.jsonl`
+- [x] Question-drafting tool for manual review
 
 ## Stage 3: API
 - [ ] FastAPI: upload, ask, answer with citations

@@ -71,3 +71,12 @@ def test_short_preamble_joins_first_section():
     assert chunks[0].text.startswith("SINTETIK NAMUNA") and "Toshkent" in chunks[0].text
     assert chunks[0].section_title == "IJARA SHARTNOMASI"
     assert not any(c.text.rstrip().endswith("SHARTNOMASI") for c in chunks)
+
+
+@pytest.mark.parametrize("text,n", [("29-bob. Oldi-sotdi", 29), ("29 - боб. Олди-сотди", 29),
+                                    ("Глава 34. Имущественный наем", 34),
+                                    ("1-modda. Predmet", None), ("§ 1. Общие положения", None)])
+def test_chapter_number(text, n):
+    from documind.ingestion.chunking import chapter_number
+
+    assert chapter_number(text) == n

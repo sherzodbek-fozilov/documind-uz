@@ -13,16 +13,17 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..config import Settings
-from ..split import assign_split, load_overrides
+from ..split import assign_split, document_split, load_overrides, split_group_of
 from ..storage import models
 from .chunking import chunk_document, chunker_version
 from .docx_parser import parse_docx
 from .image import IMAGE_MIMES, parse_image
+from .lexuz_html import is_lexuz_html, parse_lexuz_html
 from .pdf import parse_pdf
 from .text import script_counts
 from .types import ParsedDocument
 
-SUPPORTED_SUFFIXES = {".pdf", ".docx", *IMAGE_MIMES}
+SUPPORTED_SUFFIXES = {".pdf", ".docx", ".html", *IMAGE_MIMES}
 
 
 @dataclass
@@ -59,13 +60,18 @@ def parse_file(path: Path, settings: Settings, *, force_ocr: bool = False) -> Pa
         return parse_docx(path)
     if suffix in IMAGE_MIMES:
         return parse_image(path, ocr_langs=settings.ocr_langs)
+    if suffix == ".html":
+        if not is_lexuz_html(path):
+            raise ValueError(f"{path.name}: only lex.uz act pages are supported as HTML")
+        return parse_lexuz_html(path)
     raise ValueError(f"unsupported file type: {path.name} (supported: "
                      f"{', '.join(sorted(SUPPORTED_SUFFIXES))})")
 
 
 def ingest_file(path: Path, session: Session, settings: Settings, *, doc_id: str | None = None,
                 group_id: str | None = None, is_synthetic: bool = False,
-                source: str | None = None, force_ocr: bool = False) -> IngestResult:
+                source: str | None = None, force_ocr: bool = False,
+                split_unit: str = "document", meta: dict | None = None) -> IngestResult:
     path = Path(path)
     sha = sha256_file(path)
     existing = session.scalar(select(models.Document).where(models.Document.sha256 == sha))
@@ -85,7 +91,11 @@ def ingest_file(path: Path, session: Session, settings: Settings, *, doc_id: str
         lang_words[c.language] += c.n_words
     known = {k: v for k, v in lang_words.items() if k != "unknown"}
     language = max(known, key=known.get) if known else "unknown"
-    split = assign_split(group_id, settings.test_fraction, load_overrides(settings.splits_file))
+    overrides = load_overrides(settings.splits_file)
+    chunk_groups = [split_group_of(group_id, split_unit, c.chapter) for c in chunks]
+    chunk_splits = [assign_split(g, settings.test_fraction, overrides) for g in chunk_groups]
+    split = (assign_split(group_id, settings.test_fraction, overrides)
+             if split_unit == "document" else document_split(chunk_splits, "train"))
 
     settings.storage_dir.mkdir(parents=True, exist_ok=True)
     stored = settings.storage_dir / f"{sha}{path.suffix.lower()}"
@@ -98,7 +108,8 @@ def ingest_file(path: Path, session: Session, settings: Settings, *, doc_id: str
         storage_path=str(stored), n_pages=len(parsed.pages),
         n_ocr_pages=sum(p.is_ocr for p in parsed.pages), language=language,
         script_stats={**script_counts(text), "chunk_words_by_language": dict(lang_words)},
-        split=split, is_synthetic=is_synthetic, source=source,
+        split=split, split_unit=split_unit, is_synthetic=is_synthetic, source=source,
+        meta={**parsed.meta, **(meta or {})},
         chunker_version=chunker_version(settings.chunk_max_words),
         warnings=parsed.warnings, text=text,
         pages=[models.Page(page_no=s.page_no, char_start=s.char_start, char_end=s.char_end,
@@ -110,8 +121,9 @@ def ingest_file(path: Path, session: Session, settings: Settings, *, doc_id: str
         chunks=[models.Chunk(id=f"{doc_id}#c{c.idx:04d}", idx=c.idx, char_start=c.char_start,
                              char_end=c.char_end, page_start=c.page_start, page_end=c.page_end,
                              section_title=c.section_title, language=c.language,
-                             n_words=c.n_words, text=c.text)
-                for c in chunks],
+                             n_words=c.n_words, chapter=c.chapter, split_group=g, split=sp,
+                             text=c.text)
+                for c, g, sp in zip(chunks, chunk_groups, chunk_splits, strict=True)],
     )
     session.add(doc)
     session.commit()

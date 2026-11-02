@@ -59,3 +59,103 @@ Short records: what was chosen, the alternatives, and why. One entry per stage.
   writing separate Cyrillic templates. Why: less effort, consistent content. Bias: real
   Cyrillic documents differ in spelling and vocabulary, so uz-Cyrl results on synthetic
   data are optimistic.
+
+## Stage 2 prep: real documents (2026-11-01)
+
+- **Chosen:** a source registry (`data/sources.json`) as the single source of truth;
+  `scripts/fetch_sources.py` downloads only entries marked `approved` (license, who
+  checked, when) and generates the table in `docs/data.md`. Files can also be placed by
+  hand in `data/raw/`. **Alternatives:** a hand-maintained list in `docs/data.md`; a
+  scraper. **Why:** the terms check becomes a hard gate in code, and the documentation
+  cannot drift from what was actually downloaded (sha256 recorded).
+- **Chosen:** split strata = kind (real / synthetic) + languages of the group.
+  **Alternatives:** one pool for all documents; excluding synthetic documents from the
+  split. **Why:** real results must not depend on how many synthetic documents exist, and
+  a law published in uz and ru is one group, so its two versions never straddle train/test.
+- **Open:** no real document could be included: lex.uz and other sources are blocked from
+  the build environment, so their terms could not be read.
+
+## Stage 2: retrieval baselines (2026-11-01)
+
+- **BM25: own small implementation (Okapi, k1 = 1.2, b = 0.75) with selectable analyzers.**
+  Alternatives: rank_bm25, Elasticsearch/OpenSearch, PostgreSQL full-text search.
+  Why: a few dozen lines, no extra service on the CPU server, and full control over
+  tokenization, which matters most for Uzbek.
+- **Analyzer `fold+stem6` as default:** apostrophes removed, Cyrillic mapped to Latin with
+  OCR-confusable letters merged (қ/к, ҳ/х, ғ/г, ў/о), tokens cut to 6 characters.
+  Compared on the **train** split only (synthetic set; plain, fold, ±stem5/stem6): with
+  stemming Recall@5 rose from 0.949 to 1.000 and MRR from 0.864 to 0.907; fold vs plain
+  differed little. Caveat: the synthetic set is near saturation and scripts are not
+  mixed between query and document there, so this must be re-checked on real questions.
+  Alternatives: Snowball stemmers (no Uzbek), a morphological analyzer (Apertium uzb).
+- **Dense: multilingual-e5-small as ONNX, run with onnxruntime; model revision pinned.**
+  Alternatives: sentence-transformers with PyTorch; e5-base / bge-m3 (larger, slower on
+  CPU). Why: no PyTorch on the server, ~10 ms per query on 4 CPU cores in this
+  environment, 384-dim vectors. The fine-tuned model from Kaggle (stage 5) must be
+  exported to ONNX the same way.
+- **Vector store: Qdrant, in-process (`:memory:`) for evaluation and tests, server via
+  `DOCUMIND_QDRANT_URL` in deployment; same code path.** Alternatives: pgvector, FAISS,
+  plain numpy. Why: Qdrant is the planned deployment component; filters by document
+  are needed for "ask about this file".
+- **Hybrid: reciprocal rank fusion, k = 60, 100 candidates from each retriever.**
+  Alternatives: weighted score fusion (needs score normalization and tuning).
+  Why: parameter-light and robust when the two score scales differ.
+- **Evaluation: Recall@1/5/10 and MRR@10 per question set, 95% bootstrap confidence
+  intervals, per-language breakdown; real and synthetic sets are separate files, separate
+  corpora and separate README tables.** Settings are chosen on the train split and
+  reported on the test split.
+- **Synthetic questions use "document" scope (search within the gold document).**
+  Why: the synthetic contracts are near-identical templates, so a question without names
+  has many equally correct answers across documents. This makes the synthetic numbers
+  a pipeline sanity check only. Real questions use "corpus" scope.
+- **Question drafting without an LLM** (heading-based and number-based drafts), with a
+  review step that refuses unedited drafts. Alternatives: LLM-generated questions (better
+  wording, but they need the API budget guard from stage 3 and tend to copy the passage).
+  Why: drafts only save typing; the questions you write decide the result.
+- **Observation (synthetic test set):** BM25 is weakest on Russian (Recall@1 0.66) and e5
+  is weakest on uz-Cyrl (Recall@1 0.73; the uz-Cyrl text is machine-transliterated);
+  hybrid evens this out. Differences overall are within the confidence intervals.
+
+## Stage 2: real documents (2026-11-02)
+
+- **HTML instead of PDF for lex.uz acts.** lex.uz offers no PDF for the Civil Code, and
+  its Word export is a JavaScript action. Chosen: a small parser for the act pages
+  (`documind/ingestion/lexuz_html.py`, standard-library `html.parser`) that maps chapter
+  and article headings to heading blocks and paragraphs to text blocks, and keeps each
+  element's lex.uz id for citation links. Alternatives: PDF where available (inconsistent
+  across documents, layout noise); converting by hand (not reproducible). Tests use a
+  handwritten sample, never lex.uz text.
+- **Editorial amendment notes are skipped** (lex.uz marks them `lx_no_select`: amendment
+  history, cross-reference indexes, "changes origins"). Why: they are not part of the
+  legal text and would add near-duplicate passages ("in the wording of the law of ...").
+  Limitation: questions like "when was article N amended?" cannot be answered.
+- **Uzbek in Latin script for both acts** (lex.uz's own Latin publication).
+- **Deviation from the document-level split: chapter-group split for the real acts.**
+  With only two acts, splitting by document (with uz and ru kept together) would put one
+  whole act in test and the other in train. Chosen: the same chapter in both language
+  versions of an act forms one split group (`<act>/ch<N>`), stratified per act (~30 % of
+  each act's chapters in test). Translations of the same chapter never straddle the
+  split, so there is no translation leakage. **Limitation:** train and test share the
+  same acts, vocabulary, drafting style and cross-references between chapters, so test
+  results (and especially fine-tuning gains) will look better than on an unseen act.
+  Mitigation planned: a held-out third act (consumer protection law) as an
+  out-of-domain test set.
+- **Splits are stored per chunk** (`chunks.split_group`, `chunks.split`); a document
+  split by chapter has `documents.split = "mixed"`. Evaluation, drafting and future
+  training-pair generation use the chunk's split.
+- **Civil Code test chapters pinned by topic: 29 (sale), 34 (rent), 37 (contract work,
+  incl. construction).** Decided by topic and size on 2026-11-02, **before any labeling
+  or evaluation on real data**. The hash split had put all three in train. They are much
+  larger than the chapters the hash split had chosen (about 23.5k, 11.3k and 13.4k words
+  for uz + ru, against at most 5.7k), so a three-for-three swap would have raised the
+  Civil Code test share to 46 % of its words. Chosen instead: the Civil Code test set is
+  exactly these three chapters (31.4 % of its words; the other 40 chapters are train).
+  The Labor Code keeps its hash-based chapter split (10 of 34 chapters, 28 % of words).
+  Recorded in `data/splits.json`. **Limitation:** the Civil Code test set covers only
+  three chapters (sale, rent, construction work), so results may not generalize to other
+  parts of the code.
+- **Version check before labeling:** `scripts/compare_versions.py` compares the uz-Latn
+  and ru Civil Code article by article (paragraph count and the numbers in the text,
+  because the two pages show different edition dates). One article (888) differs; it is
+  listed in `docs/data.md` and should not be used for questions. Wording changes that
+  keep all numbers are not detected.

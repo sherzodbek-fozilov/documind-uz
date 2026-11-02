@@ -8,8 +8,16 @@ __pycache__/
 # raw and generated documents are never committed (licenses / size); see docs/data.md
 data/raw/*
 !data/raw/.gitkeep
+# the manifest (ids, URLs, licenses, sha256) is committed; the documents are not
+!data/raw/manifest.jsonl
 data/synthetic/*
 !data/synthetic/README.md
 data/store/
 *.sqlite
 node_modules/
+# downloaded model weights
+models/
+# embedding cache
+data/cache/
+# question drafts under review (working files)
+data/eval/drafts/

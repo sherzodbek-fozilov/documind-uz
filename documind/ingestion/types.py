@@ -11,8 +11,10 @@ class Block:
 
     text: str
     kind: str = "text"  # "text" | "heading" | "table"
-    # (x0, y0, x1, y1) in PDF points; None for DOCX
+    # (x0, y0, x1, y1) in PDF points; None for DOCX / HTML
     bbox: tuple[float, float, float, float] | None = None
+    # stable element id in the source (e.g. a lex.uz element id) for citation links
+    anchor: str | None = None
 
 
 @dataclass
@@ -31,6 +33,8 @@ class ParsedDocument:
     mime: str
     pages: list[ParsedPage]
     warnings: list[str] = field(default_factory=list)
+    # source metadata found in the file (e.g. title, edition date for lex.uz pages)
+    meta: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -55,3 +59,6 @@ class Chunk:
     section_title: str | None
     language: str
     n_words: int
+    # number of the chapter ("bob" / "глава") the chunk belongs to, if the document has
+    # numbered chapters; used for the chapter-group split
+    chapter: int | None = None

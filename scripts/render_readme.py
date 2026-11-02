@@ -27,13 +27,19 @@ END = "<!-- END METRICS -->"
 
 RETRIEVAL_COLUMNS = [("Recall@1", "recall@1"), ("Recall@5", "recall@5"),
                      ("Recall@10", "recall@10"), ("MRR", "mrr")]
+# (label, method key); the file is results/retrieval_<key>_<set>.json
 RETRIEVAL_ROWS = [
-    ("BM25", "retrieval_bm25.json"),
-    ("multilingual-e5-small (dense)", "retrieval_e5_small.json"),
-    ("Hybrid BM25 + e5 (RRF)", "retrieval_hybrid_rrf.json"),
-    ("Hybrid + reranker", "retrieval_hybrid_rerank.json"),
-    ("Fine-tuned e5-small (dense)", "retrieval_e5_small_ft.json"),
-    ("Hybrid with fine-tuned e5 (RRF)", "retrieval_hybrid_rrf_ft.json"),
+    ("BM25", "bm25"),
+    ("multilingual-e5-small (dense)", "e5_small"),
+    ("Hybrid BM25 + e5 (RRF)", "hybrid_rrf"),
+    ("Hybrid + reranker", "hybrid_rerank"),
+    ("Fine-tuned e5-small (dense)", "e5_small_ft"),
+    ("Hybrid with fine-tuned e5 (RRF)", "hybrid_rrf_ft"),
+]
+RETRIEVAL_SETS = [
+    ("real", "Retrieval: real documents (test split, main result)"),
+    ("synthetic", "Retrieval: SYNTHETIC sanity set (test split, search within the gold "
+                  "document; not comparable to the real set)"),
 ]
 OTHER_ROWS = [
     # (label, file, metric key, format)
@@ -60,17 +66,28 @@ def _fmt(value, kind: str = "num") -> str:
     return f"{value:.3f}"
 
 
+def _ci(data: dict, key: str) -> str:
+    ci = data.get("ci95", {}).get(key)
+    return f" ({ci[0]:.2f}–{ci[1]:.2f})" if ci else ""
+
+
 def render_tables(results_dir: Path) -> str:
-    lines = ["### Retrieval (test split)", "",
-             "| Method | " + " | ".join(c for c, _ in RETRIEVAL_COLUMNS) + " | Questions |",
-             "|---" * (len(RETRIEVAL_COLUMNS) + 2) + "|"]
-    for label, fname in RETRIEVAL_ROWS:
-        data = _load(results_dir, fname) or {}
-        metrics = data.get("metrics", {})
-        cells = [_fmt(metrics.get(key)) for _, key in RETRIEVAL_COLUMNS]
-        n = data.get("n")
-        lines.append(f"| {label} | " + " | ".join(cells) + f" | {n if n is not None else 'TBD'} |")
-    lines += ["", "### Other measurements", "", "| Measurement | Value | n | Source file |",
+    lines: list[str] = []
+    for set_key, title in RETRIEVAL_SETS:
+        lines += [f"### {title}", "",
+                  "| Method | " + " | ".join(c for c, _ in RETRIEVAL_COLUMNS) + " | Questions |",
+                  "|---" * (len(RETRIEVAL_COLUMNS) + 2) + "|"]
+        for label, method in RETRIEVAL_ROWS:
+            data = _load(results_dir, f"retrieval_{method}_{set_key}.json") or {}
+            metrics = data.get("metrics", {})
+            cells = [_fmt(metrics.get(key)) + (_ci(data, key) if key in metrics else "")
+                     for _, key in RETRIEVAL_COLUMNS]
+            n = data.get("n")
+            lines.append(f"| {label} | " + " | ".join(cells)
+                         + f" | {n if n is not None else 'TBD'} |")
+        lines.append("")
+    lines += ["Values in parentheses: 95% bootstrap confidence interval over questions.", "",
+              "### Other measurements", "", "| Measurement | Value | n | Source file |",
               "|---|---|---|---|"]
     for label, fname, key, kind in OTHER_ROWS:
         data = _load(results_dir, fname) or {}

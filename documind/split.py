@@ -14,6 +14,23 @@ from collections.abc import Iterable
 from pathlib import Path
 
 SPLITS = ("train", "test")
+SPLIT_UNITS = ("document", "chapter")
+
+
+def split_group_of(group_id: str, split_unit: str, chapter: int | None) -> str:
+    """Split group of a chunk. With unit "chapter", the same chapter number in every
+    language version of an act (same group_id) forms one group; text before the first
+    chapter goes to chapter 0."""
+    if split_unit == "document":
+        return group_id
+    if split_unit == "chapter":
+        return f"{group_id}/ch{chapter or 0}"
+    raise ValueError(f"split_unit must be one of {SPLIT_UNITS}")
+
+
+def document_split(chunk_splits: Iterable[str], fallback: str) -> str:
+    values = set(chunk_splits)
+    return values.pop() if len(values) == 1 else ("mixed" if values else fallback)
 
 
 def hash_split(group_id: str, test_fraction: float) -> str:

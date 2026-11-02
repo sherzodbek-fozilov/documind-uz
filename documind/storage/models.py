@@ -37,11 +37,17 @@ class Document(Base):
     n_ocr_pages: Mapped[int] = mapped_column(Integer, default=0)
     language: Mapped[str] = mapped_column(String(16))
     script_stats: Mapped[dict] = mapped_column(JSONType, default=dict)
-    split: Mapped[str] = mapped_column(String(8), index=True)  # "train" | "test"
+    # "train" | "test", or "mixed" when the split unit is the chapter
+    split: Mapped[str] = mapped_column(String(8), index=True)
+    # unit of the train/test split: "document" (default) or "chapter" (chapter groups:
+    # the same chapter in all language versions of an act shares a split)
+    split_unit: Mapped[str] = mapped_column(String(16), default="document")
     is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
     source: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     chunker_version: Mapped[str] = mapped_column(String(64))
     warnings: Mapped[list] = mapped_column(JSONType, default=list)
+    # source metadata from the file and the manifest (title, edition date, license, ...)
+    meta: Mapped[dict] = mapped_column(JSONType, default=dict)
     text: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC))
@@ -87,6 +93,11 @@ class Chunk(Base):
     section_title: Mapped[str | None] = mapped_column(String(300), nullable=True)
     language: Mapped[str] = mapped_column(String(16), index=True)
     n_words: Mapped[int] = mapped_column(Integer)
+    chapter: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # split group and split of this chunk: the document's for split_unit "document",
+    # "<group_id>/ch<N>" for split_unit "chapter"
+    split_group: Mapped[str] = mapped_column(String(160), index=True)
+    split: Mapped[str] = mapped_column(String(8), index=True)
     text: Mapped[str] = mapped_column(Text)
 
     document: Mapped[Document] = relationship(back_populates="chunks")
