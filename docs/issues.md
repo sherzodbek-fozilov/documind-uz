@@ -23,11 +23,13 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [x] Split stratified by kind (real / synthetic) and language
 - [x] lex.uz robots.txt checked (none); terms checked by Sherzodbek (no statement on
       automated download or copying), recorded per source
-- [ ] Decide approval and the license field for lex.uz sources (GitHub issue #3)
+- [x] Approval and license field for the four lex.uz sources (GitHub issue #3)
 - [ ] Confirm the copyright-law article on official documents (ZRU-42)
-- [ ] Find and verify URLs: Civil Code part 2 (rent, sale, construction contract),
-      Labor Code 2022, consumer protection law (uz and ru), official model contracts
-- [ ] Download approved sources, ingest, re-run `documind split`
+- [x] Find and verify URLs: Civil Code part 2, Labor Code 2022 (uz-Latn and ru)
+- [ ] Find and verify URLs: consumer protection law (uz and ru), official model contracts
+- [x] Download approved sources, ingest, re-run `documind split` (chapter-group split)
+- [ ] Held-out third act (consumer protection law) as an out-of-domain test set, never
+      used for tuning or fine-tuning
 - [ ] Label real evaluation questions (`data/eval/questions.jsonl`)
 
 ## Stage 2: retrieval baselines

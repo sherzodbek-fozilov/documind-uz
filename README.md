@@ -8,8 +8,9 @@ project is in **retrieval**, **evaluation** and **fine-tuning an embedding model
 number below is produced by a script in this repository.
 
 > **Status:** work in progress. Stages 0–2 (skeleton, ingestion, retrieval baselines)
-> are implemented. No real documents are included yet, so the main (real) retrieval
-> table is `TBD`; the synthetic table is only a pipeline sanity check.
+> are implemented. Four real documents are ingested, but real questions are not labeled
+> yet, so the main (real) retrieval table is `TBD`; the synthetic table is only a
+> pipeline sanity check.
 > The OCR numbers are measured on **synthetic, mildly degraded** scans and are an
 > optimistic lower bound for real documents.
 
@@ -105,7 +106,7 @@ Optional: run the PostgreSQL test with
 
 | Step | What happens |
 |---|---|
-| Parse | PDF text layer (PyMuPDF blocks with bounding boxes); DOCX paragraphs, headings, tables; PNG/JPEG/TIFF |
+| Parse | PDF text layer (PyMuPDF blocks with bounding boxes); DOCX paragraphs, headings, tables; PNG/JPEG/TIFF; lex.uz act pages (HTML) |
 | OCR | PDF pages with fewer than 30 text characters are rendered at 300 dpi and OCR'd with tesseract `uzb+uzb_cyrl+rus` |
 | Normalize | NFC, whitespace, Uzbek apostrophe variants → ʻ / ʼ |
 | Chunk | new chunk at each article / chapter / section heading; ≤ 180 words; no overlap; each chunk is an exact span of the document text |
@@ -143,15 +144,18 @@ No real personal data is used.
 
 - **Real documents** (laws, official model contracts) are the main evaluation set. They
   are listed in `data/sources.json` and fetched by `scripts/fetch_sources.py` only after
-  the source's terms were checked and recorded. *Status: none included yet; see
-  [`docs/data.md`](docs/data.md).*
+  the source's terms were checked and recorded. *Status: Civil Code part 2 and Labor
+  Code 2022 from lex.uz, in Russian and Uzbek (Latin); see [`docs/data.md`](docs/data.md).
+  Real questions are not labeled yet.*
 - **Synthetic documents** are used for OCR and format tests. They are labeled as synthetic
   in their text, their file names and the database (`documents.is_synthetic`), and
   their results are always reported separately.
 
-Train/test splits are made **by document group** (e.g. the uz and ru versions of one act
-stay together), never by chunk, and are stratified by kind (real / synthetic) and
-language.
+Train/test splits never separate translations: synthetic documents are split by
+document, and the real acts by **chapter group** (the same chapter in all language
+versions of an act stays together; see `docs/decisions.md` for why and for the
+limitation). Splits are stratified by kind (real / synthetic) and frozen in
+`data/splits.json`.
 
 ## Limitations
 

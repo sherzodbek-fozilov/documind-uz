@@ -115,3 +115,42 @@ Short records: what was chosen, the alternatives, and why. One entry per stage.
 - **Observation (synthetic test set):** BM25 is weakest on Russian (Recall@1 0.66) and e5
   is weakest on uz-Cyrl (Recall@1 0.73; the uz-Cyrl text is machine-transliterated);
   hybrid evens this out. Differences overall are within the confidence intervals.
+
+## Stage 2: real documents (2026-11-02)
+
+- **HTML instead of PDF for lex.uz acts.** lex.uz offers no PDF for the Civil Code, and
+  its Word export is a JavaScript action. Chosen: a small parser for the act pages
+  (`documind/ingestion/lexuz_html.py`, standard-library `html.parser`) that maps chapter
+  and article headings to heading blocks and paragraphs to text blocks, and keeps each
+  element's lex.uz id for citation links. Alternatives: PDF where available (inconsistent
+  across documents, layout noise); converting by hand (not reproducible). Tests use a
+  handwritten sample, never lex.uz text.
+- **Editorial amendment notes are skipped** (lex.uz marks them `lx_no_select`: amendment
+  history, cross-reference indexes, "changes origins"). Why: they are not part of the
+  legal text and would add near-duplicate passages ("in the wording of the law of ...").
+  Limitation: questions like "when was article N amended?" cannot be answered.
+- **Uzbek in Latin script for both acts** (lex.uz's own Latin publication).
+- **Deviation from the document-level split: chapter-group split for the real acts.**
+  With only two acts, splitting by document (with uz and ru kept together) would put one
+  whole act in test and the other in train. Chosen: the same chapter in both language
+  versions of an act forms one split group (`<act>/ch<N>`), stratified per act (~30 % of
+  each act's chapters in test). Translations of the same chapter never straddle the
+  split, so there is no translation leakage. **Limitation:** train and test share the
+  same acts, vocabulary, drafting style and cross-references between chapters, so test
+  results (and especially fine-tuning gains) will look better than on an unseen act.
+  Mitigation planned: a held-out third act (consumer protection law) as an
+  out-of-domain test set.
+- **Splits are stored per chunk** (`chunks.split_group`, `chunks.split`); a document
+  split by chapter has `documents.split = "mixed"`. Evaluation, drafting and future
+  training-pair generation use the chunk's split.
+- **Civil Code test chapters pinned by topic: 29 (sale), 34 (rent), 37 (contract work,
+  incl. construction).** Decided by topic and size on 2026-11-02, **before any labeling
+  or evaluation on real data**. The hash split had put all three in train. They are much
+  larger than the chapters the hash split had chosen (about 23.5k, 11.3k and 13.4k words
+  for uz + ru, against at most 5.7k), so a three-for-three swap would have raised the
+  Civil Code test share to 46 % of its words. Chosen instead: the Civil Code test set is
+  exactly these three chapters (31.4 % of its words; the other 40 chapters are train).
+  The Labor Code keeps its hash-based chapter split (10 of 34 chapters, 28 % of words).
+  Recorded in `data/splits.json`. **Limitation:** the Civil Code test set covers only
+  three chapters (sale, rent, construction work), so results may not generalize to other
+  parts of the code.
