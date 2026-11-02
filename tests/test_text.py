@@ -41,3 +41,36 @@ def test_transliteration():
     assert latin_to_cyrillic("SHARTNOMA, gʻalaba, maʼlumot, yer, ega") == \
         "ШАРТНОМА, ғалаба, маълумот, ер, эга"
     assert detect_language(latin_to_cyrillic("Toʻlov qoʻshimcha haq")) == "uz-Cyrl"
+
+
+# Handwritten samples (invented phrases, no source text).
+@pytest.mark.parametrize("text,expected", [
+    ("пеpвый", "первый"),                      # Latin p inside a Cyrillic word
+    ("Сpок аpенды", "Срок аренды"),            # several mixed words, Latin p
+    ("cтоимоcть", "стоимость"),                # Latin c
+    ("ТЕКCТ", "ТЕКСТ"),                        # Latin capital C in an upper-case word
+])
+def test_mixed_script_words_are_fixed(text, expected):
+    from documind.ingestion.text import fix_cyrillic_homoglyphs
+
+    out = fix_cyrillic_homoglyphs(text)
+    assert out == expected
+    assert len(out) == len(text)  # one character for one character
+
+
+@pytest.mark.parametrize("text", [
+    "Ijarachi oylik haq toʻlaydi",              # pure uz-Latn text
+    "«Yashil Vodiy» MChJ va «Oq Tosh» OOO",     # pure Latin company names
+    "ООО «Тexno»",                             # mixed, but "n" has no Cyrillic look-alike
+    "qарор",                                   # mixed, "q" has no Cyrillic look-alike
+    "SMS-хабарнома",                           # hyphen separates the Latin word
+    "Обычный русский текст",                   # pure Cyrillic
+])
+def test_other_words_are_left_alone(text):
+    from documind.ingestion.text import fix_cyrillic_homoglyphs
+
+    assert fix_cyrillic_homoglyphs(text) == text
+
+
+def test_normalize_block_fixes_homoglyphs_and_keeps_uzbek_apostrophes():
+    assert normalize_block("Сpок  o'zgarmaydi") == "Срок oʻzgarmaydi"
