@@ -5,7 +5,9 @@ Question files:
   data/eval/questions_synthetic.jsonl  SYNTHETIC documents, generated from templates
 
 Each set is searched only within its own corpus (real or synthetic chunks, all splits),
-and only questions whose gold document is in ``--split`` (default: test) are scored.
+and only questions whose gold chunk is in ``--split`` (default: test) are scored. The
+split is per chunk: the document's split, or its chapter group's split for acts split by
+chapter.
 Questions with ``"status": "draft"`` (unreviewed drafts) are skipped and counted.
 
 Writes results/retrieval_<method>_<set>.json for the test split (rendered in the README),
@@ -104,7 +106,7 @@ def main() -> None:
                 counts["skipped_gold_not_found"] += 1
                 print(f"WARNING [{kind}] line {q.line}: gold {q.gold_chunk} not in corpus "
                       f"or not in {q.gold_doc}", file=sys.stderr)
-            elif split_of_doc[q.gold_doc] != args.split:
+            elif by_id[q.gold_chunk].split != args.split:
                 counts["other_split"] += 1
             else:
                 selected.append(q)

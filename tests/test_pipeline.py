@@ -138,10 +138,55 @@ def test_cli_split_stratifies_real_and_synthetic(tmp_path, settings, monkeypatch
                 ingest_file(path, s, get_settings(), is_synthetic=synthetic)
     assert cli_main(["split"]) == 0
     out = json.loads(capsys.readouterr().out)
-    assert out["groups"] == {"real/uz-Latn/test": 2, "real/uz-Latn/train": 2,
-                             "synthetic/uz-Latn/test": 2, "synthetic/uz-Latn/train": 2}
+    assert out["groups"] == {"real/doc/uz-Latn/test": 2, "real/doc/uz-Latn/train": 2,
+                             "synthetic/doc/uz-Latn/test": 2, "synthetic/doc/uz-Latn/train": 2}
     assert cli_main(["stats"]) == 0
     stats = json.loads(capsys.readouterr().out)
     assert stats["by_kind_and_split"] == {"real/test": 2, "real/train": 2,
                                           "synthetic/test": 2, "synthetic/train": 2}
+    get_settings.cache_clear()
+
+
+def test_chapter_group_split_keeps_language_versions_together(tmp_path, settings, monkeypatch,
+                                                               capsys):
+    import json
+
+    from documind.config import get_settings
+
+    for key, value in [("DATABASE_URL", settings.database_url),
+                       ("STORAGE_DIR", str(settings.storage_dir)),
+                       ("SPLITS_FILE", str(settings.splits_file)),
+                       ("TEST_FRACTION", "0.5")]:
+        monkeypatch.setenv(f"DOCUMIND_{key}", value)
+    get_settings.cache_clear()
+    Session = make_session_factory(settings.database_url)
+    versions = {"uz": ("{n}-bob. Bob {n}", "{n}-modda. Modda", "Ushbu bob {n} qoidasi."),
+                "ru": ("Глава {n}. Глава {n}", "Статья {n}. Статья", "Правило главы {n}.")}
+    with Session() as s:
+        for lang, (chap, art, text) in versions.items():
+            d = docx.Document()
+            for n in range(1, 7):
+                d.add_heading(chap.format(n=n), level=2)
+                d.add_heading(art.format(n=n), level=3)
+                d.add_paragraph(text.format(n=n))
+            d.save(tmp_path / f"act-{lang}.docx")
+            res = ingest_file(tmp_path / f"act-{lang}.docx", s, get_settings(), group_id="act",
+                              split_unit="chapter")
+            assert res.split in ("train", "test", "mixed")
+    assert cli_main(["split"]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["groups"] == {"real/act/ru+uz-Latn/test": 3, "real/act/ru+uz-Latn/train": 3}
+    with Session() as s:
+        rows = s.execute(select(models.Chunk.document_id, models.Chunk.chapter,
+                                models.Chunk.split_group, models.Chunk.split)).all()
+        by_group = {}
+        for _doc, chapter, group, split in rows:
+            assert group == f"act/ch{chapter}"
+            by_group.setdefault(group, set()).add(split)
+        assert len(by_group) == 6 and all(len(v) == 1 for v in by_group.values())
+        assert {s.get(models.Document, d).split for d in ("act-uz", "act-ru")} == {"mixed"}
+    assert cli_main(["stats"]) == 0
+    stats = json.loads(capsys.readouterr().out)
+    assert stats["leaking_groups"] == []
+    assert stats["split_groups_by_kind_split"] == {"real/test": 3, "real/train": 3}
     get_settings.cache_clear()

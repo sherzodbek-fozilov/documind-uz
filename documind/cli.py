@@ -13,11 +13,14 @@ from sqlalchemy import func, select
 
 from .config import get_settings
 from .ingestion.pipeline import SUPPORTED_SUFFIXES, ingest_file
-from .split import check_no_leakage, load_overrides, stratified_split
+from .split import check_no_leakage, document_split, load_overrides, stratified_split
 from .storage import models
 from .storage.db import make_session_factory
 
 MANIFEST = "manifest.jsonl"
+# manifest fields copied into documents.meta
+MANIFEST_META = ("kind", "license", "accessed_on", "edition", "source_page", "template",
+                 "format", "transliterated")
 
 
 def _load_manifest(directory: Path) -> dict[str, dict]:
@@ -54,7 +57,9 @@ def cmd_ingest(args) -> int:
                                   group_id=meta.get("group_id"),
                                   is_synthetic=bool(meta.get("synthetic", args.synthetic)),
                                   source=meta.get("source", args.source),
-                                  force_ocr=args.force_ocr)
+                                  force_ocr=args.force_ocr,
+                                  split_unit=meta.get("split_unit", "document"),
+                                  meta={k: meta[k] for k in MANIFEST_META if k in meta})
                 print(json.dumps({"file": str(path), **asdict(res)}, ensure_ascii=False))
             except Exception as exc:  # keep going; report at the end
                 session.rollback()
@@ -70,8 +75,15 @@ def cmd_stats(args) -> int:
     with Session() as s:
         docs = s.execute(select(models.Document.id, models.Document.group_id,
                                 models.Document.split, models.Document.language,
-                                models.Document.is_synthetic, models.Document.n_ocr_pages)).all()
+                                models.Document.is_synthetic, models.Document.n_ocr_pages,
+                                models.Document.split_unit)).all()
         n_chunks = s.scalar(select(func.count()).select_from(models.Chunk))
+        chunk_rows = s.execute(
+            select(models.Document.is_synthetic, models.Chunk.split, models.Chunk.language,
+                   models.Chunk.split_group, func.count(), func.min(models.Chunk.document_id))
+            .join(models.Document)
+            .group_by(models.Document.is_synthetic, models.Chunk.split, models.Chunk.language,
+                      models.Chunk.split_group)).all()
         stats = {
             "documents": len(docs),
             "chunks": n_chunks,
@@ -81,8 +93,19 @@ def cmd_stats(args) -> int:
             "by_language": Counter(d.language for d in docs),
             "synthetic": sum(d.is_synthetic for d in docs),
             "documents_with_ocr": sum(d.n_ocr_pages > 0 for d in docs),
-            "leaking_groups": check_no_leakage((d.id, d.group_id, d.split) for d in docs),
+            "chunks_by_kind_split_language": Counter(),
+            "split_groups_by_kind_split": Counter(),
+            "leaking_groups": check_no_leakage(
+                [(d.id, d.group_id, d.split) for d in docs if d.split_unit == "document"]
+                + [(r[5], r[3], r[1]) for r in chunk_rows]),
         }
+        seen_groups = set()
+        for synthetic, split, language, group, n, _ in chunk_rows:
+            kind = "synthetic" if synthetic else "real"
+            stats["chunks_by_kind_split_language"][f"{kind}/{split}/{language}"] += n
+            if (group, split) not in seen_groups:
+                seen_groups.add((group, split))
+                stats["split_groups_by_kind_split"][f"{kind}/{split}"] += 1
         if args.list:
             stats["document_ids"] = {d.id: d.split for d in docs}
     print(json.dumps(stats, ensure_ascii=False, indent=2))
@@ -90,37 +113,44 @@ def cmd_stats(args) -> int:
 
 
 def cmd_split(args) -> int:
-    """Write a split stratified by kind (real / synthetic) and language; apply it to the DB.
+    """Write a stratified split of the split groups to the splits file; apply it to the DB.
 
-    Real and synthetic documents get separate strata, so the real test set has its own
-    ~test_fraction share per language and real results never depend on synthetic data.
+    Split groups are documents (split_unit "document") or chapter groups (split_unit
+    "chapter": the same chapter in all language versions of an act). Strata keep real and
+    synthetic data apart, and chapter groups are stratified per act, so each act gets
+    about ``test_fraction`` of its chapters in the test split.
     """
     settings = get_settings()
     Session = make_session_factory(settings.database_url)
     existing = {} if args.reset else load_overrides(settings.splits_file)
     with Session() as s:
         docs = s.scalars(select(models.Document)).all()
-        groups: dict[str, tuple[set[str], set[str]]] = {}
+        info: dict[str, tuple[set[str], set[str], set[str]]] = {}
         for d in docs:
-            kinds, langs = groups.setdefault(d.group_id, (set(), set()))
-            kinds.add("synthetic" if d.is_synthetic else "real")
-            langs.add(d.language)
-        # stratum = kind + the set of languages in the group (e.g. "real/ru+uz-Latn" for
-        # an act available in two languages)
-        strata = {g: f"{'+'.join(sorted(k))}/{'+'.join(sorted(lang))}"
-                  for g, (k, lang) in groups.items()}
+            kind = "synthetic" if d.is_synthetic else "real"
+            unit = d.group_id if d.split_unit == "chapter" else "doc"
+            for g in {c.split_group for c in d.chunks}:
+                kinds, langs, units = info.setdefault(g, (set(), set(), set()))
+                kinds.add(kind)
+                langs.add(d.language)
+                units.add(unit)
+        strata = {g: "/".join(["+".join(sorted(k)), "+".join(sorted(u)), "+".join(sorted(la))])
+                  for g, (k, la, u) in info.items()}
         splits = stratified_split(strata, settings.test_fraction, existing)
         changed = 0
         for d in docs:
-            if d.split != splits[d.group_id]:
-                d.split = splits[d.group_id]
-                changed += 1
+            for c in d.chunks:
+                if c.split != splits[c.split_group]:
+                    c.split = splits[c.split_group]
+                    changed += 1
+            d.split = (splits[d.group_id] if d.split_unit == "document"
+                       else document_split((c.split for c in d.chunks), "train"))
         s.commit()
     settings.splits_file.parent.mkdir(parents=True, exist_ok=True)
     settings.splits_file.write_text(json.dumps(splits, ensure_ascii=False, indent=1) + "\n",
                                     encoding="utf-8")
     summary = Counter((strata[g], sp) for g, sp in splits.items() if g in strata)
-    print(json.dumps({"splits_file": str(settings.splits_file), "documents_changed": changed,
+    print(json.dumps({"splits_file": str(settings.splits_file), "chunks_changed": changed,
                       "groups": {f"{k[0]}/{k[1]}": v for k, v in sorted(summary.items())}},
                      ensure_ascii=False, indent=2))
     return 0

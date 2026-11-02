@@ -14,7 +14,7 @@ from ..storage import models
 class CorpusChunk:
     id: str
     doc_id: str
-    split: str
+    split: str  # the chunk's own split (document split, or chapter-group split)
     language: str
     text: str
     section_title: str | None
@@ -36,7 +36,7 @@ def load_corpus(session: Session, kind: str) -> list[CorpusChunk]:
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}")
     rows = session.execute(
-        select(models.Chunk, models.Document.split, models.Document.chunker_version)
+        select(models.Chunk, models.Chunk.split, models.Document.chunker_version)
         .join(models.Document)
         .where(models.Document.is_synthetic.is_(kind == "synthetic"))
         .order_by(models.Chunk.document_id, models.Chunk.idx)).all()
