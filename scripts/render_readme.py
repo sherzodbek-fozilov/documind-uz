@@ -51,7 +51,11 @@ OTHER_ROWS = [
     ("OCR CER, synthetic scans, uz-Latn", "ocr_synthetic.json", "cer_uz_latn", "pct"),
     ("OCR CER, synthetic scans, uz-Cyrl", "ocr_synthetic.json", "cer_uz_cyrl", "pct"),
     ("OCR CER, synthetic scans, ru", "ocr_synthetic.json", "cer_ru", "pct"),
-    ("Citation correctness", "citations.json", "citation_correctness", "pct"),
+    # n = citations checked (top-k passages of every test question)
+    ("Citation correctness (exact span), real questions", "citations_real.json",
+     "citation_correctness", "pct"),
+    ("Citation correctness (exact span), SYNTHETIC questions", "citations_synthetic.json",
+     "citation_correctness", "pct"),
     ("Answer latency p50, CPU (s)", "latency.json", "p50_seconds", "num"),
 ]
 

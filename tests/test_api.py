@@ -1,6 +1,7 @@
 """API tests on HANDWRITTEN documents: a small act in the lex.uz page structure (invented
 text, element ids made up) and a synthetic DOCX. No real lex.uz content is used."""
 
+import importlib.util
 import json
 from pathlib import Path
 
@@ -9,11 +10,13 @@ from fastapi.testclient import TestClient
 
 from documind.api.app import create_app
 from documind.ingestion.pipeline import ingest_file
+from documind.qa.citations import Citation
 from documind.qa.llm import LLMConfigError
 from documind.qa.service import QAService
 from documind.storage import models
 from documind.storage.db import make_session_factory
 
+ROOT = Path(__file__).resolve().parent.parent
 LEX_URL = "https://lex.uz/ru/docs/-9999"
 
 
@@ -148,3 +151,20 @@ def test_llm_mode_errors(settings, db):
     with pytest.raises(LLMConfigError):  # flag on, no provider configured
         QAService(db, settings)
 
+
+def test_eval_script_check_detects_tampered_citations(db):
+    spec = importlib.util.spec_from_file_location("eval_citations",
+                                                  ROOT / "scripts/eval_citations.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    with db() as s:
+        chunk = next(c for c in s.query(models.Chunk).all() if "penya" in c.text)
+        start = chunk.text.index("Kechiktirilgan")
+        quote = "Kechiktirilgan har bir kun uchun penya hisoblanadi."
+        good = Citation("namuna-uz", chunk.id, quote, start, start + len(quote), "-103")
+        assert mod.check_against_db(s, good) == (None, True)
+        wrong_anchor = Citation(**{**good.__dict__, "anchor": "-104"})
+        assert mod.check_against_db(s, wrong_anchor) == (None, False)
+        shifted = Citation(**{**good.__dict__, "start": start + 1, "end": start + 1 + len(quote)})
+        assert mod.check_against_db(s, shifted)[0] is not None
+        assert mod.check_against_db(s, Citation("x", "x#c0000", "q", 0, 1))[0] == "unknown chunk"
