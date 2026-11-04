@@ -8,7 +8,7 @@ project is in **retrieval**, **evaluation** and **fine-tuning an embedding model
 number below is produced by a script in this repository.
 
 > **Status:** work in progress. Stages 0–2 (skeleton, ingestion, retrieval baselines)
-> are implemented. Four real documents are ingested, but real questions are not labeled
+> are implemented; stage 3 has started (API with extractive answers and a citation check). Four real documents are ingested, but real questions are not labeled
 > yet, so the main (real) retrieval table is `TBD`; the synthetic table is only a
 > pipeline sanity check.
 > The OCR numbers are measured on **synthetic, mildly degraded** scans and are an
@@ -53,7 +53,8 @@ Values in parentheses: 95% bootstrap confidence interval over questions.
 | OCR CER, synthetic scans, uz-Latn | 0.1% | 8 | `results/ocr_synthetic.json` |
 | OCR CER, synthetic scans, uz-Cyrl | 0.7% | 8 | `results/ocr_synthetic.json` |
 | OCR CER, synthetic scans, ru | 0.6% | 8 | `results/ocr_synthetic.json` |
-| Citation correctness | TBD | TBD | `results/citations.json` |
+| Citation correctness (exact span), real questions | 100.0% | 30 | `results/citations_real.json` |
+| Citation correctness (exact span), SYNTHETIC questions | 100.0% | 376 | `results/citations_synthetic.json` |
 | Answer latency p50, CPU (s) | TBD | TBD | `results/latency.json` |
 <!-- END METRICS -->
 
@@ -65,8 +66,9 @@ upload (PDF / DOCX / image)
        └─ PostgreSQL (documents, pages, chunks)   Qdrant (dense vectors, stage 2)
 ask
   └─ retrieval: BM25 | multilingual-e5-small | hybrid (RRF) | optional reranker
-       └─ LLM phrases an answer from the top passages, with citations
-            └─ citation check: does each cited passage contain the supporting text?
+       └─ extractive (default): best sentence(s) of each passage, quoted verbatim
+       └─ LLM (optional, off by default): phrases an answer from the top passages
+            └─ citation check: every quote must be an exact span of the cited chunk
 ```
 
 Deployment target: a CPU-only Linux server with Docker Compose (PostgreSQL, Qdrant,
@@ -76,7 +78,7 @@ FastAPI, React + TypeScript). Embedding fine-tuning runs on Kaggle, not on the s
 
 | Path | Contents |
 |---|---|
-| `documind/` | Python package (ingestion, storage; later retrieval and API) |
+| `documind/` | Python package (ingestion, storage, retrieval, `qa` answers and citations, `api`) |
 | `tests/` | pytest suite |
 | `scripts/` | data generation, evaluation, README rendering |
 | `data/eval/questions.jsonl` | hand-labeled evaluation questions (see `data/eval/README.md`) |
@@ -133,6 +135,34 @@ python scripts/draft_questions.py          # drafts for real test documents, for
 Recall@k = share of questions whose gold chunk is in the top k; MRR = mean reciprocal
 rank of the gold chunk (cut at 10). Settings are tuned on the train split and reported
 on the test split.
+
+## API
+
+```bash
+pip install -e ".[dev,api]"
+documind serve                    # http://127.0.0.1:8000/docs
+curl -s localhost:8000/ask -H 'content-type: application/json' \
+     -d '{"question": "Ijara haqi qachon toʻlanadi?", "top_k": 3}'
+```
+
+| Endpoint | Returns |
+|---|---|
+| `GET /health` | status, answer mode, retriever, document and chunk counts |
+| `GET /documents?corpus=real\|synthetic` | id, title, language, source URL, edition, chunk count |
+| `POST /ask` | `{question, corpus, document_id?, top_k?}` → the best passages, each with an exact `quote`, `quote_start`/`quote_end` in the chunk, `document_id`, `chunk_id`, lex.uz `anchor` and `link` (`<page>#<element id>`) |
+
+- **Extractive mode** (default, no LLM key): for each retrieved chunk the best window of
+  1–2 sentences inside one source block is quoted (scored by BM25 idf of the query terms).
+- **LLM mode** (`DOCUMIND_ANSWER_MODE=llm`, off by default): a provider is loaded from
+  `DOCUMIND_LLM_PROVIDER="package.module:factory"`. The model must return verbatim quotes;
+  citations that are not an exact span of a passage it was given are dropped and counted.
+- **Citation check**: a citation is valid only if `chunk.text[quote_start:quote_end] ==
+  quote` for the cited chunk of the cited document. `python scripts/eval_citations.py`
+  re-checks every citation against the database (also the anchor) and writes
+  `results/citations_<set>.json`. In extractive mode the quotes are cut from the chunk,
+  so 100 % is expected: the metric guards against offset bugs and becomes informative in
+  LLM mode.
+- Retriever: `DOCUMIND_API_RETRIEVER=bm25` (default) or `hybrid` (needs the e5 model).
 
 ## Configuration
 

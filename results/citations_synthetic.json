@@ -1,0 +1,965 @@
+{
+  "metrics": {
+    "citation_correctness": 1.0,
+    "anchor_correctness": null,
+    "gold_cited": 0.9849624060150376
+  },
+  "n": 376,
+  "n_by_metric": {
+    "citation_correctness": 376,
+    "anchor_correctness": 0,
+    "gold_cited": 133
+  },
+  "failures": {},
+  "service_check_failures": {},
+  "set": "synthetic",
+  "split": "test",
+  "dataset": "SYNTHETIC contracts (synthetic-contracts-v1), template questions",
+  "question_counts": {
+    "used": 133,
+    "other_split": 275
+  },
+  "config": {
+    "mode": "extractive",
+    "retriever": "bm25",
+    "bm25_analyzer": "fold+stem6",
+    "top_k": 3,
+    "quote_max_sentences": 2
+  },
+  "per_question": [
+    {
+      "line": 49,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 50,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 51,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 52,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 53,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 54,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 55,
+      "language": "uz-Latn",
+      "n_citations": 2,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 56,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 57,
+      "language": "uz-Latn",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 58,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 59,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 93,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 94,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 95,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 96,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 97,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 98,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 99,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 100,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 101,
+      "language": "uz-Latn",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 102,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 103,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 115,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 116,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 117,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 118,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 119,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 120,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 121,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 122,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 123,
+      "language": "uz-Latn",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 124,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 125,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 126,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 127,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 128,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 129,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 130,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 131,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 132,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 133,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 134,
+      "language": "uz-Latn",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 135,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 136,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 149,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 150,
+      "language": "uz-Cyrl",
+      "n_citations": 2,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 151,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 152,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 153,
+      "language": "uz-Cyrl",
+      "n_citations": 2,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 154,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 155,
+      "language": "uz-Cyrl",
+      "n_citations": 2,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 156,
+      "language": "uz-Cyrl",
+      "n_citations": 2,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 157,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 158,
+      "language": "uz-Cyrl",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 159,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 160,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 196,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 197,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 198,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 199,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 200,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 201,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 202,
+      "language": "uz-Cyrl",
+      "n_citations": 2,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 203,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 204,
+      "language": "uz-Cyrl",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 205,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 206,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 207,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 208,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 209,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 210,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 211,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 212,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 213,
+      "language": "uz-Cyrl",
+      "n_citations": 2,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 214,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 215,
+      "language": "uz-Cyrl",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 216,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 217,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 251,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 252,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 253,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 254,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 255,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 256,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 257,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 258,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 259,
+      "language": "uz-Cyrl",
+      "n_citations": 1,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 260,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 261,
+      "language": "uz-Cyrl",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 332,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 333,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 334,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 335,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 336,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 337,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 338,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 339,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 340,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 341,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 342,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 343,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 344,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 345,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 346,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 347,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 348,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 349,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 350,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 351,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 352,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 353,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 354,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 355,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 356,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 357,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 358,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 359,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 360,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 361,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 362,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 363,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 364,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 387,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 388,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 389,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 390,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 391,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 392,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 393,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 394,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 395,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 396,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 397,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    }
+  ],
+  "generated_at": "2026-11-04T20:57:27+00:00",
+  "git_commit": "690f035",
+  "script": "scripts/eval_citations.py"
+}

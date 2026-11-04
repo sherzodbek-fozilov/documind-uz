@@ -1,0 +1,103 @@
+{
+  "metrics": {
+    "citation_correctness": 1.0,
+    "anchor_correctness": 1.0,
+    "gold_cited": 0.4
+  },
+  "n": 30,
+  "n_by_metric": {
+    "citation_correctness": 30,
+    "anchor_correctness": 30,
+    "gold_cited": 10
+  },
+  "failures": {},
+  "service_check_failures": {},
+  "set": "real",
+  "split": "test",
+  "dataset": "real documents (laws), hand-labeled questions",
+  "question_counts": {
+    "used": 10
+  },
+  "config": {
+    "mode": "extractive",
+    "retriever": "bm25",
+    "bm25_analyzer": "fold+stem6",
+    "top_k": 3,
+    "quote_max_sentences": 2
+  },
+  "per_question": [
+    {
+      "line": 1,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 2,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 3,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 4,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 5,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 6,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 7,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 8,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 9,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 10,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    }
+  ],
+  "generated_at": "2026-11-04T20:57:26+00:00",
+  "git_commit": "690f035",
+  "script": "scripts/eval_citations.py"
+}

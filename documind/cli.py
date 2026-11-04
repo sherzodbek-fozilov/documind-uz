@@ -1,4 +1,4 @@
-"""Command line: ``documind ingest PATH...``, ``documind stats``, ``documind split``."""
+"""Command line: ``documind ingest PATH...``, ``stats``, ``split``, ``serve``."""
 
 from __future__ import annotations
 
@@ -156,6 +156,13 @@ def cmd_split(args) -> int:
     return 0
 
 
+def cmd_serve(args) -> int:
+    import uvicorn
+
+    uvicorn.run("documind.api.app:create_app", factory=True, host=args.host, port=args.port)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="documind")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -172,6 +179,10 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--reset", action="store_true",
                     help="ignore the existing splits file (only before labels/training exist)")
     sp.set_defaults(func=cmd_split)
+    sv = sub.add_parser("serve", help="run the HTTP API (FastAPI + uvicorn)")
+    sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8000)
+    sv.set_defaults(func=cmd_serve)
     args = ap.parse_args(argv)
     return args.func(args)
 

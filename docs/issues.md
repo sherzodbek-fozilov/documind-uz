@@ -45,9 +45,16 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [x] Question-drafting tool for manual review
 
 ## Stage 3: API
-- [ ] FastAPI: upload, ask, answer with citations
+- [x] FastAPI skeleton: `/health`, `/documents`, `/ask` (extractive quotes with lex.uz
+      anchor links)
+- [x] Pluggable LLM mode behind `DOCUMIND_ANSWER_MODE=llm` (off by default)
+- [x] Citation-correctness metric (exact span), real and synthetic question sets
+- [ ] Upload endpoint
+- [ ] A concrete LLM provider
 - [ ] Per-request token limit and monthly LLM budget guard
-- [ ] Citation-correctness metric
+- [ ] Quote selection is a heuristic (idf overlap); measure whether the quoted sentence
+      is the one that answers the question (needs gold spans, not only gold chunks)
+- [ ] Answer latency p50 on CPU (`results/latency.json`)
 
 ## Stage 4: UI
 - [ ] Document viewer with highlighted source passage
