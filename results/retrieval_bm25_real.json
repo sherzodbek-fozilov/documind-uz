@@ -1,0 +1,218 @@
+{
+  "metrics": {
+    "recall@1": 0.1,
+    "recall@5": 0.5,
+    "recall@10": 0.6,
+    "mrr": 0.27
+  },
+  "n": 10,
+  "ci95": {
+    "recall@1": [
+      0.0,
+      0.3
+    ],
+    "recall@5": [
+      0.2,
+      0.8
+    ],
+    "recall@10": [
+      0.3,
+      0.9
+    ],
+    "mrr": [
+      0.09,
+      0.47000000000000003
+    ]
+  },
+  "by_language": {
+    "ru": {
+      "n": 4,
+      "recall@1": 0.25,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 0.375
+    },
+    "uz-Latn": {
+      "n": 6,
+      "recall@1": 0.0,
+      "recall@5": 0.5,
+      "recall@10": 0.6666666666666666,
+      "mrr": 0.19999999999999998
+    }
+  },
+  "by_tag": {
+    "colloquial": {
+      "n": 7,
+      "recall@1": 0.14285714285714285,
+      "recall@5": 0.42857142857142855,
+      "recall@10": 0.5714285714285714,
+      "mrr": 0.26666666666666666
+    },
+    "mixed-uz-ru": {
+      "n": 1,
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 1.0,
+      "mrr": 0.16666666666666666
+    },
+    "neutral": {
+      "n": 3,
+      "recall@1": 0.0,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 0.6666666666666666,
+      "mrr": 0.27777777777777773
+    },
+    "no-apostrophe": {
+      "n": 3,
+      "recall@1": 0.0,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 0.3333333333333333,
+      "mrr": 0.06666666666666667
+    },
+    "typo": {
+      "n": 2,
+      "recall@1": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.6
+    }
+  },
+  "set": "real",
+  "split": "test",
+  "dataset": "real documents (laws, model contracts), hand-labeled questions",
+  "scope": {
+    "corpus": 10
+  },
+  "corpus": {
+    "chunks": 3290,
+    "documents": 4,
+    "chunker_versions": [
+      "struct-v1-w180"
+    ]
+  },
+  "question_counts": {
+    "used": 10
+  },
+  "config": {
+    "method": "bm25",
+    "bm25_analyzer": "fold+stem6",
+    "embed_model": null,
+    "rrf_k": null,
+    "depth": null
+  },
+  "latency_s": {
+    "p50": 0.0009,
+    "max": 0.0031
+  },
+  "per_question": [
+    {
+      "line": 1,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": 2,
+      "top1": "labor-code-2022-ru#c0379",
+      "latency_s": 0.0031
+    },
+    {
+      "line": 2,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "top1": "labor-code-2022-ru#c0695",
+      "latency_s": 0.001
+    },
+    {
+      "line": 3,
+      "language": "ru",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": null,
+      "top1": "civil-code-part2-ru#c0074",
+      "latency_s": 0.0017
+    },
+    {
+      "line": 4,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": 1,
+      "top1": "civil-code-part2-ru#c0073",
+      "latency_s": 0.0017
+    },
+    {
+      "line": 5,
+      "language": "uz-Latn",
+      "tags": [
+        "neutral"
+      ],
+      "rank": 3,
+      "top1": "labor-code-2022-uz#c0528",
+      "latency_s": 0.0008
+    },
+    {
+      "line": 6,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe"
+      ],
+      "rank": null,
+      "top1": "labor-code-2022-uz#c0325",
+      "latency_s": 0.0009
+    },
+    {
+      "line": 7,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe"
+      ],
+      "rank": null,
+      "top1": "civil-code-part2-uz#c0008",
+      "latency_s": 0.0005
+    },
+    {
+      "line": 8,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": 2,
+      "top1": "civil-code-part2-uz#c0109",
+      "latency_s": 0.0005
+    },
+    {
+      "line": 9,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "mixed-uz-ru"
+      ],
+      "rank": 6,
+      "top1": "civil-code-part2-ru#c0192",
+      "latency_s": 0.0009
+    },
+    {
+      "line": 10,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo",
+        "no-apostrophe"
+      ],
+      "rank": 5,
+      "top1": "civil-code-part2-uz#c0090",
+      "latency_s": 0.0008
+    }
+  ],
+  "generated_at": "2026-11-04T20:30:33+00:00",
+  "git_commit": "7d98389",
+  "script": "scripts/eval_retrieval.py"
+}
