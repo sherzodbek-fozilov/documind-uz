@@ -39,6 +39,8 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [ ] Optional cross-encoder reranker (CPU latency must be measured)
 - [ ] Real-set results (blocked on real documents and labeled questions)
 - [ ] Re-check the BM25 analyzer choice on real train-split questions (GitHub issue #7)
+- [ ] Dev question set from train chapters, used to tune analyzers (stem length,
+      synonyms) without touching the test set
 - [x] Eval script: Recall@1/5/10, MRR on `data/eval/questions.jsonl`
 - [x] Question-drafting tool for manual review
 
