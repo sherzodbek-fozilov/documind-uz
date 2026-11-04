@@ -2,6 +2,14 @@
 All texts are handwritten for these tests."""
 
 from documind.qa.citations import Citation, check_citation, locate_quote, summarize
+from documind.qa.passages import (
+    Segment,
+    chunk_segments,
+    select_quote,
+    sentence_spans,
+    source_link,
+)
+from documind.retrieval.analyzers import get_analyzer
 
 CHUNK = ("3-modda. Ijara haqi\n\nIjara haqi har oyning 10-kunigacha toʻlanadi. "
          "Kechiktirilgan har bir kun uchun 0,1 foiz penya hisoblanadi.\n\n"
@@ -44,3 +52,67 @@ def test_summarize():
     assert (r.checked, r.valid, r.correctness) == (4, 2, 0.5)
     assert r.as_dict()["failures"] == {"empty quote": 2}
     assert summarize([]).correctness is None
+
+
+def test_sentence_spans_keep_clause_numbers_and_trim():
+    start = CHUNK.find("Ijara haqi har")
+    end = CHUNK.find("\n\n1.1.")
+    spans = sentence_spans(CHUNK, start, end)
+    assert [CHUNK[s:e] for s, e in spans] == [
+        "Ijara haqi har oyning 10-kunigacha toʻlanadi.",
+        "Kechiktirilgan har bir kun uchun 0,1 foiz penya hisoblanadi."]
+    s = CHUNK.find("1.1.")
+    assert [CHUNK[a:b] for a, b in sentence_spans(CHUNK, s, len(CHUNK))] == [
+        "1.1. Ijarachi binoni saqlaydi."]
+
+
+SEGMENTS = [Segment(0, 19, "heading", "-1"),
+            Segment(21, CHUNK.find("\n\n1.1."), "text", "-2"),
+            Segment(CHUNK.find("1.1."), len(CHUNK), "text", "-3")]
+ANALYZE = get_analyzer("fold+stem6")
+IDF = {t: 1.0 for t in ANALYZE(CHUNK)} | {"penya": 3.0, "binoni": 2.0}
+
+
+def test_select_quote_picks_the_matching_sentence_and_its_anchor():
+    s, e, anchor = select_quote(CHUNK, SEGMENTS, "penya qancha?", ANALYZE, IDF)
+    assert CHUNK[s:e] == "Kechiktirilgan har bir kun uchun 0,1 foiz penya hisoblanadi."
+    assert anchor == "-2"
+    s, e, anchor = select_quote(CHUNK, SEGMENTS, "binoni kim saqlaydi", ANALYZE, IDF)
+    assert (CHUNK[s:e], anchor) == ("1.1. Ijarachi binoni saqlaydi.", "-3")
+
+
+def test_select_quote_joins_sentences_only_when_that_adds_terms():
+    s, e, _ = select_quote(CHUNK, SEGMENTS, "toʻlanadi penya", ANALYZE, IDF)
+    assert CHUNK[s:e].startswith("Ijara haqi har") and CHUNK[s:e].endswith("hisoblanadi.")
+    s, e, _ = select_quote(CHUNK, SEGMENTS, "toʻlanadi penya", ANALYZE, IDF, max_sentences=1)
+    assert CHUNK[s:e].startswith("Kechiktirilgan")
+    # a window never crosses a block: "penya" + "binoni" are in different blocks
+    s, e, _ = select_quote(CHUNK, SEGMENTS, "penya binoni", ANALYZE, IDF)
+    assert "\n\n" not in CHUNK[s:e]
+
+
+def test_select_quote_skips_headings_and_falls_back_to_first_sentence():
+    s, e, anchor = select_quote(CHUNK, SEGMENTS, "Ijara haqi", ANALYZE, IDF)
+    assert anchor == "-2"  # the heading also matches, but headings are not quoted
+    s, e, anchor = select_quote(CHUNK, SEGMENTS, "арендная плата", ANALYZE, IDF)
+    assert (CHUNK[s:e], anchor) == ("Ijara haqi har oyning 10-kunigacha toʻlanadi.", "-2")
+
+
+def test_chunk_segments_clip_blocks_to_the_chunk():
+    pages = [(100, [{"start": 0, "end": 10, "kind": "heading", "anchor": "a"},
+                    {"start": 12, "end": 40, "kind": "text", "anchor": "b"},
+                    {"start": 42, "end": 60, "kind": "text"}])]
+    assert chunk_segments(112, 130, pages) == [Segment(0, 18, "text", "b")]
+    assert chunk_segments(105, 150, pages)[0] == Segment(0, 5, "heading", "a")
+    assert chunk_segments(0, 50, []) == [Segment(0, 50)]
+
+
+def test_source_link():
+    assert source_link("https://lex.uz/ru/docs/6257291", "6264702") == \
+        "https://lex.uz/ru/docs/6257291#6264702"
+    assert source_link("https://lex.uz/ru/docs/-180552", "-1813") == \
+        "https://lex.uz/ru/docs/-180552#-1813"
+    assert source_link("https://lex.uz/ru/docs/1", None) == "https://lex.uz/ru/docs/1"
+    assert source_link("https://example.org/a.pdf", "x") == "https://example.org/a.pdf"
+    assert source_link("synthetic-contracts-v1", "x") is None
+    assert source_link(None, None) is None
