@@ -220,3 +220,31 @@ written by the annotator.
 - **No analyzer is tuned on these test questions.** Stem length, synonyms and similar
   settings will be tuned only on a separate dev question set from train chapters (see
   `docs/issues.md`).
+
+## API: extractive answers and the citation check (2026-11-04)
+
+- **Default answer mode is extractive**: `/ask` returns the top passages and, for each,
+  a verbatim quote of 1–2 sentences inside one source block, chosen by the BM25 idf of
+  the query terms it contains. No LLM key is needed and nothing is paraphrased. The LLM
+  mode is behind `DOCUMIND_ANSWER_MODE=llm`, off by default, with the provider loaded
+  from an import path, so no provider SDK becomes a dependency. Alternatives: returning
+  whole chunks (up to 180 words, harder to read and to highlight); an LLM by default
+  (needs a key and a budget guard, which are not built yet).
+- **Citation check = exact span.** A citation is valid only if
+  `chunk.text[quote_start:quote_end] == quote` for the cited chunk of the cited document.
+  No fuzzy matching: a changed letter, a paraphrase or a quote stitched from two places is
+  invalid. LLM quotes are located with an exact search (surrounding whitespace and quote
+  marks removed) and dropped if not found. Alternatives: a similarity threshold (would
+  accept text that is not in the source); checking only that the chunk id exists (says
+  nothing about the quote).
+- **Reported per set** (real, synthetic test questions), `n` = citations checked.
+  `scripts/eval_citations.py` checks against the database, not the in-memory index, and
+  also checks that the chunk is the exact span of its document and that the quote starts
+  inside the block its anchor names. **Limitation:** in extractive mode the quotes are cut
+  from the chunk, so 100 % is the expected value; the number is a regression guard now
+  and a real measurement only in LLM mode. It does not measure whether the quote answers
+  the question.
+- **Links**: lex.uz element ids are kept per block at ingestion; a citation links to
+  `<documents.source>#<element id>`. Other web sources get the plain URL; synthetic
+  documents get none.
+
