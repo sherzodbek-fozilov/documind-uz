@@ -1,7 +1,11 @@
 """Unit tests for the citation check, extractive quote selection and the LLM hooks.
 All texts are handwritten for these tests."""
 
+import pytest
+
+from documind.config import Settings
 from documind.qa.citations import Citation, check_citation, locate_quote, summarize
+from documind.qa.llm import LLMConfigError, build_prompt, load_llm, parse_response
 from documind.qa.passages import (
     Segment,
     chunk_segments,
@@ -116,3 +120,34 @@ def test_source_link():
     assert source_link("https://example.org/a.pdf", "x") == "https://example.org/a.pdf"
     assert source_link("synthetic-contracts-v1", "x") is None
     assert source_link(None, None) is None
+
+
+def test_parse_response_and_prompt():
+    answer, cites = parse_response('```json\n{"answer": "10-kungacha.", "citations": '
+                                   '[{"chunk_id": "d1#c0000", "quote": "toʻlanadi."}]}\n```')
+    assert answer == "10-kungacha." and cites == [("d1#c0000", "toʻlanadi.")]
+    assert parse_response('{"answer": "Yoʻq.", "citations": []}') == ("Yoʻq.", [])
+    for bad in ("not json", '{"citations": []}', '{"answer": "a", "citations": "x"}'):
+        with pytest.raises(ValueError):
+            parse_response(bad)
+    prompt = build_prompt("Savol?", [("d1#c0000", CHUNK)])
+    assert "[d1#c0000]\n3-modda" in prompt and "Question: Savol?" in prompt
+
+
+class _Provider:
+    def __init__(self, settings):
+        self.settings = settings
+
+    def complete(self, prompt, max_tokens):
+        return "{}"
+
+
+def test_load_llm_from_import_path():
+    s = Settings(_env_file=None, answer_mode="llm",
+                 llm_provider="tests.test_citations:_Provider")
+    llm = load_llm(s)  # the module is imported again under its dotted name
+    assert type(llm).__name__ == "_Provider" and llm.settings is s
+    assert llm.complete("p", 10) == "{}"
+    for spec in (None, "no_colon", "tests.test_citations:missing", "no.such.module:x"):
+        with pytest.raises(LLMConfigError):
+            load_llm(Settings(_env_file=None, answer_mode="llm", llm_provider=spec))
