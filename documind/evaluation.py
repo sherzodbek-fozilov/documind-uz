@@ -6,6 +6,11 @@ Definitions (per question; usually one gold chunk, optionally several in "gold_c
   Recall@k   share of questions with rank <= k
   MRR@10     mean of 1/rank over questions, 0 when rank is None or > 10
 Confidence intervals: percentile bootstrap over questions (2000 resamples, fixed seed).
+
+Primary metric: chunk level (above). Secondary metric, reported next to it: article level,
+where a result counts if it is ANY chunk of the gold article in ANY language version of
+the act (``article_rank``); a gold chunk outside a numbered article falls back to
+chunk-level matching.
 """
 
 from __future__ import annotations
@@ -83,6 +88,21 @@ def rank_of(gold: str | Iterable[str], results: list[str]) -> int | None:
     golds = {gold} if isinstance(gold, str) else set(gold)
     for i, cid in enumerate(results, start=1):
         if cid in golds:
+            return i
+    return None
+
+
+def article_rank(golds: Iterable[str], results: list[str],
+                 key_of: dict[str, tuple | None]) -> int | None:
+    """Rank of the first result that is in the same article as a gold chunk (any chunk,
+    any language). ``key_of`` maps chunk id -> article key, or None when the chunk is not
+    inside a numbered article (then only the chunk itself matches)."""
+    def key(cid: str) -> tuple:
+        return key_of.get(cid) or ("chunk", cid)
+
+    gold_keys = {key(g) for g in golds}
+    for i, cid in enumerate(results, start=1):
+        if key(cid) in gold_keys:
             return i
     return None
 
