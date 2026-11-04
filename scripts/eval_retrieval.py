@@ -35,6 +35,7 @@ from common import ROOT, write_result  # noqa: E402
 
 from documind.config import get_settings  # noqa: E402
 from documind.evaluation import (  # noqa: E402
+    article_rank,
     bootstrap_ci,
     load_questions,
     metrics_from_ranks,
@@ -55,18 +56,22 @@ DATASET = {"real": "real documents (laws, model contracts), hand-labeled questio
 MAX_K = 10
 
 
-def evaluate(retriever, questions, chunk_ids: set[str]) -> tuple[list, list]:
-    ranks, per_q = [], []
+def evaluate(retriever, questions, key_of: dict) -> tuple[list, list, list]:
+    """Chunk-level ranks (primary), article-level ranks (secondary), per-question records."""
+    ranks, art_ranks, per_q = [], [], []
     for q in questions:
         start = time.perf_counter()
         results = retriever.search(q.question, k=MAX_K,
                                    doc_id=q.gold_doc if q.scope == "document" else None)
         latency = time.perf_counter() - start
         r = rank_of(q.gold_chunks, results)
+        ra = article_rank(q.gold_chunks, results, key_of)
         ranks.append(r)
-        per_q.append({"line": q.line, "language": q.language, "rank": r,
-                      "top1": results[0] if results else None, "latency_s": round(latency, 4)})
-    return ranks, per_q
+        art_ranks.append(ra)
+        per_q.append({"line": q.line, "language": q.language, "tags": list(q.tags), "rank": r,
+                      "rank_article": ra, "top1": results[0] if results else None,
+                      "latency_s": round(latency, 4)})
+    return ranks, art_ranks, per_q
 
 
 def main() -> None:
@@ -96,6 +101,7 @@ def main() -> None:
             print(f"[{kind}] no {kind} documents ingested; skipping", file=sys.stderr)
             continue
         by_id = {c.id: c for c in chunks}
+        key_of = {c.id: c.article_key for c in chunks}
         split_of_doc = {c.doc_id: c.split for c in chunks}
         counts: Counter = Counter()
         selected = []
@@ -140,17 +146,30 @@ def main() -> None:
             runs.append(("e5_small", None, retrievers["e5_small"]))
 
         for method, analyzer, retriever in runs:
-            ranks, per_q = evaluate(retriever, selected, set(by_id))
-            by_lang = defaultdict(list)
-            for q, r in zip(selected, ranks, strict=True):
-                by_lang[q.language].append(r)
+            ranks, art_ranks, per_q = evaluate(retriever, selected, key_of)
+            by_lang, by_tag = defaultdict(list), defaultdict(list)
+            for q, r, ra in zip(selected, ranks, art_ranks, strict=True):
+                by_lang[q.language].append((r, ra))
+                for tag in q.tags:
+                    by_tag[tag].append((r, ra))
+
+            def group(pairs: list) -> dict:
+                return {"n": len(pairs), **metrics_from_ranks([p[0] for p in pairs]),
+                        "article": metrics_from_ranks([p[1] for p in pairs])}
+
             latencies = sorted(p["latency_s"] for p in per_q)
             payload = {
+                # primary: the gold chunk itself
                 "metrics": metrics_from_ranks(ranks),
                 "n": len(selected),
                 "ci95": bootstrap_ci(ranks, metrics_from_ranks),
-                "by_language": {lang: {"n": len(r), **metrics_from_ranks(r)}
-                                for lang, r in sorted(by_lang.items())},
+                # secondary: any chunk of the gold article, in any language version
+                "metrics_article": metrics_from_ranks(art_ranks),
+                "ci95_article": bootstrap_ci(art_ranks, metrics_from_ranks),
+                "by_language": {lang: group(v) for lang, v in sorted(by_lang.items())},
+                # a question with several tags counts in each of them; untagged questions
+                # appear in no tag group
+                "by_tag": {tag: group(v) for tag, v in sorted(by_tag.items())},
                 "set": kind,
                 "split": args.split,
                 "dataset": DATASET[kind],
@@ -175,16 +194,16 @@ def main() -> None:
                 name = f"tuning/retrieval_{method}{tag}_{kind}_{args.split}.json"
             (ROOT / "results" / "tuning").mkdir(parents=True, exist_ok=True)
             write_result(name, payload, "scripts/eval_retrieval.py")
-            m = payload["metrics"]
+            m, ma = payload["metrics"], payload["metrics_article"]
             summary_rows.append((kind, method, analyzer or "-", len(selected), m["recall@1"],
-                                 m["recall@5"], m["recall@10"], m["mrr"], name))
+                                 m["recall@5"], m["recall@10"], m["mrr"], ma["recall@5"],
+                                 ma["mrr"], name))
 
     print(f"\n{'set':10} {'method':11} {'analyzer':12} {'n':>4} {'R@1':>6} {'R@5':>6} "
-          f"{'R@10':>6} {'MRR':>6}  file")
+          f"{'R@10':>6} {'MRR':>6} | {'art R@5':>7} {'art MRR':>7}  file")
     for row in summary_rows:
         print(f"{row[0]:10} {row[1]:11} {row[2]:12} {row[3]:4d} {row[4]:6.3f} {row[5]:6.3f} "
-              f"{row[6]:6.3f} {row[7]:6.3f}  results/{row[8]}")
-
+              f"{row[6]:6.3f} {row[7]:6.3f} | {row[8]:7.3f} {row[9]:7.3f}  results/{row[10]}")
 
 if __name__ == "__main__":
     main()

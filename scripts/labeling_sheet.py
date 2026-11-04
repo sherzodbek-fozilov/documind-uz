@@ -3,9 +3,11 @@
   plan    pick the chunks to label from the REAL TEST split and save their ids in
           data/eval/labeling_plan.json (ids only, no text; seeded, reproducible)
   show    print one batch (chunk id, language, chapter / article title, text)
-  record  read lines "chunk_id | language | question" from stdin and append them to
+  record  read lines "chunk_id | language | question [| tags]" from stdin and append them to
           data/eval/questions.jsonl with "status": "reviewed" (same format as
           draft_questions.py --accept). Several gold chunks: "id1, id2 | language | q".
+          Optional 4th column: comma-separated tags (e.g. "colloquial, typo"), stored as
+          "tags": [...] exactly as written (only surrounding spaces are removed).
           The question text is stored exactly as given.
 
 Selection: half Civil Code, half Labor Code per language; within an act, chunks are
@@ -139,12 +141,13 @@ def parse_answers(lines: list[str], chunks_by_id: dict[str, dict],
     for n, line in enumerate(lines, start=1):
         if not line.strip():
             continue
-        parts = line.split("|", 2)
-        if len(parts) != 3:
-            problems.append(f"line {n}: expected 'chunk_id | language | question'")
+        parts = line.split("|", 3)
+        if len(parts) not in (3, 4):
+            problems.append(f"line {n}: expected 'chunk_id | language | question [| tags]'")
             continue
         ids = [x.strip().strip("`") for x in parts[0].split(",") if x.strip()]
         language, question = parts[1].strip(), parts[2].strip()
+        tags = [t.strip() for t in parts[3].split(",") if t.strip()] if len(parts) == 4 else []
         bad = [i for i in ids if i not in chunks_by_id]
         if not ids or bad:
             problems.append(f"line {n}: not a real test chunk: {', '.join(bad) or '(none)'}")
@@ -162,6 +165,8 @@ def parse_answers(lines: list[str], chunks_by_id: dict[str, dict],
                "gold_chunk": ids[0], "scope": "corpus"}
         if len(ids) > 1:
             row["gold_chunks"] = ids
+        if tags:
+            row["tags"] = tags
         row["status"] = "reviewed"
         rows.append(row)
         existing.add((question, tuple(ids)))

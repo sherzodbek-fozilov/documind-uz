@@ -86,3 +86,12 @@ def test_index_text_adds_section_title_to_continuations():
     assert c.index_text.startswith("ДОГОВОР / 2. ЦЕНА\n")
     head = CorpusChunk("d#c0000", "d", "test", "ru", "2. ЦЕНА\n\n2.1. Цена.", "2. ЦЕНА", "v")
     assert head.index_text == head.text
+
+
+def test_article_key_is_shared_across_language_versions_and_chunks():
+    uz = CorpusChunk("a-uz#c1", "a-uz", "test", "uz-Latn", "t", "29-bob. X / 386-modda. Y", "v",
+                     "a")
+    ru = CorpusChunk("a-ru#c7", "a-ru", "test", "ru", "t", "Глава 29 / Статья 386. Y", "v", "a")
+    assert uz.article_key == ru.article_key == ("a", 386)
+    assert CorpusChunk("a-ru#c0", "a-ru", "test", "ru", "t", "Глава 29. X", "v", "a").article_key \
+        is None

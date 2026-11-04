@@ -49,3 +49,29 @@ def test_multiple_gold_chunks(tmp_path):
     assert rank_of(qs[0].gold_chunks, ["x", "d#c2", "d#c1"]) == 2
     single, _ = load_questions(tmp_path / "missing.jsonl")
     assert single == []
+
+
+def test_tags_are_loaded_and_validated(tmp_path):
+    p = tmp_path / "q.jsonl"
+    base = {"question": "Q?", "language": "ru", "gold_doc": "d", "gold_chunk": "d#c1"}
+    p.write_text("\n".join([json.dumps(base | {"tags": ["colloquial", "typo"]}),
+                            json.dumps(base),
+                            json.dumps(base | {"tags": "typo"})]), encoding="utf-8")
+    qs, problems = load_questions(p)
+    assert [q.tags for q in qs] == [("colloquial", "typo"), ()]
+    assert len(problems) == 1 and "tags" in problems[0]
+
+
+def test_article_rank_counts_any_chunk_and_any_language_of_the_gold_article():
+    from documind.evaluation import article_rank
+
+    key_of = {"act-ru#c1": ("act", 5), "act-ru#c2": ("act", 5), "act-uz#c1": ("act", 5),
+              "act-ru#c3": ("act", 6), "act-ru#c0": None}
+    gold = ["act-ru#c1"]
+    # strict: only the gold chunk itself; article level: any chunk of article 5
+    assert rank_of(gold, ["act-ru#c3", "act-uz#c1", "act-ru#c1"]) == 3
+    assert article_rank(gold, ["act-ru#c3", "act-uz#c1", "act-ru#c1"], key_of) == 2
+    assert article_rank(gold, ["act-ru#c2"], key_of) == 1
+    assert article_rank(gold, ["act-ru#c3"], key_of) is None
+    # a gold chunk outside a numbered article falls back to chunk-level matching
+    assert article_rank(["act-ru#c0"], ["act-ru#c1", "act-ru#c0"], key_of) == 2
