@@ -36,6 +36,11 @@ RETRIEVAL_ROWS = [
     ("Fine-tuned e5-small (dense)", "e5_small_ft"),
     ("Hybrid with fine-tuned e5 (RRF)", "hybrid_rrf_ft"),
 ]
+# Results with fewer questions than this stay out of the README (shown as TBD); pilot
+# results are documented in docs/experiments.md instead.
+MIN_QUESTIONS = {"real": 80, "synthetic": 1}
+RETRIEVAL_NOTES = {"real": "Shown once at least 80 labeled real questions exist; pilot "
+                           "results on smaller samples are in `docs/experiments.md`."}
 RETRIEVAL_SETS = [
     ("real", "Retrieval: real documents (test split, main result)"),
     ("synthetic", "Retrieval: SYNTHETIC sanity set (test split, search within the gold "
@@ -79,12 +84,16 @@ def render_tables(results_dir: Path) -> str:
                   "|---" * (len(RETRIEVAL_COLUMNS) + 2) + "|"]
         for label, method in RETRIEVAL_ROWS:
             data = _load(results_dir, f"retrieval_{method}_{set_key}.json") or {}
+            if (data.get("n") or 0) < MIN_QUESTIONS[set_key]:
+                data = {}  # too few questions for the README: stays TBD
             metrics = data.get("metrics", {})
             cells = [_fmt(metrics.get(key)) + (_ci(data, key) if key in metrics else "")
                      for _, key in RETRIEVAL_COLUMNS]
             n = data.get("n")
             lines.append(f"| {label} | " + " | ".join(cells)
                          + f" | {n if n is not None else 'TBD'} |")
+        if set_key in RETRIEVAL_NOTES:
+            lines += ["", RETRIEVAL_NOTES[set_key]]
         lines.append("")
     lines += ["Values in parentheses: 95% bootstrap confidence interval over questions.", "",
               "### Other measurements", "", "| Measurement | Value | n | Source file |",

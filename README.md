@@ -31,6 +31,8 @@ The tables are regenerated with `python scripts/render_readme.py`; missing value
 | Fine-tuned e5-small (dense) | TBD | TBD | TBD | TBD | TBD |
 | Hybrid with fine-tuned e5 (RRF) | TBD | TBD | TBD | TBD | TBD |
 
+Shown once at least 80 labeled real questions exist; pilot results on smaller samples are in `docs/experiments.md`.
+
 ### Retrieval: SYNTHETIC sanity set (test split, search within the gold document; not comparable to the real set)
 
 | Method | Recall@1 | Recall@5 | Recall@10 | MRR | Questions |

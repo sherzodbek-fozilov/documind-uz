@@ -27,14 +27,14 @@ def test_values_come_from_result_files(tmp_path):
     results = tmp_path / "results"
     results.mkdir()
     (results / "retrieval_bm25_real.json").write_text(json.dumps(
-        {"metrics": {"recall@1": 0.25, "recall@5": 0.5, "mrr": 0.3333}, "n": 12,
+        {"metrics": {"recall@1": 0.25, "recall@5": 0.5, "mrr": 0.3333}, "n": 120,
          "ci95": {"recall@1": [0.1, 0.4]}}))
     readme = _readme(tmp_path)
     render_readme.update_readme(readme, results)
     text = readme.read_text()
     real, synthetic = text.split("SYNTHETIC sanity set")
     # recall@10 is absent from the file, so it must stay TBD; CI shown when present
-    assert "| BM25 | 0.250 (0.10–0.40) | 0.500 | TBD | 0.333 | 12 |" in real
+    assert "| BM25 | 0.250 (0.10–0.40) | 0.500 | TBD | 0.333 | 120 |" in real
     # a real result never fills the synthetic table
     assert "| BM25 | TBD | TBD | TBD | TBD | TBD |" in synthetic
 
@@ -52,3 +52,18 @@ def test_per_metric_n(tmp_path):
     readme = _readme(tmp_path)
     render_readme.update_readme(readme, results)
     assert "| OCR CER, synthetic scans, ru | 1.0% | 8 |" in readme.read_text()
+
+
+def test_small_real_samples_stay_tbd(tmp_path):
+    results = tmp_path / "results"
+    results.mkdir()
+    (results / "retrieval_bm25_real.json").write_text(json.dumps(
+        {"metrics": {"recall@1": 0.1, "recall@5": 0.5, "mrr": 0.27}, "n": 10}))
+    (results / "retrieval_bm25_synthetic.json").write_text(json.dumps(
+        {"metrics": {"recall@1": 0.8, "recall@5": 1.0, "mrr": 0.9}, "n": 10}))
+    readme = _readme(tmp_path)
+    render_readme.update_readme(readme, results)
+    real, synthetic = readme.read_text().split("SYNTHETIC sanity set")
+    assert "| BM25 | TBD | TBD | TBD | TBD | TBD |" in real
+    assert "docs/experiments.md" in real
+    assert "| BM25 | 0.800 | 1.000 | TBD | 0.900 | 10 |" in synthetic
