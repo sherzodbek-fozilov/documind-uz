@@ -49,3 +49,14 @@ def test_multiple_gold_chunks(tmp_path):
     assert rank_of(qs[0].gold_chunks, ["x", "d#c2", "d#c1"]) == 2
     single, _ = load_questions(tmp_path / "missing.jsonl")
     assert single == []
+
+
+def test_tags_are_loaded_and_validated(tmp_path):
+    p = tmp_path / "q.jsonl"
+    base = {"question": "Q?", "language": "ru", "gold_doc": "d", "gold_chunk": "d#c1"}
+    p.write_text("\n".join([json.dumps(base | {"tags": ["colloquial", "typo"]}),
+                            json.dumps(base),
+                            json.dumps(base | {"tags": "typo"})]), encoding="utf-8")
+    qs, problems = load_questions(p)
+    assert [q.tags for q in qs] == [("colloquial", "typo"), ()]
+    assert len(problems) == 1 and "tags" in problems[0]

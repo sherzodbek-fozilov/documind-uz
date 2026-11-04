@@ -64,7 +64,7 @@ def evaluate(retriever, questions, chunk_ids: set[str]) -> tuple[list, list]:
         latency = time.perf_counter() - start
         r = rank_of(q.gold_chunks, results)
         ranks.append(r)
-        per_q.append({"line": q.line, "language": q.language, "rank": r,
+        per_q.append({"line": q.line, "language": q.language, "tags": list(q.tags), "rank": r,
                       "top1": results[0] if results else None, "latency_s": round(latency, 4)})
     return ranks, per_q
 
@@ -141,9 +141,11 @@ def main() -> None:
 
         for method, analyzer, retriever in runs:
             ranks, per_q = evaluate(retriever, selected, set(by_id))
-            by_lang = defaultdict(list)
+            by_lang, by_tag = defaultdict(list), defaultdict(list)
             for q, r in zip(selected, ranks, strict=True):
                 by_lang[q.language].append(r)
+                for tag in q.tags:
+                    by_tag[tag].append(r)
             latencies = sorted(p["latency_s"] for p in per_q)
             payload = {
                 "metrics": metrics_from_ranks(ranks),
@@ -151,6 +153,10 @@ def main() -> None:
                 "ci95": bootstrap_ci(ranks, metrics_from_ranks),
                 "by_language": {lang: {"n": len(r), **metrics_from_ranks(r)}
                                 for lang, r in sorted(by_lang.items())},
+                # a question with several tags counts in each of them; untagged questions
+                # appear in no tag group
+                "by_tag": {tag: {"n": len(r), **metrics_from_ranks(r)}
+                           for tag, r in sorted(by_tag.items())},
                 "set": kind,
                 "split": args.split,
                 "dataset": DATASET[kind],

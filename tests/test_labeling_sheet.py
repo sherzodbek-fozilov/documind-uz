@@ -50,3 +50,17 @@ def test_parse_answers_keeps_wording_and_validates():
                        "gold_chunk": "a#c1", "scope": "corpus", "status": "reviewed"}
     assert rows[1]["gold_chunks"] == ["a#c1", "a#c2"] and rows[1]["gold_chunk"] == "a#c1"
     assert len(rows) == 2 and len(problems) == 4
+
+
+def test_parse_answers_optional_tags_column():
+    by_id = {"a#c1": _chunk("a#c1", "x", "ru", 1, 1)}
+    lines = ["a#c1 | uz-Latn | Ijtimoiy tatildan bosh tortsam boʻladimi? "
+             "| colloquial, no-apostrophe",
+             "a#c1 | ru | Без тегов?",
+             "a#c1 | ru | Пустые теги? |  , "]
+    rows, problems = ls.parse_answers(lines, by_id, set())
+    assert problems == []
+    # wording and apostrophes are stored exactly; tags keep their spelling
+    assert rows[0]["question"] == "Ijtimoiy tatildan bosh tortsam boʻladimi?"
+    assert rows[0]["tags"] == ["colloquial", "no-apostrophe"]
+    assert "tags" not in rows[1] and "tags" not in rows[2]

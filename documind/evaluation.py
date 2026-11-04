@@ -33,6 +33,7 @@ class Question:
     draft_question: str | None = None
     line: int = 0
     gold_chunks: tuple[str, ...] = ()  # all acceptable chunks; defaults to (gold_chunk,)
+    tags: tuple[str, ...] = ()  # free labels from the annotator, e.g. ("colloquial", "typo")
 
     def __post_init__(self):
         if not self.gold_chunks:
@@ -67,9 +68,13 @@ def load_questions(path: Path) -> tuple[list[Question], list[str]]:
         if row["gold_chunk"] not in golds:
             problems.append(f"{path.name}:{n}: gold_chunk must be one of gold_chunks")
             continue
+        tags = row.get("tags") or []
+        if not isinstance(tags, list) or not all(isinstance(t, str) and t for t in tags):
+            problems.append(f"{path.name}:{n}: tags must be a list of non-empty strings")
+            continue
         questions.append(Question(row["question"], row["language"], row["gold_doc"],
                                   row["gold_chunk"], scope, row.get("status", "reviewed"),
-                                  row.get("draft_question"), n, golds))
+                                  row.get("draft_question"), n, golds, tuple(tags)))
     return questions, problems
 
 
