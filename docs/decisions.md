@@ -248,3 +248,65 @@ written by the annotator.
   `<documents.source>#<element id>`. Other web sources get the plain URL; synthetic
   documents get none.
 
+
+## Stage 5 prep: fine-tuning data, Kaggle script, ONNX export, before/after hook (2026-11-04)
+
+- **Training pairs only from TRAIN chunk groups** (`documind/training/pairs.py`,
+  `scripts/make_training_pairs.py`). Test chunks are dropped before anything else and
+  `check_pairs` refuses to write if a test chunk appears anywhere (query source,
+  positive, negative, validation corpus). The test questions are not read. Unit: an
+  article (`article_key`); its passage is the article's first chunk, indexed as in the
+  service (`index_text`).
+- **Queries:** article title and first sentence (5–40 words) in uz-Latn and ru; cross-
+  lingual title pairs (uz → ru passage, ru → uz passage) only when the two versions
+  correspond (same paragraph count and numbers, the check of `compare_versions.py`;
+  2 articles excluded). One noisy variant per clean query, queries only: typos,
+  no apostrophes, uz-Cyrl transliteration, uz-Cyrl without ў қ ғ ҳ, ru without ё/й.
+  About 10 % of articles also get code-mixed queries (a title in one language inside a
+  question frame of the other; the passage is in the frame's language).
+  **Limitations:** first-sentence queries are verbatim substrings of their passage and
+  titles are short noun phrases; neither looks like the colloquial test questions, so
+  gains on real questions may be smaller than on validation.
+- **Hard negatives:** the best BM25 (`fold+stem6`) hit in the passage's language, from
+  the training groups, that is not a chunk of the positive's article in any language.
+  Usually the neighbouring article on the same topic; some may be partly relevant
+  (false negatives). Alternatives: dense-model negatives (stronger, more false
+  negatives), random negatives (too easy).
+- **Validation = held-out chapter groups** (15 % of each act's train groups, salted
+  hash, 10 groups), never trained on; used only to pick the epoch. Its queries come from
+  the same generator, so it measures fit to generated queries, not to real questions.
+  A hand-written dev set from train chapters would be better (open item).
+- **Batches never hold two rows of the same article** (positive or negative article),
+  so another query or the other language version of the same article is never counted
+  as an in-batch negative. This is why the Kaggle script uses a short explicit training
+  loop around `MultipleNegativesRankingLoss` instead of `SentenceTransformerTrainer`:
+  the batch rule, seeds and schedule are visible in one place and do not depend on
+  trainer defaults that changed between sentence-transformers 3 and 6.
+- **Hyperparameters fixed in advance, not tuned:** full fine-tuning, lr 2e-5, batch 32,
+  at most 3 epochs, 10 % warmup, weight decay 0.01, MNRL scale 20, fp16, seed 42,
+  max 512 tokens; best validation MRR@10 (chunk level) wins, ties keep the earlier epoch.
+- **Pair files are git-ignored** (`data/training/`): they contain lex.uz text, which
+  this project does not redistribute. Committed: the generator, tests on handwritten
+  samples and `results/training_pairs_stats.json` (counts, validation group ids, file
+  sha256; no text).
+- **The Kaggle notebook rebuilds the data itself instead of receiving it.** It clones
+  the public repository, re-fetches the approved sources with the polite fetcher,
+  ingests and builds the pairs under `/tmp` (not kept by Kaggle as output), and stops
+  unless chunk counts and pair-file sha256 equal the committed statistics (generation
+  is deterministic; checked with several `PYTHONHASHSEED` values). Only the model and
+  count-only statistics go to `/kaggle/working`. Alternatives: a private Kaggle dataset
+  with the pair files (an upload of lex.uz text to a third party, and one mistake in
+  the sharing setting publishes it); training locally (no GPU). A full `--smoke` run of
+  this path (clone, install, fetch, ingest, pairs, data check, one loss forward) passed
+  on CPU with the data check reporting identical files.
+- **ONNX export** (`scripts/export_onnx.py`): TorchScript export of the transformer
+  (output `last_hidden_state`), mean pooling and L2 norm stay in `E5Embedder`, same
+  folder layout as the base model; `SOURCE.json` revision = sha256 of `model.onnx`, so
+  embedding caches never mix models. Verified: exporting the *base* model this way
+  reproduces the official ONNX embeddings (max |diff| 7e-8 on 64 real passages).
+- **Before/after hook** (`scripts/eval_finetune.py`): runs `eval_retrieval.py` for base
+  and fine-tuned (`--variant ft`) with identical arguments and refuses to compare unless
+  the question file hash, questions, split and corpus are identical; reports paired
+  bootstrap CIs of the deltas. Checked with the base export as a stand-in "fine-tuned"
+  model: all deltas 0 and baseline results identical to the committed ones (results
+  files restored afterwards, nothing chosen from them).

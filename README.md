@@ -136,6 +136,25 @@ Recall@k = share of questions whose gold chunk is in the top k; MRR = mean recip
 rank of the gold chunk (cut at 10). Settings are tuned on the train split and reported
 on the test split.
 
+## Fine-tuning (stage 5)
+
+Step by step: [`docs/finetune-runbook.md`](docs/finetune-runbook.md).
+
+```bash
+python scripts/make_training_pairs.py   # local pairs (git-ignored) + results/training_pairs_stats.json
+# Kaggle (GPU, internet on), in a private notebook: rebuilds the pairs itself, trains,
+# picks the epoch on validation; no data is uploaded
+#   !python finetune_e5.py --ref main --smoke   # setup check first
+#   !python finetune_e5.py --ref main
+python scripts/export_onnx.py --model runs/e5-small-ft/best --out models/multilingual-e5-small-ft \
+    --training-log runs/e5-small-ft/training_log.json
+python scripts/eval_finetune.py         # base vs fine-tuned on the same real test questions
+```
+
+Pairs come only from train chapter groups (test chunks are never read into them); the
+epoch is chosen on held-out train chapter groups. Details and limitations:
+`docs/decisions.md`.
+
 ## API
 
 ```bash
