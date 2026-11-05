@@ -1,8 +1,12 @@
 """Ask a question: retrieve chunks, quote the best passage of each, check citations.
 
 Used by the API and by ``scripts/eval_citations.py``. Indexes are built lazily, once
-per corpus ("real" / "synthetic"), from the chunks in the database; restart the
-process after ingesting new documents.
+per corpus, from the chunks in the database; restart the process after ingesting new
+documents with the CLI.
+
+Corpora: "real" and "synthetic" (evaluation corpora, main database) and "user" (uploaded
+documents, a separate database; its index is rebuilt after every upload). Without a
+user database (e.g. in the eval scripts) the "user" corpus does not exist.
 """
 
 from __future__ import annotations
@@ -10,17 +14,23 @@ from __future__ import annotations
 import threading
 from collections import defaultdict
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from ..config import Settings
-from ..retrieval.corpus import KINDS, CorpusChunk, load_corpus
+from ..ingestion.ocr import OCRUnavailableError
+from ..ingestion.pipeline import ingest_file
+from ..ingestion.uploads import UploadRejected
+from ..retrieval.corpus import CorpusChunk, load_corpus
 from ..retrieval.retrievers import BM25Retriever, DenseRetriever, HybridRetriever
 from ..storage import models
 from .citations import CheckReport, Citation, check_citation, locate_quote, summarize
 from .llm import LLMClient, build_prompt, load_llm, parse_response
 from .passages import Segment, chunk_segments, select_quote, source_link
+
+CORPORA = ("real", "synthetic", "user")
 
 
 class UnknownDocument(LookupError):
@@ -75,35 +85,60 @@ class _Index:
 
 class QAService:
     def __init__(self, session_factory: sessionmaker[Session], settings: Settings, *,
-                 llm: LLMClient | None = None, embedder=None):
+                 llm: LLMClient | None = None, embedder=None,
+                 user_session_factory: sessionmaker[Session] | None = None):
         self.session_factory = session_factory
+        self.user_session_factory = user_session_factory
         self.settings = settings
         self.mode = settings.answer_mode
         self.llm = llm if llm is not None or self.mode != "llm" else load_llm(settings)
         self._embedder = embedder
         self._indexes: dict[str, _Index] = {}
         self._lock = threading.Lock()
+        self._ingest_lock = threading.Lock()  # one upload is ingested at a time
 
     # --- corpus -------------------------------------------------------------------------
+    def _factory(self, corpus: str) -> sessionmaker[Session]:
+        if corpus not in CORPORA:
+            raise ValueError(f"corpus must be one of {CORPORA}")
+        if corpus != "user":
+            return self.session_factory
+        if self.user_session_factory is None:
+            raise EmptyCorpus("uploads are not configured (no user database)")
+        return self.user_session_factory
+
     def documents(self) -> list[dict]:
-        with self.session_factory() as s:
-            n_chunks = dict(s.execute(select(models.Chunk.document_id, func.count())
-                                      .group_by(models.Chunk.document_id)).all())
-            docs = s.scalars(select(models.Document).order_by(models.Document.id)).all()
-            return [{"id": d.id, "title": (d.meta or {}).get("title") or d.filename,
-                     "language": d.language, "is_synthetic": d.is_synthetic,
-                     "corpus": "synthetic" if d.is_synthetic else "real",
-                     "source": d.source, "edition": (d.meta or {}).get("edition"),
-                     "n_chunks": n_chunks.get(d.id, 0)} for d in docs]
+        out = []
+        for corpus_db in ("main", "user"):
+            if corpus_db == "user" and self.user_session_factory is None:
+                continue
+            factory = self.session_factory if corpus_db == "main" else self.user_session_factory
+            with factory() as s:
+                n_chunks = dict(s.execute(select(models.Chunk.document_id, func.count())
+                                          .group_by(models.Chunk.document_id)).all())
+                docs = s.scalars(select(models.Document).order_by(models.Document.id)).all()
+                out += [{"id": d.id, "title": (d.meta or {}).get("title") or d.filename,
+                         "language": d.language, "is_synthetic": d.is_synthetic,
+                         "corpus": ("user" if corpus_db == "user" else
+                                    "synthetic" if d.is_synthetic else "real"),
+                         "filename": d.filename, "source": d.source,
+                         "edition": (d.meta or {}).get("edition"),
+                         "n_chunks": n_chunks.get(d.id, 0)} for d in docs]
+        return out
 
     def counts(self) -> dict[str, int]:
-        with self.session_factory() as s:
-            return {"documents": s.scalar(select(func.count()).select_from(models.Document)),
-                    "chunks": s.scalar(select(func.count()).select_from(models.Chunk))}
+        def count(factory, model) -> int:
+            with factory() as s:
+                return s.scalar(select(func.count()).select_from(model))
+
+        out = {"documents": count(self.session_factory, models.Document),
+               "chunks": count(self.session_factory, models.Chunk), "user_documents": 0}
+        if self.user_session_factory is not None:
+            out["user_documents"] = count(self.user_session_factory, models.Document)
+        return out
 
     def index(self, corpus: str) -> _Index:
-        if corpus not in KINDS:
-            raise ValueError(f"corpus must be one of {KINDS}")
+        self._factory(corpus)  # validates the corpus name
         with self._lock:
             if corpus not in self._indexes:
                 self._indexes[corpus] = self._build(corpus)
@@ -111,8 +146,9 @@ class QAService:
 
     def _build(self, corpus: str) -> _Index:
         synthetic = corpus == "synthetic"
-        with self.session_factory() as s:
-            chunks = load_corpus(s, corpus)
+        # the user database holds only uploads, all stored with is_synthetic = False
+        with self._factory(corpus)() as s:
+            chunks = load_corpus(s, "synthetic" if synthetic else "real")
             offsets = {cid: (a, b) for cid, a, b in s.execute(
                 select(models.Chunk.id, models.Chunk.char_start, models.Chunk.char_end)
                 .join(models.Document).where(models.Document.is_synthetic.is_(synthetic)))}
@@ -125,7 +161,8 @@ class QAService:
             sources = dict(s.execute(select(models.Document.id, models.Document.source)
                                      .where(models.Document.is_synthetic.is_(synthetic))).all())
         if not chunks:
-            raise EmptyCorpus(f"no {corpus} documents ingested")
+            raise EmptyCorpus(f"no {corpus} documents ingested" if corpus != "user"
+                              else "no documents uploaded yet")
         bm25 = BM25Retriever(chunks, self.settings.bm25_analyzer)
         retriever = bm25
         if self.settings.api_retriever == "hybrid":
@@ -139,6 +176,51 @@ class QAService:
                                         depth=self.settings.retrieval_depth)
         return _Index({c.id: c for c in chunks}, offsets, dict(pages), sources, bm25,
                       retriever)
+
+    # --- uploads ------------------------------------------------------------------------
+    def add_user_document(self, path: Path, filename: str, sha256: str) -> dict:
+        """Parse (with OCR if needed) and store an upload in the user corpus.
+
+        Returns the stored document: id, status ("ingested", or "duplicate" for a file
+        uploaded before, then with the earlier upload's details), filename, page, OCR
+        page and chunk counts, language and parser warnings.
+
+        ``path`` must already have passed the checks in ``ingestion.uploads``. Raises
+        UploadRejected for files that cannot be parsed, need OCR on a server without
+        tesseract, or contain no text (such documents are not kept)."""
+        factory = self._factory("user")
+        settings = self.settings.model_copy(update={"storage_dir":
+                                                    self.settings.user_storage_dir})
+        with self._ingest_lock, factory() as s:
+            try:
+                res = ingest_file(path, s, settings, doc_id=f"user-{sha256[:16]}",
+                                  source=None, filename=filename,
+                                  meta={"kind": "upload"})
+            except OCRUnavailableError as exc:
+                s.rollback()
+                raise UploadRejected(503, "this file needs OCR, but OCR (tesseract) is not "
+                                          "available on this server") from exc
+            except Exception as exc:  # parser errors on untrusted input
+                s.rollback()
+                raise UploadRejected(422, f"the file could not be read "
+                                          f"({type(exc).__name__})") from exc
+            if res.status == "ingested" and res.n_chunks == 0:
+                doc = s.get(models.Document, res.doc_id)
+                stored = Path(doc.storage_path)
+                s.delete(doc)
+                s.commit()
+                stored.unlink(missing_ok=True)
+                raise UploadRejected(422, "no text was found in the file"
+                                     + (" (OCR found none)" if res.n_ocr_pages else ""))
+            doc = s.get(models.Document, res.doc_id)
+            info = {"document_id": doc.id, "status": res.status, "filename": doc.filename,
+                    "n_pages": doc.n_pages, "n_ocr_pages": doc.n_ocr_pages,
+                    "n_chunks": len(doc.chunks), "language": doc.language,
+                    "warnings": list(doc.warnings or [])}
+        if res.status == "ingested":
+            with self._lock:
+                self._indexes.pop("user", None)  # rebuilt on the next question
+        return info
 
     # --- asking -------------------------------------------------------------------------
     def _citation(self, idx: _Index, chunk: CorpusChunk, start: int, end: int,
