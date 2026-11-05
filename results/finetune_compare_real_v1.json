@@ -1,0 +1,1515 @@
+{
+  "set": "real",
+  "split": "test",
+  "eval_set": "v1",
+  "methods": {
+    "e5_small": {
+      "base_model": "614241f622f5",
+      "ft_model": "5c844d195b02",
+      "n": 49,
+      "chunk": {
+        "recall@1": {
+          "delta": -0.02040816326530613,
+          "ci95": [
+            -0.12244897959183675,
+            0.0816326530612245
+          ]
+        },
+        "recall@5": {
+          "delta": -0.14285714285714288,
+          "ci95": [
+            -0.2653061224489796,
+            -0.020408163265306117
+          ]
+        },
+        "recall@10": {
+          "delta": -0.1836734693877551,
+          "ci95": [
+            -0.326530612244898,
+            -0.04081632653061226
+          ]
+        },
+        "mrr": {
+          "delta": -0.07007612568837059,
+          "ci95": [
+            -0.17038386783284745,
+            0.026044703595724028
+          ]
+        }
+      },
+      "chunk_questions": {
+        "better": 4,
+        "worse": 13,
+        "same": 32
+      },
+      "article": {
+        "recall@1": {
+          "delta": -0.040816326530612235,
+          "ci95": [
+            -0.14285714285714285,
+            0.06122448979591835
+          ]
+        },
+        "recall@5": {
+          "delta": -0.14285714285714288,
+          "ci95": [
+            -0.2653061224489796,
+            -0.020408163265306117
+          ]
+        },
+        "recall@10": {
+          "delta": -0.16326530612244897,
+          "ci95": [
+            -0.30612244897959184,
+            -0.020408163265306145
+          ]
+        },
+        "mrr": {
+          "delta": -0.08555231616456108,
+          "ci95": [
+            -0.18087949465500486,
+            -0.0011661807580174988
+          ]
+        }
+      },
+      "article_questions": {
+        "better": 4,
+        "worse": 14,
+        "same": 31
+      },
+      "by_language_chunk": {
+        "ru": {
+          "recall@1": {
+            "delta": -0.08695652173913043,
+            "ci95": [
+              -0.2608695652173913,
+              0.043478260869565216
+            ]
+          },
+          "recall@5": {
+            "delta": -0.34782608695652173,
+            "ci95": [
+              -0.5652173913043478,
+              -0.17391304347826086
+            ]
+          },
+          "recall@10": {
+            "delta": -0.39130434782608703,
+            "ci95": [
+              -0.6086956521739131,
+              -0.17391304347826092
+            ]
+          },
+          "mrr": {
+            "delta": -0.1879399585921325,
+            "ci95": [
+              -0.33944099378881987,
+              -0.05465838509316773
+            ]
+          }
+        },
+        "uz-Cyrl": {
+          "recall@1": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "recall@5": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "recall@10": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "mrr": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "uz-Latn": {
+          "recall@1": {
+            "delta": 0.041666666666666664,
+            "ci95": [
+              -0.08333333333333334,
+              0.16666666666666669
+            ]
+          },
+          "recall@5": {
+            "delta": 0.04166666666666667,
+            "ci95": [
+              -0.08333333333333334,
+              0.20833333333333331
+            ]
+          },
+          "recall@10": {
+            "delta": 0.0,
+            "ci95": [
+              -0.16666666666666669,
+              0.16666666666666669
+            ]
+          },
+          "mrr": {
+            "delta": 0.037037037037037035,
+            "ci95": [
+              -0.08796296296296297,
+              0.16666666666666669
+            ]
+          }
+        }
+      },
+      "per_question": [
+        {
+          "line": 1,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 1,
+          "rank_ft": 1,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 2,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 3,
+          "rank_ft": null,
+          "rank_article_base": 3,
+          "rank_article_ft": null
+        },
+        {
+          "line": 3,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 2,
+          "rank_ft": 1,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 4,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 2,
+          "rank_ft": 7,
+          "rank_article_base": 2,
+          "rank_article_ft": 7
+        },
+        {
+          "line": 5,
+          "language": "uz-Latn",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": 1,
+          "rank_article_base": null,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 6,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 7,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "ambiguous-gold"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 8,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": 3,
+          "rank_article_ft": null
+        },
+        {
+          "line": 9,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 10,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo",
+            "no-apostrophe"
+          ],
+          "rank_base": 2,
+          "rank_ft": 1,
+          "rank_article_base": 2,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 11,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru",
+            "no-apostrophe"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 12,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 13,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": 1,
+          "rank_ft": null,
+          "rank_article_base": 1,
+          "rank_article_ft": null
+        },
+        {
+          "line": 14,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 15,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 16,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 17,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 18,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 19,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 20,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 21,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 1,
+          "rank_ft": null,
+          "rank_article_base": 1,
+          "rank_article_ft": null
+        },
+        {
+          "line": 22,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 5,
+          "rank_ft": null,
+          "rank_article_base": 5,
+          "rank_article_ft": null
+        },
+        {
+          "line": 23,
+          "language": "uz-Latn",
+          "tags": [
+            "neutral",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 24,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": 9,
+          "rank_ft": null,
+          "rank_article_base": 9,
+          "rank_article_ft": null
+        },
+        {
+          "line": 25,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": 2,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 26,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 27,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 28,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 29,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 30,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 4,
+          "rank_ft": null,
+          "rank_article_base": 4,
+          "rank_article_ft": null
+        },
+        {
+          "line": 31,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 32,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 1,
+          "rank_ft": null,
+          "rank_article_base": 1,
+          "rank_article_ft": null
+        },
+        {
+          "line": 33,
+          "language": "ru",
+          "tags": [
+            "neutral",
+            "typo"
+          ],
+          "rank_base": 1,
+          "rank_ft": 7,
+          "rank_article_base": 1,
+          "rank_article_ft": 7
+        },
+        {
+          "line": 34,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 10,
+          "rank_ft": null,
+          "rank_article_base": 10,
+          "rank_article_ft": null
+        },
+        {
+          "line": 35,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": 8
+        },
+        {
+          "line": 36,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 37,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 38,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 39,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 40,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 41,
+          "language": "uz-Cyrl",
+          "tags": [
+            "cyrillic",
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 42,
+          "language": "uz-Cyrl",
+          "tags": [
+            "cyrillic",
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 43,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 44,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": 4
+        },
+        {
+          "line": 45,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 46,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 3,
+          "rank_ft": 3,
+          "rank_article_base": 3,
+          "rank_article_ft": 3
+        },
+        {
+          "line": 47,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 8,
+          "rank_ft": null,
+          "rank_article_base": 8,
+          "rank_article_ft": null
+        },
+        {
+          "line": 48,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 2,
+          "rank_ft": null,
+          "rank_article_base": 2,
+          "rank_article_ft": 5
+        },
+        {
+          "line": 49,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 10,
+          "rank_ft": null,
+          "rank_article_base": 10,
+          "rank_article_ft": null
+        }
+      ]
+    },
+    "hybrid_rrf": {
+      "base_model": "614241f622f5",
+      "ft_model": "5c844d195b02",
+      "n": 49,
+      "chunk": {
+        "recall@1": {
+          "delta": -0.020408163265306117,
+          "ci95": [
+            -0.12244897959183675,
+            0.0816326530612245
+          ]
+        },
+        "recall@5": {
+          "delta": -0.020408163265306145,
+          "ci95": [
+            -0.10204081632653061,
+            0.06122448979591838
+          ]
+        },
+        "recall@10": {
+          "delta": -0.06122448979591838,
+          "ci95": [
+            -0.16326530612244894,
+            0.020408163265306145
+          ]
+        },
+        "mrr": {
+          "delta": -0.03074991901522514,
+          "ci95": [
+            -0.10408163265306125,
+            0.0447602850664075
+          ]
+        }
+      },
+      "chunk_questions": {
+        "better": 8,
+        "worse": 10,
+        "same": 31
+      },
+      "article": {
+        "recall@1": {
+          "delta": -0.020408163265306145,
+          "ci95": [
+            -0.12244897959183675,
+            0.0816326530612245
+          ]
+        },
+        "recall@5": {
+          "delta": -0.06122448979591838,
+          "ci95": [
+            -0.1428571428571429,
+            0.020408163265306145
+          ]
+        },
+        "recall@10": {
+          "delta": -0.040816326530612235,
+          "ci95": [
+            -0.12244897959183676,
+            0.040816326530612235
+          ]
+        },
+        "mrr": {
+          "delta": -0.029478458049886636,
+          "ci95": [
+            -0.10199222546161324,
+            0.04288143828960156
+          ]
+        }
+      },
+      "article_questions": {
+        "better": 8,
+        "worse": 10,
+        "same": 31
+      },
+      "by_language_chunk": {
+        "ru": {
+          "recall@1": {
+            "delta": -0.043478260869565216,
+            "ci95": [
+              -0.1739130434782609,
+              0.08695652173913046
+            ]
+          },
+          "recall@5": {
+            "delta": -0.04347826086956519,
+            "ci95": [
+              -0.17391304347826092,
+              0.08695652173913043
+            ]
+          },
+          "recall@10": {
+            "delta": -0.08695652173913038,
+            "ci95": [
+              -0.2173913043478261,
+              0.0
+            ]
+          },
+          "mrr": {
+            "delta": -0.058264320220841936,
+            "ci95": [
+              -0.16230158730158734,
+              0.03485162180814361
+            ]
+          }
+        },
+        "uz-Cyrl": {
+          "recall@1": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "recall@5": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "recall@10": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "mrr": {
+            "delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "uz-Latn": {
+          "recall@1": {
+            "delta": 0.0,
+            "ci95": [
+              -0.16666666666666666,
+              0.16666666666666669
+            ]
+          },
+          "recall@5": {
+            "delta": 0.0,
+            "ci95": [
+              -0.125,
+              0.125
+            ]
+          },
+          "recall@10": {
+            "delta": -0.041666666666666685,
+            "ci95": [
+              -0.20833333333333331,
+              0.08333333333333337
+            ]
+          },
+          "mrr": {
+            "delta": -0.0069444444444444475,
+            "ci95": [
+              -0.13020833333333334,
+              0.11805555555555558
+            ]
+          }
+        }
+      },
+      "per_question": [
+        {
+          "line": 1,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 1,
+          "rank_ft": 1,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 2,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 4,
+          "rank_ft": 4,
+          "rank_article_base": 4,
+          "rank_article_ft": 4
+        },
+        {
+          "line": 3,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 9,
+          "rank_ft": 5,
+          "rank_article_base": 4,
+          "rank_article_ft": 2
+        },
+        {
+          "line": 4,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 1,
+          "rank_ft": 1,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 5,
+          "language": "uz-Latn",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 4,
+          "rank_ft": 1,
+          "rank_article_base": 4,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 6,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 7,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "ambiguous-gold"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 8,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 2,
+          "rank_ft": 3,
+          "rank_article_base": 2,
+          "rank_article_ft": 3
+        },
+        {
+          "line": 9,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": 6,
+          "rank_article_ft": 6
+        },
+        {
+          "line": 10,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo",
+            "no-apostrophe"
+          ],
+          "rank_base": 3,
+          "rank_ft": 2,
+          "rank_article_base": 3,
+          "rank_article_ft": 2
+        },
+        {
+          "line": 11,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru",
+            "no-apostrophe"
+          ],
+          "rank_base": 6,
+          "rank_ft": null,
+          "rank_article_base": 6,
+          "rank_article_ft": 4
+        },
+        {
+          "line": 12,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": 8,
+          "rank_article_base": null,
+          "rank_article_ft": 8
+        },
+        {
+          "line": 13,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": 1,
+          "rank_ft": 4,
+          "rank_article_base": 1,
+          "rank_article_ft": 4
+        },
+        {
+          "line": 14,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 15,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": 2,
+          "rank_ft": 1,
+          "rank_article_base": 2,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 16,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 17,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 18,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 19,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 3,
+          "rank_ft": 5,
+          "rank_article_base": 3,
+          "rank_article_ft": 5
+        },
+        {
+          "line": 20,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 21,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 1,
+          "rank_ft": 8,
+          "rank_article_base": 1,
+          "rank_article_ft": 8
+        },
+        {
+          "line": 22,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 9,
+          "rank_ft": null,
+          "rank_article_base": 9,
+          "rank_article_ft": null
+        },
+        {
+          "line": 23,
+          "language": "uz-Latn",
+          "tags": [
+            "neutral",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 24,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": 1,
+          "rank_ft": 5,
+          "rank_article_base": 1,
+          "rank_article_ft": 3
+        },
+        {
+          "line": 25,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 8,
+          "rank_ft": 2,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 26,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 27,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 28,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 29,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 30,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 2,
+          "rank_ft": 1,
+          "rank_article_base": 2,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 31,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 32,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 7,
+          "rank_ft": 6,
+          "rank_article_base": 7,
+          "rank_article_ft": 6
+        },
+        {
+          "line": 33,
+          "language": "ru",
+          "tags": [
+            "neutral",
+            "typo"
+          ],
+          "rank_base": 1,
+          "rank_ft": 1,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 34,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 35,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 36,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "no-apostrophe"
+          ],
+          "rank_base": 5,
+          "rank_ft": null,
+          "rank_article_base": 5,
+          "rank_article_ft": null
+        },
+        {
+          "line": 37,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 38,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 39,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 40,
+          "language": "uz-Latn",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 41,
+          "language": "uz-Cyrl",
+          "tags": [
+            "cyrillic",
+            "colloquial",
+            "mixed-uz-ru"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 42,
+          "language": "uz-Cyrl",
+          "tags": [
+            "cyrillic",
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 43,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 44,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": 4,
+          "rank_article_ft": 7
+        },
+        {
+          "line": 45,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        },
+        {
+          "line": 46,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": 1,
+          "rank_ft": 1,
+          "rank_article_base": 1,
+          "rank_article_ft": 1
+        },
+        {
+          "line": 47,
+          "language": "ru",
+          "tags": [
+            "colloquial"
+          ],
+          "rank_base": 3,
+          "rank_ft": null,
+          "rank_article_base": 3,
+          "rank_article_ft": null
+        },
+        {
+          "line": 48,
+          "language": "ru",
+          "tags": [
+            "neutral"
+          ],
+          "rank_base": 1,
+          "rank_ft": 2,
+          "rank_article_base": 1,
+          "rank_article_ft": 2
+        },
+        {
+          "line": 49,
+          "language": "ru",
+          "tags": [
+            "colloquial",
+            "typo"
+          ],
+          "rank_base": null,
+          "rank_ft": null,
+          "rank_article_base": null,
+          "rank_article_ft": null
+        }
+      ]
+    }
+  },
+  "questions_sha256": "1476f40ed33a954f21fb536dd4202c59f46af0fe8da6f8486f110632bd95e575",
+  "generated_at": "2026-11-05T02:22:55+00:00",
+  "git_commit": "75e254e",
+  "script": "scripts/eval_finetune.py"
+}

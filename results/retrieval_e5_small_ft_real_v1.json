@@ -1,0 +1,856 @@
+{
+  "metrics": {
+    "recall@1": 0.08163265306122448,
+    "recall@5": 0.12244897959183673,
+    "recall@10": 0.16326530612244897,
+    "mrr": 0.10447035957240038
+  },
+  "n": 49,
+  "ci95": {
+    "recall@1": [
+      0.02040816326530612,
+      0.16326530612244897
+    ],
+    "recall@5": [
+      0.04081632653061224,
+      0.22448979591836735
+    ],
+    "recall@10": [
+      0.061224489795918366,
+      0.2857142857142857
+    ],
+    "mrr": [
+      0.03304178814382896,
+      0.18999028182701652
+    ]
+  },
+  "metrics_article": {
+    "recall@1": 0.10204081632653061,
+    "recall@5": 0.16326530612244897,
+    "recall@10": 0.22448979591836735,
+    "mrr": 0.12640913508260446
+  },
+  "ci95_article": {
+    "recall@1": [
+      0.02040816326530612,
+      0.20408163265306123
+    ],
+    "recall@5": [
+      0.061224489795918366,
+      0.2653061224489796
+    ],
+    "recall@10": [
+      0.10204081632653061,
+      0.3469387755102041
+    ],
+    "mrr": [
+      0.0467201166180758,
+      0.22108843537414968
+    ]
+  },
+  "by_language": {
+    "ru": {
+      "n": 23,
+      "recall@1": 0.08695652173913043,
+      "recall@5": 0.13043478260869565,
+      "recall@10": 0.21739130434782608,
+      "mrr": 0.11387163561076605,
+      "article": {
+        "recall@1": 0.08695652173913043,
+        "recall@5": 0.21739130434782608,
+        "recall@10": 0.34782608695652173,
+        "mrr": 0.13887163561076604
+      }
+    },
+    "uz-Cyrl": {
+      "n": 2,
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "article": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      }
+    },
+    "uz-Latn": {
+      "n": 24,
+      "recall@1": 0.08333333333333333,
+      "recall@5": 0.125,
+      "recall@10": 0.125,
+      "mrr": 0.10416666666666667,
+      "article": {
+        "recall@1": 0.125,
+        "recall@5": 0.125,
+        "recall@10": 0.125,
+        "mrr": 0.125
+      }
+    }
+  },
+  "by_tag": {
+    "ambiguous-gold": {
+      "n": 1,
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "article": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      }
+    },
+    "colloquial": {
+      "n": 37,
+      "recall@1": 0.05405405405405406,
+      "recall@5": 0.10810810810810811,
+      "recall@10": 0.13513513513513514,
+      "mrr": 0.08043758043758044,
+      "article": {
+        "recall@1": 0.08108108108108109,
+        "recall@5": 0.13513513513513514,
+        "recall@10": 0.16216216216216217,
+        "mrr": 0.10070785070785071
+      }
+    },
+    "cyrillic": {
+      "n": 2,
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "article": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      }
+    },
+    "mixed-uz-ru": {
+      "n": 9,
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "article": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0
+      }
+    },
+    "neutral": {
+      "n": 12,
+      "recall@1": 0.16666666666666666,
+      "recall@5": 0.16666666666666666,
+      "recall@10": 0.25,
+      "mrr": 0.17857142857142858,
+      "article": {
+        "recall@1": 0.16666666666666666,
+        "recall@5": 0.25,
+        "recall@10": 0.4166666666666667,
+        "mrr": 0.20565476190476192
+      }
+    },
+    "no-apostrophe": {
+      "n": 11,
+      "recall@1": 0.09090909090909091,
+      "recall@5": 0.09090909090909091,
+      "recall@10": 0.09090909090909091,
+      "mrr": 0.09090909090909091,
+      "article": {
+        "recall@1": 0.09090909090909091,
+        "recall@5": 0.09090909090909091,
+        "recall@10": 0.09090909090909091,
+        "mrr": 0.09090909090909091
+      }
+    },
+    "typo": {
+      "n": 21,
+      "recall@1": 0.047619047619047616,
+      "recall@5": 0.14285714285714285,
+      "recall@10": 0.23809523809523808,
+      "mrr": 0.10090702947845805,
+      "article": {
+        "recall@1": 0.09523809523809523,
+        "recall@5": 0.14285714285714285,
+        "recall@10": 0.23809523809523808,
+        "mrr": 0.12471655328798185
+      }
+    }
+  },
+  "set": "real",
+  "split": "test",
+  "dataset": "real documents (laws, model contracts), hand-labeled questions",
+  "scope": {
+    "corpus": 49
+  },
+  "corpus": {
+    "chunks": 3290,
+    "documents": 4,
+    "chunker_versions": [
+      "struct-v1-w180"
+    ]
+  },
+  "question_counts": {
+    "used": 49
+  },
+  "questions_sha256": "1476f40ed33a954f21fb536dd4202c59f46af0fe8da6f8486f110632bd95e575",
+  "eval_set": {
+    "name": "v1",
+    "n": 49,
+    "file_sha256": "0d5ef44adb965170dd1c22cd1e497b131196572ba184b0152b03ba4b46f70456"
+  },
+  "config": {
+    "method": "e5_small_ft",
+    "bm25_analyzer": null,
+    "embed_model": "5c844d195b02",
+    "embed_model_dir": "models\\multilingual-e5-small-ft",
+    "rrf_k": null,
+    "depth": null
+  },
+  "latency_s": {
+    "p50": 0.0156,
+    "max": 0.0193
+  },
+  "per_question": [
+    {
+      "id": "c64ed92abc3e",
+      "line": 1,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": 1,
+      "rank_article": 1,
+      "top1": "labor-code-2022-ru#c0378",
+      "latency_s": 0.012
+    },
+    {
+      "id": "eb36794a0528",
+      "line": 2,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0710",
+      "latency_s": 0.015
+    },
+    {
+      "id": "b3938b633f67",
+      "line": 3,
+      "language": "ru",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": 1,
+      "rank_article": 1,
+      "top1": "civil-code-part2-ru#c0098",
+      "latency_s": 0.0172
+    },
+    {
+      "id": "cfbe51dc2b36",
+      "line": 4,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": 7,
+      "rank_article": 7,
+      "top1": "civil-code-part2-uz#c0180",
+      "latency_s": 0.0178
+    },
+    {
+      "id": "5e56dcad3e85",
+      "line": 5,
+      "language": "uz-Latn",
+      "tags": [
+        "neutral"
+      ],
+      "rank": 1,
+      "rank_article": 1,
+      "top1": "labor-code-2022-uz#c0287",
+      "latency_s": 0.0135
+    },
+    {
+      "id": "9d207fdf720f",
+      "line": 6,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0359",
+      "latency_s": 0.016
+    },
+    {
+      "id": "9d7e979f2e52",
+      "line": 7,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe",
+        "ambiguous-gold"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-uz#c0391",
+      "latency_s": 0.0156
+    },
+    {
+      "id": "eb6faad8147a",
+      "line": 8,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0780",
+      "latency_s": 0.0174
+    },
+    {
+      "id": "1d4e9cbaf086",
+      "line": 9,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "mixed-uz-ru"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0634",
+      "latency_s": 0.0135
+    },
+    {
+      "id": "b766989b0975",
+      "line": 10,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo",
+        "no-apostrophe"
+      ],
+      "rank": 1,
+      "rank_article": 1,
+      "top1": "civil-code-part2-uz#c0091",
+      "latency_s": 0.0148
+    },
+    {
+      "id": "207ce535abc4",
+      "line": 11,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "mixed-uz-ru",
+        "no-apostrophe"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0175",
+      "latency_s": 0.0176
+    },
+    {
+      "id": "4fe4e0075c58",
+      "line": 12,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "mixed-uz-ru",
+        "no-apostrophe",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0260",
+      "latency_s": 0.0156
+    },
+    {
+      "id": "4be321b83e0d",
+      "line": 13,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-uz#c0179",
+      "latency_s": 0.0141
+    },
+    {
+      "id": "2a5a195ea9b9",
+      "line": 14,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-uz#c0765",
+      "latency_s": 0.0168
+    },
+    {
+      "id": "ed696c83d02e",
+      "line": 15,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-uz#c0202",
+      "latency_s": 0.0174
+    },
+    {
+      "id": "f7e2b0ff35d4",
+      "line": 16,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-uz#c0061",
+      "latency_s": 0.0171
+    },
+    {
+      "id": "be6795dda650",
+      "line": 17,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0420",
+      "latency_s": 0.0149
+    },
+    {
+      "id": "b924b584b823",
+      "line": 18,
+      "language": "ru",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0534",
+      "latency_s": 0.0139
+    },
+    {
+      "id": "52296655c9c6",
+      "line": 19,
+      "language": "ru",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0065",
+      "latency_s": 0.014
+    },
+    {
+      "id": "7df49dcad2e7",
+      "line": 20,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0261",
+      "latency_s": 0.0193
+    },
+    {
+      "id": "9cddd933e758",
+      "line": 21,
+      "language": "ru",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0065",
+      "latency_s": 0.0154
+    },
+    {
+      "id": "de562d777712",
+      "line": 22,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0707",
+      "latency_s": 0.0137
+    },
+    {
+      "id": "995d5c27b097",
+      "line": 23,
+      "language": "uz-Latn",
+      "tags": [
+        "neutral",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-uz#c0412",
+      "latency_s": 0.015
+    },
+    {
+      "id": "6cc1056a26ed",
+      "line": 24,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "mixed-uz-ru"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0168",
+      "latency_s": 0.0144
+    },
+    {
+      "id": "dc317719944e",
+      "line": 25,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": 2,
+      "rank_article": 1,
+      "top1": "civil-code-part2-uz#c0038",
+      "latency_s": 0.0172
+    },
+    {
+      "id": "eeb19c4bd4f3",
+      "line": 26,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo",
+        "mixed-uz-ru"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0551",
+      "latency_s": 0.0183
+    },
+    {
+      "id": "26ca802eef95",
+      "line": 27,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0358",
+      "latency_s": 0.014
+    },
+    {
+      "id": "51ee0040e7dd",
+      "line": 28,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo",
+        "mixed-uz-ru"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0109",
+      "latency_s": 0.0176
+    },
+    {
+      "id": "5bd9bef655cb",
+      "line": 29,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0248",
+      "latency_s": 0.0165
+    },
+    {
+      "id": "9accba942098",
+      "line": 30,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0197",
+      "latency_s": 0.0143
+    },
+    {
+      "id": "6bc36fa23577",
+      "line": 31,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0551",
+      "latency_s": 0.0161
+    },
+    {
+      "id": "41150d959a28",
+      "line": 32,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0230",
+      "latency_s": 0.0142
+    },
+    {
+      "id": "1a2ecf1ecbba",
+      "line": 33,
+      "language": "ru",
+      "tags": [
+        "neutral",
+        "typo"
+      ],
+      "rank": 7,
+      "rank_article": 7,
+      "top1": "civil-code-part2-uz#c0029",
+      "latency_s": 0.0147
+    },
+    {
+      "id": "79b1c4510d4c",
+      "line": 34,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0097",
+      "latency_s": 0.0144
+    },
+    {
+      "id": "b027a0e77388",
+      "line": 35,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": 8,
+      "top1": "labor-code-2022-ru#c0712",
+      "latency_s": 0.0173
+    },
+    {
+      "id": "083e38411d04",
+      "line": 36,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "no-apostrophe"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0710",
+      "latency_s": 0.0137
+    },
+    {
+      "id": "56b803358ba5",
+      "line": 37,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "mixed-uz-ru",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0279",
+      "latency_s": 0.0175
+    },
+    {
+      "id": "a88e370f4bb1",
+      "line": 38,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0254",
+      "latency_s": 0.0146
+    },
+    {
+      "id": "66ec9c18566b",
+      "line": 39,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "mixed-uz-ru"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0682",
+      "latency_s": 0.0167
+    },
+    {
+      "id": "caada5a500a9",
+      "line": 40,
+      "language": "uz-Latn",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0044",
+      "latency_s": 0.0158
+    },
+    {
+      "id": "b599a5707464",
+      "line": 41,
+      "language": "uz-Cyrl",
+      "tags": [
+        "cyrillic",
+        "colloquial",
+        "mixed-uz-ru"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0604",
+      "latency_s": 0.0176
+    },
+    {
+      "id": "de81bd33d309",
+      "line": 42,
+      "language": "uz-Cyrl",
+      "tags": [
+        "cyrillic",
+        "colloquial"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-ru#c0052",
+      "latency_s": 0.0188
+    },
+    {
+      "id": "484cfbb93be4",
+      "line": 43,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-uz#c0176",
+      "latency_s": 0.015
+    },
+    {
+      "id": "1aea1899cf01",
+      "line": 44,
+      "language": "ru",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": null,
+      "rank_article": 4,
+      "top1": "labor-code-2022-ru#c0260",
+      "latency_s": 0.0131
+    },
+    {
+      "id": "4bbaf64571bd",
+      "line": 45,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "civil-code-part2-uz#c0302",
+      "latency_s": 0.0158
+    },
+    {
+      "id": "aa8e55e4588f",
+      "line": 46,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": 3,
+      "rank_article": 3,
+      "top1": "labor-code-2022-ru#c0500",
+      "latency_s": 0.0146
+    },
+    {
+      "id": "0fe76b0420a8",
+      "line": 47,
+      "language": "ru",
+      "tags": [
+        "colloquial"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0710",
+      "latency_s": 0.0153
+    },
+    {
+      "id": "f5c998af9e8a",
+      "line": 48,
+      "language": "ru",
+      "tags": [
+        "neutral"
+      ],
+      "rank": null,
+      "rank_article": 5,
+      "top1": "labor-code-2022-uz#c0760",
+      "latency_s": 0.0171
+    },
+    {
+      "id": "19aaaa554a8e",
+      "line": 49,
+      "language": "ru",
+      "tags": [
+        "colloquial",
+        "typo"
+      ],
+      "rank": null,
+      "rank_article": null,
+      "top1": "labor-code-2022-ru#c0411",
+      "latency_s": 0.0156
+    }
+  ],
+  "generated_at": "2026-11-05T02:22:54+00:00",
+  "git_commit": "75e254e",
+  "script": "scripts/eval_retrieval.py"
+}
