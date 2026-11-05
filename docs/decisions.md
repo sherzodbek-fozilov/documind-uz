@@ -310,3 +310,35 @@ written by the annotator.
   bootstrap CIs of the deltas. Checked with the base export as a stand-in "fine-tuned"
   model: all deltas 0 and baseline results identical to the committed ones (results
   files restored afterwards, nothing chosen from them).
+
+## Eval set v1 frozen for the before/after comparison (2026-11-05)
+
+- **Chosen:** the 49 real test questions labeled in batches 1 to 4 are frozen as **eval
+  set v1** (`data/eval/sets/v1.json`). The comparison of the base and the fine-tuned
+  embedding model is run on v1 only (`scripts/eval_finetune.py --eval-set v1`).
+  **Questions labeled later form v2**; they are appended to `questions.jsonl` as usual and
+  reported separately (v1 and v2 results are never pooled for the before/after numbers).
+- **How v1 stays reproducible:**
+  - Each question has a stable id: the first 12 hex digits of the sha256 of its text and
+    its gold chunk ids. The id is computed, not stored, so the annotator's lines in
+    `questions.jsonl` stay untouched; line order and tags do not affect it.
+  - `v1.json` lists the 49 ids, counts by language and tag, the sha256 of
+    `questions.jsonl` at freeze time, and the corpus fingerprint the gold chunk ids
+    depend on: sha256 and chunker version of each document, and the sha256 of
+    `data/splits.json`. It is written once by `scripts/freeze_eval_set.py`, which refuses
+    to overwrite an existing set.
+  - `scripts/eval_retrieval.py --eval-set v1` evaluates exactly these questions, writes
+    `results/retrieval_<method>_real_v1.json` (so a later run on all questions cannot
+    overwrite it), and **fails** if a frozen question was edited or removed or if the
+    corpus or split no longer contains its gold chunks. Result files record the eval
+    set's sha256 and each question's id; `eval_finetune.py` refuses to compare runs with
+    different eval sets or question ids.
+- **Consequences:** a frozen question is never edited. Fixing one (text or gold) means a
+  new set version (e.g. v1.1) with its own manifest, reported as such. Tags may still be
+  added, since they do not change the id. Re-chunking or re-ingesting the corpus breaks v1
+  on purpose; the before/after comparison must then be repeated on a new frozen set.
+- **Alternatives:** storing an `id` field in each question line (changes the annotator's
+  file); freezing by line numbers (breaks when lines are reordered); freezing only the
+  sha256 of the whole file (breaks as soon as v2 questions are appended).
+- **Not tuned on v1:** like the pilots, v1 is a test set. Analyzer and model settings are
+  tuned only on train-chapter dev questions (`docs/issues.md`).
