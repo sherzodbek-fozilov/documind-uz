@@ -12,7 +12,7 @@ from ..qa.service import AskResult, Passage
 
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
-    corpus: Literal["real", "synthetic"] = "real"
+    corpus: Literal["real", "synthetic", "user"] = "real"
     # restrict the search to one document ("document" scope); None = whole corpus
     document_id: str | None = None
     top_k: int | None = Field(None, ge=1, le=10)
@@ -74,8 +74,9 @@ class DocumentOut(BaseModel):
     id: str
     title: str
     language: str
-    corpus: Literal["real", "synthetic"]
+    corpus: Literal["real", "synthetic", "user"]
     is_synthetic: bool
+    filename: str
     source: str | None
     edition: str | None
     n_chunks: int
@@ -87,3 +88,16 @@ class HealthOut(BaseModel):
     retriever: str
     documents: int
     chunks: int
+    user_documents: int
+
+
+class UploadOut(BaseModel):
+    document_id: str
+    status: Literal["ingested", "duplicate"]
+    corpus: Literal["user"] = "user"
+    filename: str
+    n_pages: int
+    n_ocr_pages: int
+    n_chunks: int
+    language: str
+    warnings: list[str]

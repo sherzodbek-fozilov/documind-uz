@@ -16,7 +16,8 @@ requires_font = pytest.mark.skipif(not FONT.exists(), reason="DejaVuSans font mi
 def settings(tmp_path) -> Settings:
     return Settings(_env_file=None, database_url=f"sqlite:///{tmp_path / 'test.sqlite'}",
                     storage_dir=tmp_path / "store", splits_file=tmp_path / "splits.json",
-                    chunk_max_words=60)
+                    user_database_url=f"sqlite:///{tmp_path / 'user.sqlite'}",
+                    user_storage_dir=tmp_path / "user_store", chunk_max_words=60)
 
 
 UZ_LATN = ["IJARA SHARTNOMASI",
