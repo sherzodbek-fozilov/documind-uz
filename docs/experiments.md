@@ -16,11 +16,22 @@ small, so the size of the drop is uncertain. For e5-small the paired intervals l
 zero for Recall@5 and Recall@10 (chunk level) and for Recall@5, Recall@10 and MRR@10
 (article level); for chunk-level Recall@1 and MRR@10 they include zero.
 
-- **Validation improved, but the gain did not transfer to the test questions.** The
-  Kaggle run reported a higher validation MRR@10 on held-out train chapters for the
-  fine-tuned model than for the base model. **The validation numbers are TBD here** until
-  the run's `training_log.json` is committed under `results/`, since every number in this
-  document must come from a result file.
+- **Validation improved, but the gain did not transfer to the test questions.** On the
+  1,573 held-out validation pairs (train chapter groups not used for training), chunk-level
+  MRR@10 rose from 0.5498 (base model, epoch 0) to 0.7421
+  (epoch 3, the epoch selected on this metric). Source:
+  `results/finetune_attempt1_training_log.json` (Kaggle run on a Tesla T4, source
+  commit `75e254e`; its pair-file sha256s match
+  `results/training_pairs_stats.json`). Validation retrieves among 2,300 train-chapter
+  chunks, not among all real chunks, so these numbers are not on the same scale as the
+  test numbers.
+
+  | Level | Metric | Base (epoch 0) | Fine-tuned (epoch 3) |
+  |---|---|---|---|
+  | chunk | Recall@5 | 0.6090 | 0.9142 |
+  | chunk | MRR@10 | 0.5498 | 0.7421 |
+  | article | Recall@5 | 0.8976 | 0.9809 |
+  | article | MRR@10 | 0.8254 | 0.9602 |
 - **Settings were fixed in advance** (`docs/finetune-runbook.md`): pairs from train
   chapters only, epoch chosen on validation MRR@10, nothing changed after seeing test
   results. The test questions were not used for training or model selection.

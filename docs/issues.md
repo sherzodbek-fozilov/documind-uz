@@ -16,8 +16,9 @@ After fine-tuning attempt 1 gave no improvement on real questions
 - [ ] **Screen off-the-shelf Uzbek embedding models on v1, report all**: every candidate
       tried is listed with its result, license and size, including the ones that do not
       help (see `docs/decisions.md`, "Next embedding experiments").
-- [ ] Commit the Kaggle `training_log.json` of fine-tuning attempt 1 under `results/`, so
-      the validation numbers in `docs/experiments.md` can be filled in from a file.
+- [x] Commit the Kaggle `training_log.json` of fine-tuning attempt 1 under `results/`, so
+      the validation numbers in `docs/experiments.md` can be filled in from a file
+      (`results/finetune_attempt1_training_log.json`)
 - [ ] Hash text files with normalized line endings (or add `.gitattributes` with
       `eol=lf`), so a CRLF checkout does not change `questions_sha256`.
 
