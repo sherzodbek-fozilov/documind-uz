@@ -1,0 +1,11 @@
+# Build context of the API image (Dockerfile): only what the image needs.
+# Never send .env, anything from data/raw, models or databases to the builder.
+*
+!pyproject.toml
+!README.md
+!documind/
+!scripts/
+!data/sources.json
+!data/splits.json
+**/__pycache__
+**/*.py[cod]

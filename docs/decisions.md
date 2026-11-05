@@ -408,6 +408,36 @@ written by the annotator.
 - **Not tuned on v1:** like the pilots, v1 is a test set. Analyzer and model settings are
   tuned only on train-chapter dev questions (`docs/issues.md`).
 
+## Packaging: Docker Compose, public demo mode, Caddy (2026-11-05)
+
+- **Two images.** `Dockerfile` (API; also runs the one-off jobs as the `ops` service) and
+  `deploy/web/Dockerfile` (the built frontend served by Caddy). Code in the API image is
+  owned by root and the root file system is mounted read-only; only the volume
+  directories are writable by the service user (uid 10001). No secret is an image layer:
+  `.env` is excluded from the build context and read at run time.
+- **Read-only corpus, twice.** The API connects to the main database as `documind_api`,
+  which has only SELECT rights (`deploy/postgres/init-roles.sh`); ingest runs as the
+  owner in the `ops` service. With `DOCUMIND_PUBLIC_DEMO=true` the API additionally opens
+  the main database with `default_transaction_read_only=on` (SQLite: `mode=ro`) and does
+  not create tables. The role is the real protection; the read-only transactions guard
+  against a code path that writes by mistake. Uploads keep their own database
+  (`documind_user`, owned by `documind_api`), so the role split also holds outside demo
+  mode.
+- **Upload in demo mode** is a route without a body parameter that answers 403, so the
+  multipart body is never parsed (Starlette would otherwise spool it to disk first).
+- **Rate limits in Caddy**, not in the API: per client IP, before the request reaches
+  Python, with the `caddy-ratelimit` plugin compiled in (pinned commit). Alternatives: an
+  in-process limiter in FastAPI (counts per worker, runs after the body is received);
+  nginx `limit_req` (needs separate certificate handling). Limitation: the key is the TCP
+  peer, so a proxy or load balancer in front of Caddy would collapse all clients into one.
+- **Fetching on the server.** `scripts/fetch_sources.py --keep-registry` writes only to
+  `data/raw` (a volume); the registry and `docs/data.md` in the image are not changed.
+  The model is downloaded at the pinned revision into the `models` volume.
+- **Not verified before the first server build:** the Debian tesseract packages could not
+  be installed where these files were written (no access to the Debian mirrors). Both
+  images were otherwise built and the stack was run end to end (ask, upload, demo mode,
+  role permissions, rate limits) with that one step left out.
+
 ## After fine-tuning attempt 1: deployment and rules for the next experiments (2026-11-05)
 
 - **Deployment keeps the base multilingual-e5-small in the hybrid; the fine-tuned model

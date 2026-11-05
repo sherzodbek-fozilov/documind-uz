@@ -117,3 +117,19 @@ After fine-tuning attempt 1 gave no improvement on real questions
 - Chunk ids depend on the chunker configuration; changing it invalidates `gold_chunk`
   labels. Need a remapping tool (by character span overlap) before relabeling.
 - Database migrations (Alembic) instead of `create_all`.
+
+## Packaging and deployment
+- [x] API image (tesseract uzb, uzb_cyrl, rus; non-root; no secrets) and Compose stack
+      (API, web, PostgreSQL, Qdrant) with health checks and volumes
+- [x] Public demo mode: uploads disabled, read-only corpus; Caddy with HTTPS and per-IP
+      rate limits
+- [x] CI: ruff, pytest (with PostgreSQL and tesseract), README check, frontend tests and
+      build
+- [x] Deployment guide for a Hetzner Ubuntu server (`docs/deploy.md`)
+- [ ] Decide whether a public demo may show quotes of lex.uz text (no license stated);
+      record the decision before a domain is set
+- [ ] First build of the API image with the tesseract packages and an OCR check on the
+      server (the apt step has not been run yet; everything else in both images has)
+- [ ] Image build in CI (catches Dockerfile breakage before a deploy)
+- [ ] FastAPI docs behind the `/api` prefix (`root_path`) if they should be public
+

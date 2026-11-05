@@ -9,7 +9,9 @@ import type { AskResponse } from "./api/types";
 import { renderIn } from "./test/render";
 import { DOCUMENTS, PASSAGE_SYNTHETIC, PASSAGE_UZ, askResponse } from "./test/samples";
 
-const HEALTH = { status: "ok" as const, mode: "extractive", retriever: "bm25", documents: 3, chunks: 9 };
+const HEALTH = {
+  status: "ok" as const, mode: "extractive", retriever: "bm25", documents: 3, chunks: 9, public_demo: false,
+};
 
 function fakeApi(over: Partial<ApiClient> = {}): ApiClient {
   return {

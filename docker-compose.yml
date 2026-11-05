@@ -1,0 +1,135 @@
+# DocuMind UZ: API, web (built frontend + Caddy), PostgreSQL, Qdrant.
+#
+#   cp .env.example .env      # set the passwords; see docs/deploy.md
+#   docker compose build
+#   docker compose run --rm ops python scripts/download_model.py   # one-off jobs
+#   docker compose up -d
+#
+# Only the web service publishes ports (by default on 127.0.0.1). Models and data live
+# in named volumes; nothing from data/raw is part of an image or of the repository.
+
+x-documind-volumes: &documind-volumes
+  - models:/app/models
+  - raw:/app/data/raw
+  - store:/app/data/store
+  - cache:/app/data/cache
+
+services:
+  postgres:
+    image: postgres:17-trixie
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: documind
+      POSTGRES_DB: documind
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      DOCUMIND_API_DB_PASSWORD: ${DOCUMIND_API_DB_PASSWORD:?set DOCUMIND_API_DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres/init-roles.sh:/docker-entrypoint-initdb.d/10-roles.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U documind -d documind"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.2
+    restart: unless-stopped
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true"
+    volumes:
+      - qdrant:/qdrant/storage
+    healthcheck:
+      # the image has no curl or wget; bash can open a TCP connection itself
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/6333 && printf \"GET /readyz HTTP/1.0\\r\\n\\r\\n\" >&3 && grep -q \" 200 \" <&3'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    image: documind-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # SELECT-only role on the main database (deploy/postgres/init-roles.sh)
+      DOCUMIND_DATABASE_URL: postgresql+psycopg://documind_api:${DOCUMIND_API_DB_PASSWORD}@postgres:5432/documind
+      DOCUMIND_USER_DATABASE_URL: postgresql+psycopg://documind_api:${DOCUMIND_API_DB_PASSWORD}@postgres:5432/documind_user
+      DOCUMIND_QDRANT_URL: http://qdrant:6333
+      # .env also holds the owner password, which the API must not have
+      POSTGRES_PASSWORD: ""
+    volumes:
+      - models:/app/models:ro
+      - store:/app/data/store:ro
+      - cache:/app/data/cache
+      - user_store:/app/data/user_store
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web/Dockerfile
+    image: documind-web
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      RATE_LIMIT_ASK_PER_MINUTE: ${RATE_LIMIT_ASK_PER_MINUTE:-20}
+      RATE_LIMIT_UPLOAD_PER_HOUR: ${RATE_LIMIT_UPLOAD_PER_HOUR:-10}
+      RATE_LIMIT_ALL_PER_MINUTE: ${RATE_LIMIT_ALL_PER_MINUTE:-300}
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:${WEB_HTTP_PORT:-8080}:80"
+      - "${WEB_BIND:-127.0.0.1}:${WEB_HTTPS_PORT:-8443}:443"
+      - "${WEB_BIND:-127.0.0.1}:${WEB_HTTPS_PORT:-8443}:443/udp"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    # Caddy runs as a non-root user; the binary has only the capability to bind 80/443
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # One-off jobs (model download, fetching the lex.uz documents, ingest), never started
+  # by "docker compose up":  docker compose run --rm ops <command>
+  ops:
+    image: documind-api
+    pull_policy: never  # built by "docker compose build" (same image as api)
+    profiles: ["ops"]
+    env_file: .env
+    environment:
+      DOCUMIND_DATABASE_URL: postgresql+psycopg://documind:${POSTGRES_PASSWORD}@postgres:5432/documind
+      DOCUMIND_QDRANT_URL: http://qdrant:6333
+      HF_HOME: /tmp/huggingface  # the root file system is read-only
+    volumes: *documind-volumes
+    read_only: true
+    tmpfs:
+      - /tmp:size=1g
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["documind", "stats"]
+
+volumes:
+  pgdata:
+  qdrant:
+  models:
+  raw:
+  store:
+  cache:
+  user_store:
+  caddy_data:
+  caddy_config:

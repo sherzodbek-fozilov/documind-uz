@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     upload_max_unzipped_bytes: int = Field(100 * 1024 * 1024, ge=1)  # DOCX, all parts
     upload_max_zip_entries: int = Field(2000, ge=1)  # DOCX
 
+    # Public demo: the upload endpoint answers 403, the "user" corpus does not exist and
+    # the main database is opened read-only (every transaction is READ ONLY in PostgreSQL;
+    # SQLite is opened with mode=ro). The corpus is ingested beforehand with the CLI.
+    public_demo: bool = False
+
     # LLM (stage 3). The key only ever comes from the environment.
     # "package.module:factory" returning an object with
     # ``complete(prompt: str, max_tokens: int) -> str``; used only when answer_mode="llm"

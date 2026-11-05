@@ -8,6 +8,8 @@ export interface Health {
   retriever: string;
   documents: number;
   chunks: number;
+  /** public demo: uploads disabled, corpus read-only */
+  public_demo: boolean;
 }
 
 export interface DocumentInfo {

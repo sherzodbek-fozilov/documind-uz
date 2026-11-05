@@ -1,0 +1,74 @@
+# Web server for the built frontend and reverse proxy for the API, with per-IP rate
+# limits (github.com/mholt/caddy-ratelimit, compiled into the image).
+#
+# SITE_ADDRESS (from .env, see docs/deploy.md):
+#   ":80"                  plain HTTP, e.g. on a laptop behind 127.0.0.1 (default)
+#   "demo.example.org"     public demo: Caddy gets a Let's Encrypt certificate, serves
+#                          HTTPS on 443 and redirects HTTP to HTTPS
+{
+	# rate_limit is a plugin directive; give it a place in the handler chain
+	order rate_limit before basic_auth
+}
+
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	header {
+		# browsers ignore HSTS on plain HTTP, so this is safe for ":80" too
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+		-Server
+	}
+
+	# Per client IP ({remote_host} is the TCP peer: Caddy is the edge, so this is the
+	# visitor's address; behind another proxy or load balancer it would not be).
+	# Over the limit: 429 with a Retry-After header.
+	rate_limit {
+		zone ask {
+			match {
+				path /api/ask
+			}
+			key {remote_host}
+			events {$RATE_LIMIT_ASK_PER_MINUTE:20}
+			window 1m
+		}
+		zone upload {
+			match {
+				path /api/documents/upload
+			}
+			key {remote_host}
+			events {$RATE_LIMIT_UPLOAD_PER_HOUR:10}
+			window 1h
+		}
+		zone all {
+			key {remote_host}
+			events {$RATE_LIMIT_ALL_PER_MINUTE:300}
+			window 1m
+		}
+	}
+
+	# /api/* -> the FastAPI service, without the /api prefix (as in the Vite dev proxy)
+	handle_path /api/* {
+		# uploads are at most 20 MB (DOCUMIND_UPLOAD_MAX_BYTES) plus multipart framing;
+		# the API enforces its own limit as well
+		request_body {
+			max_size 21MB
+		}
+		reverse_proxy api:8000
+	}
+
+	# the built single-page app
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

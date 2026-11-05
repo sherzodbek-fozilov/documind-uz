@@ -23,6 +23,8 @@ Usage:
   python scripts/fetch_sources.py               # download approved entries, write outputs
   python scripts/fetch_sources.py --no-download # only use files already in data/raw
   python scripts/fetch_sources.py --render-only # only regenerate the docs/data.md table
+  python scripts/fetch_sources.py --keep-registry  # on a server: write only data/raw,
+                                                  # never data/sources.json or docs/data.md
 """
 
 from __future__ import annotations
@@ -237,15 +239,20 @@ def update_data_md(text: str, table: str) -> str:
     return pattern.sub(lambda _: f"{BEGIN}\n{table}\n{END}", text)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--no-download", action="store_true")
     ap.add_argument("--render-only", action="store_true")
+    ap.add_argument("--keep-registry", action="store_true",
+                    help="write only data/raw (files and manifest); leave data/sources.json "
+                         "and docs/data.md unchanged (server checkout, read-only image)")
     ap.add_argument("--delay", type=float, default=10.0,
                     help="seconds between requests to the same site (default 10)")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
+    if args.keep_registry and args.render_only:
+        ap.error("--keep-registry and --render-only exclude each other")
 
-    registry = load_registry()
+    registry = load_registry(REGISTRY)
     problems = validate(registry)
     if problems:
         raise SystemExit("invalid data/sources.json:\n  " + "\n  ".join(problems))
@@ -261,9 +268,11 @@ def main() -> None:
             with (RAW / "manifest.jsonl").open("w", encoding="utf-8") as f:
                 for row in rows:
                     f.write(json.dumps(row, ensure_ascii=False) + "\n")
+        print(f"{len(rows)} real documents ready in {RAW}")
+        if args.keep_registry:
+            return
         REGISTRY.write_text(json.dumps(registry, ensure_ascii=False, indent=2) + "\n",
                             encoding="utf-8")
-        print(f"{len(rows)} real documents ready in {RAW}")
     elif (RAW / "manifest.jsonl").exists():
         included = {json.loads(line)["doc_id"] for line in
                     (RAW / "manifest.jsonl").read_text(encoding="utf-8").splitlines() if line}
