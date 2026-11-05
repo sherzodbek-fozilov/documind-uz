@@ -1,0 +1,99 @@
+{
+ "name": "v1",
+ "set": "real",
+ "frozen_on": "2026-11-05",
+ "n": 49,
+ "by_language": {
+  "ru": 23,
+  "uz-Cyrl": 2,
+  "uz-Latn": 24
+ },
+ "by_tag": {
+  "ambiguous-gold": 1,
+  "colloquial": 37,
+  "cyrillic": 2,
+  "mixed-uz-ru": 9,
+  "neutral": 12,
+  "no-apostrophe": 11,
+  "typo": 21
+ },
+ "questions_file": "data/eval/questions.jsonl",
+ "questions_file_sha256": "84a80aa8a30b5008314ce492095d5d8e91075f6d07b8a5ae12ac528fd87d05ac",
+ "question_id": "sha256(question + U+001F + gold chunks joined by U+001E)[:12]",
+ "corpus": {
+  "documents": [
+   {
+    "id": "civil-code-part2-ru",
+    "sha256": "8a2c09d21858a4bee3657f7f7a3bb81c7e5c0a7aff607d74cdea3dbd0e60f450",
+    "chunker_version": "struct-v1-w180"
+   },
+   {
+    "id": "civil-code-part2-uz",
+    "sha256": "31b8d5ecb811d2429ff3a885f3349cbfba7e88debf997f0e115d89d487746918",
+    "chunker_version": "struct-v1-w180"
+   },
+   {
+    "id": "labor-code-2022-ru",
+    "sha256": "fe138c6da4dbf11baa6a582e699464addd946c5a2d5c8d6302857f7ae3915760",
+    "chunker_version": "struct-v1-w180"
+   },
+   {
+    "id": "labor-code-2022-uz",
+    "sha256": "0f8a63b803bbc5c7ed0d51194a8840fce174286160ba9cf4525e9a95c39e7a62",
+    "chunker_version": "struct-v1-w180"
+   }
+  ],
+  "splits_file_sha256": "4c93d5a5b094bb77962e38538dbb4cb9865e87e3b859c4db32e8a457822828eb"
+ },
+ "question_ids": [
+  "c64ed92abc3e",
+  "eb36794a0528",
+  "b3938b633f67",
+  "cfbe51dc2b36",
+  "5e56dcad3e85",
+  "9d207fdf720f",
+  "9d7e979f2e52",
+  "eb6faad8147a",
+  "1d4e9cbaf086",
+  "b766989b0975",
+  "207ce535abc4",
+  "4fe4e0075c58",
+  "4be321b83e0d",
+  "2a5a195ea9b9",
+  "ed696c83d02e",
+  "f7e2b0ff35d4",
+  "be6795dda650",
+  "b924b584b823",
+  "52296655c9c6",
+  "7df49dcad2e7",
+  "9cddd933e758",
+  "de562d777712",
+  "995d5c27b097",
+  "6cc1056a26ed",
+  "dc317719944e",
+  "eeb19c4bd4f3",
+  "26ca802eef95",
+  "51ee0040e7dd",
+  "5bd9bef655cb",
+  "9accba942098",
+  "6bc36fa23577",
+  "41150d959a28",
+  "1a2ecf1ecbba",
+  "79b1c4510d4c",
+  "b027a0e77388",
+  "083e38411d04",
+  "56b803358ba5",
+  "a88e370f4bb1",
+  "66ec9c18566b",
+  "caada5a500a9",
+  "b599a5707464",
+  "de81bd33d309",
+  "484cfbb93be4",
+  "1aea1899cf01",
+  "4bbaf64571bd",
+  "aa8e55e4588f",
+  "0fe76b0420a8",
+  "f5c998af9e8a",
+  "19aaaa554a8e"
+ ]
+}
