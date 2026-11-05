@@ -1,0 +1,148 @@
+# Development
+
+Working on DocuMind UZ without Docker: setup, the pipeline stages, the API and the
+settings. For a quick overview see the [README](../README.md); for running the whole stack
+with Docker Compose see [`deploy.md`](deploy.md).
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `documind/` | Python package (ingestion, storage, retrieval, `qa` answers and citations, `api`) |
+| `tests/` | pytest suite |
+| `scripts/` | data generation, evaluation, README rendering |
+| `data/eval/questions.jsonl` | hand-labeled evaluation questions (see `data/eval/README.md`) |
+| `results/` | metric files written by scripts, the only source of README numbers |
+| `docs/data.md` | every data source: URL, license, date, synthetic or not |
+| `docs/decisions.md` | design decisions and the alternatives considered |
+| `docs/issues.md` | open work items by stage |
+| `frontend/` | React + TypeScript UI (stage 4) |
+| `Dockerfile`, `docker-compose.yml`, `deploy/` | API image, Compose stack (API, web, PostgreSQL, Qdrant), Caddy config, database roles |
+| `docs/deploy.md` | step-by-step deployment on a Hetzner Ubuntu server |
+
+## Quick start
+
+```bash
+pip install -e ".[dev]"
+sudo apt-get install tesseract-ocr tesseract-ocr-uzb tesseract-ocr-uzb-cyrl tesseract-ocr-rus
+cp .env.example .env          # set DOCUMIND_DATABASE_URL; SQLite works for local experiments
+python scripts/make_synthetic_docs.py      # synthetic contracts (clearly marked synthetic)
+documind ingest data/synthetic           # reads data/synthetic/manifest.jsonl
+documind split                           # language-stratified split, frozen in data/splits.json
+documind stats                           # counts per split/language + leakage check
+python scripts/eval_ocr.py               # writes results/ocr_synthetic.json
+python scripts/render_readme.py          # regenerates the README tables
+python -m pytest
+```
+
+Optional: run the PostgreSQL test with
+`TEST_DATABASE_URL=postgresql+psycopg://user:pass@localhost/db_test python -m pytest -m postgres`.
+
+## Ingestion
+
+| Step | What happens |
+|---|---|
+| Parse | PDF text layer (PyMuPDF blocks with bounding boxes); DOCX paragraphs, headings, tables; PNG/JPEG/TIFF; lex.uz act pages (HTML) |
+| OCR | PDF pages with fewer than 30 text characters are rendered at 300 dpi and OCR'd with tesseract `uzb+uzb_cyrl+rus` |
+| Normalize | NFC, whitespace, Uzbek apostrophe variants → ʻ / ʼ |
+| Chunk | new chunk at each article / chapter / section heading; ≤ 180 words; no overlap; each chunk is an exact span of the document text |
+| Label | language per chunk (uz-Latn / uz-Cyrl / ru), document split (train / test) by document group |
+| Store | PostgreSQL tables `documents`, `pages` (with block offsets and boxes), `chunks`; original file by sha256 |
+
+## Train/test split
+
+Train/test splits never separate translations: synthetic documents are split by
+document, and the real acts by **chapter group** (the same chapter in all language
+versions of an act stays together; see `docs/decisions.md` for why and for the
+limitation). Splits are stratified by kind (real / synthetic) and frozen in
+`data/splits.json`.
+
+## Retrieval and evaluation
+
+| Method | Details |
+|---|---|
+| BM25 | Okapi BM25 (k1 1.2, b 0.75); analyzer `fold+stem6`: apostrophes removed, Cyrillic → Latin with OCR-confusable letters merged, tokens cut to 6 characters |
+| Dense | multilingual-e5-small, ONNX on CPU (pinned revision), Qdrant |
+| Hybrid | reciprocal rank fusion (k = 60) of the top 100 from each |
+
+```bash
+pip install -e ".[models]"                # huggingface_hub, for the download script
+python scripts/download_model.py          # e5-small ONNX into models/ (git-ignored)
+python scripts/make_synthetic_questions.py # SYNTHETIC sanity questions
+python scripts/eval_retrieval.py           # writes results/retrieval_<method>_<set>.json
+python scripts/draft_questions.py          # drafts for real test documents, for review
+```
+
+Recall@k = share of questions whose gold chunk is in the top k; MRR = mean reciprocal
+rank of the gold chunk (cut at 10). Settings are tuned on the train split and reported
+on the test split.
+
+## Fine-tuning (stage 5)
+
+Step by step: [`docs/finetune-runbook.md`](finetune-runbook.md).
+
+```bash
+python scripts/make_training_pairs.py   # local pairs (git-ignored) + results/training_pairs_stats.json
+# Kaggle (GPU, internet on), in a private notebook: rebuilds the pairs itself, trains,
+# picks the epoch on validation; no data is uploaded
+#   !python finetune_e5.py --ref main --smoke   # setup check first
+#   !python finetune_e5.py --ref main
+python scripts/export_onnx.py --model runs/e5-small-ft/best --out models/multilingual-e5-small-ft \
+    --training-log runs/e5-small-ft/training_log.json
+python scripts/eval_finetune.py         # base vs fine-tuned on the same real test questions
+```
+
+Pairs come only from train chapter groups (test chunks are never read into them); the
+epoch is chosen on held-out train chapter groups. Details and limitations:
+`docs/decisions.md`.
+
+## API
+
+```bash
+pip install -e ".[dev,api]"
+documind serve                    # http://127.0.0.1:8000/docs
+curl -s localhost:8000/ask -H 'content-type: application/json' \
+     -d '{"question": "Ijara haqi qachon toʻlanadi?", "top_k": 3}'
+curl -s localhost:8000/documents/upload -F 'file=@contract.pdf;type=application/pdf'
+curl -s localhost:8000/ask -H 'content-type: application/json' \
+     -d '{"question": "Shartnoma muddati qancha?", "corpus": "user"}'
+```
+
+| Endpoint | Returns |
+|---|---|
+| `GET /health` | status, answer mode, retriever, document and chunk counts, uploaded documents |
+| `GET /documents?corpus=real\|synthetic\|user` | id, title, file name, language, source URL, edition, chunk count |
+| `POST /documents/upload` | multipart `file` (PDF, DOCX, PNG, JPEG, TIFF) → `201` with document id, pages, OCR pages, chunks, language; `200` if the same file was uploaded before; `413` / `415` / `422` / `503` with a message |
+| `POST /ask` | `{question, corpus, document_id?, top_k?}` → the best passages, each with an exact `quote`, `quote_start`/`quote_end` in the chunk, `document_id`, `chunk_id`, lex.uz `anchor` and `link` (`<page>#<element id>`) |
+
+- **Extractive mode** (default, no LLM key): for each retrieved chunk the best window of
+  1–2 sentences inside one source block is quoted (scored by BM25 idf of the query terms).
+- **LLM mode** (`DOCUMIND_ANSWER_MODE=llm`, off by default): a provider is loaded from
+  `DOCUMIND_LLM_PROVIDER="package.module:factory"`. The model must return verbatim quotes;
+  citations that are not an exact span of a passage it was given are dropped and counted.
+- **Citation check**: a citation is valid only if `chunk.text[quote_start:quote_end] ==
+  quote` for the cited chunk of the cited document. `python scripts/eval_citations.py`
+  re-checks every citation against the database (also the anchor) and writes
+  `results/citations_<set>.json`. In extractive mode the quotes are cut from the chunk,
+  so 100 % is expected: the metric guards against offset bugs and becomes informative in
+  LLM mode.
+- Retriever: `DOCUMIND_API_RETRIEVER=bm25` (default) or `hybrid` (needs the e5 model).
+- **Uploads** go to the **user** corpus, which has its own database and storage
+  directory (`DOCUMIND_USER_DATABASE_URL`, `DOCUMIND_USER_STORAGE_DIR`). They never reach
+  the evaluation corpora, the train/test split or training pairs. Checks before parsing:
+  extension and content-type whitelist, file signature, size (20 MB), pages (50), pixels
+  per page, DOCX unpacked size; the client's file name is never used in a path. Scanned
+  pages are OCR'd with the existing pipeline. **Not for a public server yet**: no
+  authentication or rate limit, and the parsers run in the API process (see
+  `docs/decisions.md`).
+- **Public demo** (`DOCUMIND_PUBLIC_DEMO=true`): `POST /documents/upload` answers `403`
+  without reading the request body, the user corpus does not exist, and the main
+  database is opened read-only (PostgreSQL: every transaction `READ ONLY`; SQLite:
+  `mode=ro`), so the corpus must be ingested beforehand with the CLI. `GET /health`
+  reports `public_demo`.
+
+## Configuration
+
+All settings are environment variables with the `DOCUMIND_` prefix; see `.env.example`.
+The LLM API key is read from the environment only and is never committed. A per-request
+token limit and a monthly budget guard are part of stage 3.
