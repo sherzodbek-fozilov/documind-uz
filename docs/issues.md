@@ -2,6 +2,26 @@
 
 Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 
+## Priority (next)
+
+After fine-tuning attempt 1 gave no improvement on real questions
+(`docs/experiments.md`), these come first:
+
+- [ ] **Dev question set from train chapters** (hand-written, same style as real user
+      questions), used for all tuning and model selection: analyzers (stem length,
+      synonyms), embedding models, fine-tuning settings. Never the test set.
+- [ ] **Eval set v2**: new real test questions, frozen like v1 (disjoint from v1:
+      `scripts/freeze_eval_set.py` needs an option to exclude v1's ids), used once to
+      confirm a candidate chosen on the dev set; reported separately from v1.
+- [ ] **Screen off-the-shelf Uzbek embedding models on v1, report all**: every candidate
+      tried is listed with its result, license and size, including the ones that do not
+      help (see `docs/decisions.md`, "Next embedding experiments").
+- [x] Commit the Kaggle `training_log.json` of fine-tuning attempt 1 under `results/`, so
+      the validation numbers in `docs/experiments.md` can be filled in from a file
+      (`results/finetune_attempt1_training_log.json`)
+- [ ] Hash text files with normalized line endings (or add `.gitattributes` with
+      `eol=lf`), so a CRLF checkout does not change `questions_sha256`.
+
 ## Stage 0: skeleton
 - [x] Package layout, `pyproject.toml`, `.env.example`, `.gitignore`, Makefile
 - [x] README draft with generated, empty metrics table
@@ -40,7 +60,7 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [ ] Real-set results (blocked on real documents and labeled questions)
 - [ ] Re-check the BM25 analyzer choice on real train-split questions (GitHub issue #7)
 - [ ] Dev question set from train chapters, used to tune analyzers (stem length,
-      synonyms) without touching the test set
+      synonyms) without touching the test set (priority, see top)
 - [x] Eval script: Recall@1/5/10, MRR on `data/eval/questions.jsonl`
 - [x] Question-drafting tool for manual review
 
@@ -75,8 +95,10 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [x] Kaggle script (`kaggle/finetune_e5.py`)
 - [x] ONNX export for the CPU service, verified against PyTorch
 - [x] Before/after evaluation hook on the same test questions (`scripts/eval_finetune.py`)
-- [ ] Run the fine-tuning on Kaggle, export, run the before/after evaluation
+- [x] Run the fine-tuning on Kaggle, export, run the before/after evaluation
+      (attempt 1: no improvement on eval set v1, see `docs/experiments.md`)
 - [ ] Hand-written dev questions from train chapters as a second validation signal
+      (priority, see top)
 - [ ] Optional: cross-lingual first-sentence pairs; dense-model hard negatives
 
 ## Stage 6: hardening

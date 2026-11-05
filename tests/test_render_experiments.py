@@ -33,3 +33,46 @@ def test_render_header_shows_questions_sha_and_eval_set():
     assert "`results/retrieval_*_real_v1.json`" in out
     assert "Questions file sha256: `abc123`" in out
     assert "Eval set: `v1` (10 frozen questions, `data/eval/sets/v1.json` sha256 `def456`)" in out
+
+
+def _ft_inputs(ft_sha: str = "s"):
+    from documind.evaluation import metrics_from_ranks
+
+    def run(ranks, sha):
+        m = metrics_from_ranks(ranks)
+        return {"git_commit": "c1", "questions_sha256": sha, "metrics": m,
+                "metrics_article": m,
+                "per_question": [{"id": f"q{i}"} for i in range(len(ranks))]}
+
+    base_r, ft_r = [1, 2, None, 1], [3, 2, None, 1]
+    pq = [{"language": lang, "tags": tags, "rank_base": b, "rank_ft": f}
+          for lang, tags, b, f in zip(["ru", "ru", "uz-Latn", "uz-Latn"],
+                                      [["typo"], [], ["typo"], []], base_r, ft_r, strict=True)]
+    method = {"base_model": "b", "ft_model": "f", "n": 4,
+              "chunk": {k: {"delta": -0.1, "ci95": [-0.2, 0.0]} for k in
+                        ("recall@1", "recall@5", "recall@10", "mrr")},
+              "chunk_questions": {"better": 0, "worse": 1, "same": 3},
+              "article_questions": {"better": 0, "worse": 1, "same": 3},
+              "per_question": pq}
+    method["article"] = method["chunk"]
+    cmp = {"set": "real", "split": "test", "eval_set": "v1", "git_commit": "c2",
+           "generated_at": "t", "methods": {"e5_small": method, "hybrid_rrf": method}}
+    base = {m: run(base_r, "s") for m in ("e5_small", "hybrid_rrf")}
+    ft = {m: run(ft_r, ft_sha) for m in ("e5_small", "hybrid_rrf")}
+    return cmp, base, ft
+
+
+def test_render_finetune_tables_come_from_the_files():
+    cmp, base, ft = _ft_inputs()
+    out = rx.render_finetune(cmp, base, ft)
+    assert "question ids identical in base and fine-tuned runs: yes" in out
+    assert "| e5-small (dense) | Recall@1 | 0.500 | 0.250 | -0.100 [-0.200, +0.000] |" in out
+    assert "| e5-small (dense) | chunk | 0 | 1 | 3 |" in out
+    assert "| ru | 2 |" in out and "| typo | 2 |" in out
+    assert "Questions file sha256 `s`" in out
+
+
+def test_render_finetune_shows_both_hashes_when_they_differ():
+    cmp, base, ft = _ft_inputs(ft_sha="other")
+    out = rx.render_finetune(cmp, base, ft)
+    assert "differs between the runs (base `s`, fine-tuned `other`)" in out

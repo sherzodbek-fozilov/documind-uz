@@ -1,8 +1,10 @@
 # Frontend
 
 React + TypeScript (Vite) UI for the DocuMind UZ API: ask a question, see each passage
-with the exact quote highlighted and a link to the source anchor. **The UI itself is not
-built yet**; see [Status and next steps](#status-and-next-steps).
+with the exact quote highlighted and a link to the source anchor.
+The UI language can be
+switched between Uzbek, Russian and English; questions are asked in Uzbek (Latin or
+Cyrillic) or Russian.
 
 ```bash
 npm install        # npm 11+ (npm 10 cannot resolve vitest's optional peers)
@@ -24,40 +26,29 @@ No LLM key is needed: the default extractive mode returns verbatim quotes.
 | `src/api/types.ts` | response types, mirroring `documind/api/schemas.py` |
 | `src/api/client.ts` | `fetch` wrapper; maps failures to `ApiError` kinds for the UI |
 | `src/lib/highlight.ts` | splits a passage around its exact quote; never highlights a non-exact span |
+| `src/lib/url.ts` | only http(s) URLs become links |
+| `src/i18n/` | UI strings (uz, ru, en), language choice remembered in the browser |
+| `src/components/` | ask form, result cards, document list, language switch, status line, error message |
+| `src/App.tsx` | page state: health, documents, collection and scope, the question in flight |
+| `src/test/` | handwritten sample passages and documents, test helpers |
 
-## Status and next steps
-
-Paused after the foundation; the pages and components are not written yet
-(`src/main.tsx` renders a placeholder).
+## Status
 
 Done:
 
-- API: `POST /ask` returns each passage's full text (`text`), so the quote can be
-  highlighted inside it (`quote == text[quote_start:quote_end]`).
-- Project setup: Vite, React 19, strict TypeScript, Vitest with jsdom; the dev server
-  proxies `/api/*` to the FastAPI server.
-- `src/api/`: types mirroring the API schemas and a `fetch` client that maps failures to
-  `network`, `not_found` (404), `invalid` (422), `unavailable` (503, nothing ingested)
-  or `server`.
-- `src/lib/highlight.ts`: splits a passage around its exact quote (offsets first, then a
-  verbatim search, otherwise no highlight) and trims long context without cutting the
-  quote.
-- 13 tests on handwritten uz-Latn, uz-Cyrl and ru samples.
-
-Remaining (step 3, one commit):
-
-- Ask box: question input in Uzbek or Russian, corpus choice (real / synthetic),
-  optional single-document scope, submit with loading state; a new question cancels
-  the previous request.
-- Result cards: passage with the quote highlighted, document title, article
-  (`section_title`) and chunk id, rank, and a link to the source anchor when there is
-  one; the quote is shown on its own if it cannot be highlighted exactly.
-- Document list from `GET /documents` (title, language, edition, number of chunks,
-  source link), usable to restrict the question to one document.
-- UI language switch (uz, ru, en) for all labels and messages, remembered in the
-  browser.
-- Clear states: API unreachable, nothing ingested (503), unknown document (404),
-  invalid question (422), server error, no results, empty document list; status line
+- API: `POST /ask` returns each passage's full text, so the quote is highlighted inside it.
+- Ask box (Uzbek or Russian questions; Enter asks, Shift+Enter adds a line), collection
+  (real / synthetic) and an optional single-document scope.
+- Result cards: passage with the exact quote highlighted, document title, article and
+  chunk id, rank, link to the source anchor (or "no online source"); a quote that cannot
+  be located is shown separately and not highlighted.
+- Document list with language, edition, chunk count, source link and "search only here".
+- UI language switch (uz, ru, en).
+- Error and empty states: API unreachable, nothing ingested (503), unknown document
+  (404), rejected question (422), server error, no passages, no documents; a status line
   from `GET /health`.
-- Mobile-friendly layout and basic accessibility (labels, focus, contrast).
-- Component tests with handwritten samples (no server, no LLM key).
+- Layout for phones and desktops, light and dark themes.
+- Component tests on handwritten samples (no server, no LLM key).
+
+Not done yet: serving the built bundle next to the API (Docker Compose, stage 6) and
+showing the LLM-mode answer (`answer`, `citations`) when that mode is enabled.
