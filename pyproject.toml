@@ -27,6 +27,8 @@ dependencies = [
 
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn>=0.29"]
+# only for scripts/download_model.py (fetches the pinned ONNX embedding model)
+models = ["huggingface_hub>=0.23"]
 # stage 5, on Kaggle (GPU) or for scripts/export_onnx.py; never needed by the service
 finetune = ["torch>=2.1", "transformers>=4.40", "sentence-transformers>=3.0", "onnx>=1.15"]
 dev = ["pytest>=8", "ruff>=0.5", "reportlab>=4", "rapidfuzz>=3", "fastapi>=0.110",

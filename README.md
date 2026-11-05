@@ -126,6 +126,7 @@ Optional: run the PostgreSQL test with
 | Hybrid | reciprocal rank fusion (k = 60) of the top 100 from each |
 
 ```bash
+pip install -e ".[models]"                # huggingface_hub, for the download script
 python scripts/download_model.py          # e5-small ONNX into models/ (git-ignored)
 python scripts/make_synthetic_questions.py # SYNTHETIC sanity questions
 python scripts/eval_retrieval.py           # writes results/retrieval_<method>_<set>.json
