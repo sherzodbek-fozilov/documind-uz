@@ -1,0 +1,77 @@
+# Checks only: nothing is built for release or deployed from here.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python ${{ matrix.python }} (ruff, README check, pytest)
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]  # 3.11: minimum in pyproject.toml; 3.12: the API image
+    services:
+      postgres:  # for the tests marked "postgres"
+        image: postgres:17
+        env:
+          POSTGRES_USER: documind
+          POSTGRES_PASSWORD: documind-ci
+          POSTGRES_DB: documind_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U documind -d documind_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://documind:documind-ci@localhost:5432/documind_test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install tesseract (uzb, uzb_cyrl, rus) and the test font
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-uzb \
+            tesseract-ocr-uzb-cyrl tesseract-ocr-rus fonts-dejavu-core
+          tesseract --list-langs
+      - name: Install the package
+        run: pip install -e ".[dev,api]"
+      - name: Ruff
+        run: ruff check documind tests scripts kaggle
+      - name: README metrics are up to date
+        run: python scripts/render_readme.py --check
+      - name: Pytest
+        run: python -m pytest -q -rs
+
+  frontend:
+    name: Frontend (tests, build)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: npm 11 (package.json engines; npm 10 cannot resolve vitest's optional peers)
+        run: npm install -g npm@11.21.2
+      - run: npm ci
+      - run: npm test
+      - name: Build (type check and bundle)
+        run: npm run build
