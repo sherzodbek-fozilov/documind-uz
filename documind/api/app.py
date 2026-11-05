@@ -34,6 +34,10 @@ MULTIPART_OVERHEAD = 64 * 1024
 
 def create_app(settings: Settings | None = None, service: QAService | None = None) -> FastAPI:
     settings = settings or get_settings()
+    demo = settings.public_demo
+    if service is None and demo:  # read-only corpus, no user corpus
+        service = QAService(make_session_factory(settings.database_url, read_only=True),
+                            settings)
     service = service or QAService(
         make_session_factory(settings.database_url), settings,
         user_session_factory=make_session_factory(settings.user_database_url))
@@ -47,7 +51,7 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
     @app.get("/health", response_model=HealthOut)
     def health() -> HealthOut:
         return HealthOut(status="ok", mode=service.mode, retriever=settings.api_retriever,
-                         **service.counts())
+                         public_demo=demo, **service.counts())
 
     @app.get("/documents", response_model=list[DocumentOut])
     def documents(corpus: Literal["real", "synthetic", "user"] | None = Query(None)
@@ -55,12 +59,10 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
         docs = service.documents()
         return [d for d in docs if corpus is None or d["corpus"] == corpus]
 
-    @app.post(UPLOAD_PATH, response_model=UploadOut, status_code=201,
-              responses={200: {"description": "the same file was uploaded before"},
-                         413: {"description": "file too large"},
-                         415: {"description": "file type not accepted"},
-                         422: {"description": "file damaged, over a limit, or no text"},
-                         503: {"description": "OCR needed but not available"}})
+    def upload_disabled() -> None:
+        """Disabled in the public demo."""
+        raise HTTPException(403, "uploads are disabled in the public demo")
+
     def upload(response: Response, file: Annotated[UploadFile, File()]) -> dict:
         """Add a PDF, DOCX or image (PNG, JPEG, TIFF) to the **user** corpus (asked with
         ``"corpus": "user"``). Uploads never enter the evaluation corpora."""
@@ -84,6 +86,18 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
         if info["status"] == "duplicate":
             response.status_code = 200
         return info
+
+    if demo:  # no body parameter, so the request body is never read or parsed
+        app.post(UPLOAD_PATH, status_code=403,
+                 responses={403: {"description": "uploads are disabled (public demo)"}}
+                 )(upload_disabled)
+    else:
+        app.post(UPLOAD_PATH, response_model=UploadOut, status_code=201,
+                 responses={200: {"description": "the same file was uploaded before"},
+                            413: {"description": "file too large"},
+                            415: {"description": "file type not accepted"},
+                            422: {"description": "file damaged, over a limit, or no text"},
+                            503: {"description": "OCR needed but not available"}})(upload)
 
     @app.post("/ask", response_model=AskResponse)
     def ask(req: AskRequest) -> AskResponse:

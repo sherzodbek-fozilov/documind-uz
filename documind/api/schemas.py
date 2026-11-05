@@ -92,6 +92,7 @@ class HealthOut(BaseModel):
     documents: int
     chunks: int
     user_documents: int
+    public_demo: bool = Field(False, description="uploads disabled, corpus read-only")
 
 
 class UploadOut(BaseModel):

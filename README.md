@@ -195,6 +195,11 @@ curl -s localhost:8000/ask -H 'content-type: application/json' \
   pages are OCR'd with the existing pipeline. **Not for a public server yet**: no
   authentication or rate limit, and the parsers run in the API process (see
   `docs/decisions.md`).
+- **Public demo** (`DOCUMIND_PUBLIC_DEMO=true`): `POST /documents/upload` answers `403`
+  without reading the request body, the user corpus does not exist, and the main
+  database is opened read-only (PostgreSQL: every transaction `READ ONLY`; SQLite:
+  `mode=ro`), so the corpus must be ingested beforehand with the CLI. `GET /health`
+  reports `public_demo`.
 
 ## Configuration
 
