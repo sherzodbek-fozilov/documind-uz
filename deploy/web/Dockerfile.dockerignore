@@ -1,0 +1,7 @@
+# Build context of deploy/web/Dockerfile (BuildKit reads <Dockerfile>.dockerignore):
+# only the frontend sources and the Caddyfile.
+*
+!frontend/
+!deploy/web/Caddyfile
+frontend/node_modules
+frontend/dist
