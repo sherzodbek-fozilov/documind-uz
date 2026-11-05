@@ -407,3 +407,34 @@ written by the annotator.
   sha256 of the whole file (breaks as soon as v2 questions are appended).
 - **Not tuned on v1:** like the pilots, v1 is a test set. Analyzer and model settings are
   tuned only on train-chapter dev questions (`docs/issues.md`).
+
+## After fine-tuning attempt 1: deployment and rules for the next experiments (2026-11-05)
+
+- **Deployment keeps the base multilingual-e5-small in the hybrid; the fine-tuned model
+  is not used.** On eval set v1 it made e5-small worse (Recall@5 0.265 → 0.122, paired
+  95% interval below zero) and the hybrid no better (0.347 → 0.327, within noise); see
+  `docs/experiments.md`. The fine-tuned weights stay out of the deployment and the README.
+- **Rules for any next experiment** (embedding model, fine-tuning, analyzer):
+  - Tune and select **only on a dev question set from train chapters** (`docs/issues.md`,
+    priority section). The validation pairs of attempt 1 had the same synthetic query
+    style as the training pairs and did not predict the test result.
+  - **Confirm once on a new frozen set v2** (disjoint from v1). v1 has now been used to
+    judge attempt 1; it stays a reported benchmark but is no longer clean for choosing.
+  - **Report every candidate tried and how many were tried**, including those that did
+    not help, so the final number is not the best of many silent attempts.
+- **Candidates to screen without training** (licenses and sizes as declared on the
+  Hugging Face model cards, read via the Hugging Face API on 2026-11-05; to be re-checked
+  before use):
+
+  | Candidate | License | Parameters | Notes |
+  |---|---|---|---|
+  | `sukhrobnurali/uzbek-e5-small` | MIT | 118M | fine-tuned from multilingual-e5-small; no ONNX export in the repo |
+  | UTE-1 | not identified | — | no model of this name found on Hugging Face (search 2026-11-05); the exact repository id is needed |
+  | `intfloat/multilingual-e5-base` | MIT | 278M | ONNX export in the repo |
+  | `intfloat/multilingual-e5-large` | MIT | 560M | ONNX export in the repo (external weights) |
+
+  Also found by the same search (Uzbek sentence-similarity models), not yet assessed:
+  `Just-Bax/bge-m3-uzbek-cyrillic` (Apache-2.0, 568M, from BAAI/bge-m3) and
+  `sukhrobnurali/uzbek-minilm` (Apache-2.0, 118M, from
+  paraphrase-multilingual-MiniLM-L12-v2). Larger models must also be measured for CPU
+  latency, since the deployment target has no GPU.
