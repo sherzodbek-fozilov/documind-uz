@@ -87,3 +87,22 @@ def test_url_cell_shows_verification_state():
     assert "(candidate, unverified)" in fetch_sources.render_table(reg, set())
     entry["url_verified_on"] = "2026-11-02"
     assert "(page verified 2026-11-02; not downloaded)" in fetch_sources.render_table(reg, set())
+
+
+def test_keep_registry_writes_only_raw(tmp_path, monkeypatch):
+    """On a server, the registry and docs/data.md stay as committed; only data/raw changes."""
+    reg = _registry(status="approved", license="public domain (official act)",
+                    checked_by="me", checked_on="2026-11-02")
+    reg["sources"][0]["accessed_on"] = "2026-11-02"
+    registry, data_md, raw = tmp_path / "sources.json", tmp_path / "data.md", tmp_path / "raw"
+    registry.write_text(json.dumps(reg), encoding="utf-8")
+    data_md.write_text(f"{fetch_sources.BEGIN}\nold\n{fetch_sources.END}\n", encoding="utf-8")
+    raw.mkdir()
+    (raw / "law-ru.pdf").write_bytes(b"%PDF-1.4 fake")
+    before = registry.read_text(encoding="utf-8"), data_md.read_text(encoding="utf-8")
+    for name, value in [("REGISTRY", registry), ("DATA_MD", data_md), ("RAW", raw)]:
+        monkeypatch.setattr(fetch_sources, name, value)
+    fetch_sources.main(["--no-download", "--keep-registry"])
+    assert (registry.read_text(encoding="utf-8"), data_md.read_text(encoding="utf-8")) == before
+    row = json.loads((raw / "manifest.jsonl").read_text(encoding="utf-8"))
+    assert row["doc_id"] == "law-ru" and row["synthetic"] is False
