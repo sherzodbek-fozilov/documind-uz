@@ -87,6 +87,8 @@ FastAPI, React + TypeScript). Embedding fine-tuning runs on Kaggle, not on the s
 | `docs/decisions.md` | design decisions and the alternatives considered |
 | `docs/issues.md` | open work items by stage |
 | `frontend/` | React + TypeScript UI (stage 4) |
+| `Dockerfile`, `docker-compose.yml`, `deploy/` | API image, Compose stack (API, web, PostgreSQL, Qdrant), Caddy config, database roles |
+| `docs/deploy.md` | step-by-step deployment on a Hetzner Ubuntu server |
 
 ## Quick start (development)
 
@@ -200,6 +202,15 @@ curl -s localhost:8000/ask -H 'content-type: application/json' \
   database is opened read-only (PostgreSQL: every transaction `READ ONLY`; SQLite:
   `mode=ro`), so the corpus must be ingested beforehand with the CLI. `GET /health`
   reports `public_demo`.
+
+## Deployment
+
+Docker Compose runs the API, the built frontend behind Caddy (HTTPS, per-IP rate
+limits), PostgreSQL and Qdrant; model weights and lex.uz documents are fetched on the
+server into volumes, never committed. A public demo mode (`DOCUMIND_PUBLIC_DEMO=true`)
+disables uploads and keeps the corpus read-only. Step by step for a Hetzner Ubuntu
+server: [`docs/deploy.md`](docs/deploy.md). CI (`.github/workflows/ci.yml`) runs ruff,
+pytest, `render_readme.py --check` and the frontend tests and build; it deploys nothing.
 
 ## Configuration
 
