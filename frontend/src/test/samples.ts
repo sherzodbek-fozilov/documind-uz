@@ -1,6 +1,6 @@
 // Handwritten samples: invented text in the style of an act / contract. Element ids and
 // URLs are made up; no real lex.uz content is used.
-import type { AskResponse, Passage } from "../api/types";
+import type { AskResponse, DocumentInfo, Passage } from "../api/types";
 
 function passage(p: Omit<Passage, "quote_start" | "quote_end" | "document_id"> & {
   document_id?: string;
@@ -59,3 +59,19 @@ export function askResponse(question: string, passages: Passage[]): AskResponse 
     citation_check: { checked: passages.length, valid: passages.length, failures: {} },
   };
 }
+
+export const DOCUMENTS: DocumentInfo[] = [
+  {
+    id: "namuna-uz", title: "01.02.2003. Namuna kodeksi", language: "uz-Latn", corpus: "real",
+    is_synthetic: false, source: "https://lex.uz/ru/docs/-9999", edition: "05.06.2026",
+    n_chunks: 3,
+  },
+  {
+    id: "obrazets-ru", title: "Образец договора аренды", language: "ru", corpus: "real",
+    is_synthetic: false, source: null, edition: null, n_chunks: 5,
+  },
+  {
+    id: "syn-1", title: "SINOV SHARTNOMASI (SYNTHETIC)", language: "uz-Cyrl",
+    corpus: "synthetic", is_synthetic: true, source: "synthetic-test", edition: null, n_chunks: 1,
+  },
+];
