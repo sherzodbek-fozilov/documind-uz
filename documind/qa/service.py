@@ -43,6 +43,7 @@ class Passage:
     section_title: str | None
     language: str
     citation: Citation  # the extractive quote of this chunk
+    text: str  # the whole chunk text; citation.quote == text[citation.start:citation.end]
 
 
 @dataclass
@@ -164,7 +165,7 @@ class QAService:
                                               self.settings.quote_max_sentences)
             passages.append(Passage(rank, chunk.doc_id, cid, chunk.section_title,
                                     chunk.language, self._citation(idx, chunk, start, end,
-                                                                   anchor)))
+                                                                   anchor), chunk.text))
         result = AskResult(question, self.mode, corpus, idx.retriever.name, passages)
         if self.mode != "llm" or not passages:
             result.citation_check = summarize(

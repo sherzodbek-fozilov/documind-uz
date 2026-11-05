@@ -91,6 +91,7 @@ def test_ask_returns_exact_quotes_with_lexuz_anchor_links(client, db):
     with db() as s:
         chunk = s.get(models.Chunk, top["chunk_id"])
         assert chunk.text[top["quote_start"]:top["quote_end"]] == top["quote"]
+        assert top["text"] == chunk.text  # the UI highlights the quote inside this text
     check = body["citation_check"]
     assert check == {"checked": len(body["passages"]), "valid": len(body["passages"]),
                      "failures": {}}
