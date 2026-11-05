@@ -60,9 +60,15 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
 - [ ] Document viewer with highlighted source passage
 
 ## Stage 5: fine-tuning prep
-- [ ] Question–passage training pairs from train documents only
-- [ ] Kaggle notebook
-- [ ] Before/after evaluation on the same test set
+- [x] Question–passage training pairs from train chunk groups only, with noise,
+      cross-lingual and code-mixed queries and BM25 hard negatives
+- [x] Validation set from held-out train chapter groups (for choosing the epoch)
+- [x] Kaggle script (`kaggle/finetune_e5.py`)
+- [x] ONNX export for the CPU service, verified against PyTorch
+- [x] Before/after evaluation hook on the same test questions (`scripts/eval_finetune.py`)
+- [ ] Run the fine-tuning on Kaggle, export, run the before/after evaluation
+- [ ] Hand-written dev questions from train chapters as a second validation signal
+- [ ] Optional: cross-lingual first-sentence pairs; dense-model hard negatives
 
 ## Stage 6: hardening
 - [ ] pytest coverage, Docker Compose, CI (incl. `render_readme.py --check`)

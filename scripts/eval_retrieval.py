@@ -18,11 +18,16 @@ Usage:
   python scripts/eval_retrieval.py --set synthetic --methods bm25
   python scripts/eval_retrieval.py --split train --methods bm25 \
       --bm25-analyzers plain,fold,plain+stem6,fold+stem6   # tuning on train questions
+  python scripts/eval_retrieval.py --set real --methods e5_small,hybrid_rrf \
+      --embed-model-dir models/multilingual-e5-small-ft --variant ft
+      # fine-tuned model: writes retrieval_e5_small_ft_real.json, retrieval_hybrid_rrf_ft_...
+      # (scripts/eval_finetune.py runs base and fine-tuned on the same questions)
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import sys
 import time
 from collections import Counter, defaultdict
@@ -81,8 +86,17 @@ def main() -> None:
     ap.add_argument("--methods", default="bm25,e5_small,hybrid_rrf")
     ap.add_argument("--bm25-analyzers", default=None,
                     help="comma-separated analyzers to compare (default: the configured one)")
+    ap.add_argument("--embed-model-dir", type=Path, default=None,
+                    help="ONNX embedding model (default: DOCUMIND_EMBED_MODEL_DIR)")
+    ap.add_argument("--variant", default="",
+                    help="suffix for the dense and hybrid method names, e.g. 'ft' for the "
+                         "fine-tuned model (results/retrieval_e5_small_ft_<set>.json)")
     args = ap.parse_args()
     settings = get_settings()
+    embed_dir = args.embed_model_dir or settings.embed_model_dir
+    suffix = f"_{args.variant}" if args.variant else ""
+    if suffix and "bm25" in args.methods.split(","):
+        ap.error("--variant changes the embedding model only; leave bm25 out of --methods")
     Session = make_session_factory(settings.database_url)
     methods = args.methods.split(",")
     analyzers = (args.bm25_analyzers.split(",") if args.bm25_analyzers
@@ -93,6 +107,7 @@ def main() -> None:
 
     for kind in sets:
         questions, problems = load_questions(QUESTION_FILES[kind])
+        questions_sha256 = hashlib.sha256(QUESTION_FILES[kind].read_bytes()).hexdigest()
         for p in problems:
             print(f"WARNING {p}", file=sys.stderr)
         with Session() as session:
@@ -130,8 +145,8 @@ def main() -> None:
         if "e5_small" in methods or "hybrid_rrf" in methods:
             if embedder is None:
                 from documind.retrieval.embedder import E5Embedder
-                embedder = E5Embedder(settings.embed_model_dir)
-            retrievers["e5_small"] = DenseRetriever(chunks, embedder, f"chunks_{kind}",
+                embedder = E5Embedder(embed_dir)
+            retrievers["e5_small"] = DenseRetriever(chunks, embedder, f"chunks_{kind}{suffix}",
                                                     qdrant_url=settings.qdrant_url,
                                                     cache_dir=settings.embed_cache_dir)
         runs = []
@@ -146,6 +161,7 @@ def main() -> None:
             runs.append(("e5_small", None, retrievers["e5_small"]))
 
         for method, analyzer, retriever in runs:
+            method = f"{method}{suffix}"
             ranks, art_ranks, per_q = evaluate(retriever, selected, key_of)
             by_lang, by_tag = defaultdict(list), defaultdict(list)
             for q, r, ra in zip(selected, ranks, art_ranks, strict=True):
@@ -177,11 +193,13 @@ def main() -> None:
                 "corpus": {"chunks": len(chunks), "documents": len(split_of_doc),
                            "chunker_versions": chunker_versions},
                 "question_counts": {"used": len(selected), **counts},
+                "questions_sha256": questions_sha256,
                 "config": {"method": method, "bm25_analyzer": analyzer,
                            "embed_model": getattr(embedder, "model_id", None)
                            if method != "bm25" else None,
-                           "rrf_k": settings.rrf_k if method == "hybrid_rrf" else None,
-                           "depth": settings.retrieval_depth if method == "hybrid_rrf"
+                           "embed_model_dir": str(embed_dir) if method != "bm25" else None,
+                           "rrf_k": settings.rrf_k if method.startswith("hybrid") else None,
+                           "depth": settings.retrieval_depth if method.startswith("hybrid")
                            else None},
                 "latency_s": {"p50": latencies[len(latencies) // 2],
                               "max": latencies[-1]},

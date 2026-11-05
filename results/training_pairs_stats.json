@@ -1,0 +1,173 @@
+{
+  "description": "Fine-tuning pairs for the embedding model, from TRAIN chunk groups only. Counts only; the pair files contain lex.uz text and are not committed.",
+  "config": {
+    "seed": 13,
+    "val_fraction": 0.15,
+    "mixed_fraction": 0.1,
+    "bm25_analyzer": "fold+stem6",
+    "val_salt": "val-v1"
+  },
+  "source_chunks": {
+    "total": 3290,
+    "train": 2305,
+    "test_excluded": 985,
+    "chunker_versions": [
+      "struct-v1-w180"
+    ],
+    "documents": [
+      "civil-code-part2-ru",
+      "civil-code-part2-uz",
+      "labor-code-2022-ru",
+      "labor-code-2022-uz"
+    ]
+  },
+  "train": {
+    "pairs": 10327,
+    "articles": 851,
+    "split_groups": 54,
+    "by_query_type": {
+      "first_sentence": 3397,
+      "mixed": 148,
+      "title": 3398,
+      "xling_title": 3384
+    },
+    "by_noise": {
+      "cyrillic": 746,
+      "cyrillic_no_diacritics": 633,
+      "no_apostrophes": 425,
+      "no_diacritics": 571,
+      "none": 5238,
+      "typos": 2714
+    },
+    "by_query_type_and_noise": {
+      "first_sentence/cyrillic": 215,
+      "first_sentence/cyrillic_no_diacritics": 205,
+      "first_sentence/no_apostrophes": 175,
+      "first_sentence/no_diacritics": 291,
+      "first_sentence/none": 1699,
+      "first_sentence/typos": 812,
+      "mixed/none": 148,
+      "title/cyrillic": 266,
+      "title/cyrillic_no_diacritics": 217,
+      "title/no_apostrophes": 123,
+      "title/no_diacritics": 142,
+      "title/none": 1699,
+      "title/typos": 951,
+      "xling_title/cyrillic": 265,
+      "xling_title/cyrillic_no_diacritics": 211,
+      "xling_title/no_apostrophes": 127,
+      "xling_title/no_diacritics": 138,
+      "xling_title/none": 1692,
+      "xling_title/typos": 951
+    },
+    "by_query_lang_to_passage_lang": {
+      "mixed->ru": 74,
+      "mixed->uz-Latn": 74,
+      "ru->ru": 3403,
+      "ru->uz-Latn": 1692,
+      "uz-Cyrl->ru": 476,
+      "uz-Cyrl->uz-Latn": 903,
+      "uz-Latn->ru": 1216,
+      "uz-Latn->uz-Latn": 2489
+    },
+    "negatives": {
+      "by_source": {
+        "bm25": 10307,
+        "random": 20
+      },
+      "bm25_rank_of_chosen": {
+        "1": 844,
+        "2": 8623,
+        "3": 753,
+        "4": 71,
+        "5": 16
+      },
+      "distinct_negative_chunks": 1446
+    }
+  },
+  "val": {
+    "pairs": 1573,
+    "articles": 130,
+    "split_groups": 10,
+    "by_query_type": {
+      "first_sentence": 518,
+      "mixed": 22,
+      "title": 517,
+      "xling_title": 516
+    },
+    "by_noise": {
+      "cyrillic": 134,
+      "cyrillic_no_diacritics": 88,
+      "no_apostrophes": 45,
+      "no_diacritics": 89,
+      "none": 798,
+      "typos": 419
+    },
+    "by_query_type_and_noise": {
+      "first_sentence/cyrillic": 45,
+      "first_sentence/cyrillic_no_diacritics": 31,
+      "first_sentence/no_apostrophes": 24,
+      "first_sentence/no_diacritics": 50,
+      "first_sentence/none": 259,
+      "first_sentence/typos": 109,
+      "mixed/none": 22,
+      "title/cyrillic": 41,
+      "title/cyrillic_no_diacritics": 28,
+      "title/no_apostrophes": 8,
+      "title/no_diacritics": 21,
+      "title/none": 259,
+      "title/typos": 160,
+      "xling_title/cyrillic": 48,
+      "xling_title/cyrillic_no_diacritics": 29,
+      "xling_title/no_apostrophes": 13,
+      "xling_title/no_diacritics": 18,
+      "xling_title/none": 258,
+      "xling_title/typos": 150
+    },
+    "by_query_lang_to_passage_lang": {
+      "mixed->ru": 11,
+      "mixed->uz-Latn": 11,
+      "ru->ru": 519,
+      "ru->uz-Latn": 258,
+      "uz-Cyrl->ru": 77,
+      "uz-Cyrl->uz-Latn": 145,
+      "uz-Latn->ru": 181,
+      "uz-Latn->uz-Latn": 371
+    }
+  },
+  "corpus_chunks": {
+    "train/ru": 1003,
+    "train/uz-Latn": 1017,
+    "val/ru": 140,
+    "val/uz-Latn": 140
+  },
+  "val_split_groups": [
+    "civil-code-part2/ch30",
+    "civil-code-part2/ch41",
+    "civil-code-part2/ch42",
+    "civil-code-part2/ch45",
+    "civil-code-part2/ch67",
+    "civil-code-part2/ch69",
+    "labor-code-2022/ch29",
+    "labor-code-2022/ch32",
+    "labor-code-2022/ch7",
+    "labor-code-2022/ch8"
+  ],
+  "skipped": {
+    "chunks_outside_articles": 5,
+    "test_or_other_split_chunks_ignored": 985,
+    "versions_differ": 2
+  },
+  "checks": {
+    "problems": 0,
+    "test_chunks_in_outputs": 0
+  },
+  "files_sha256": {
+    "pairs_train.jsonl": "3e67d4501e12105958ff4bdb0346a3ee7f5327a5199484364c2e2bf7cb0d655e",
+    "pairs_val.jsonl": "b30e5aaa83d0f842f2e138cc655c3b1e3275482f3a17e8a2dea715b9040bd6fa",
+    "corpus.jsonl": "9f180cb6485efb262b162c7b1d86dcc81033be23aed0321c10459d145a2d1d6c"
+  },
+  "generated_at": "2026-11-04T22:19:04+00:00",
+  "git_commit": "ad82e03",
+  "script": "scripts/make_training_pairs.py"
+}

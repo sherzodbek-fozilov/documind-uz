@@ -132,3 +132,31 @@ def bootstrap_ci(ranks: list[int | None], fn: Callable[[list], dict[str, float]]
         vals.sort()
         ci[key] = [vals[int(0.025 * n_boot)], vals[min(int(0.975 * n_boot), n_boot - 1)]]
     return ci
+
+
+def paired_bootstrap_delta(ranks_a: list[int | None], ranks_b: list[int | None],
+                           fn: Callable[[list], dict[str, float]] = metrics_from_ranks,
+                           n_boot: int = 2000, seed: int = 0) -> dict[str, dict]:
+    """Difference b - a of each metric on the SAME questions (ranks_a[i] and ranks_b[i] are
+    one question), with a paired percentile bootstrap: questions are resampled once and
+    both systems are scored on the resample. Returns {metric: {"delta", "ci95"}}."""
+    if len(ranks_a) != len(ranks_b):
+        raise ValueError("paired comparison needs the same questions in the same order")
+    if not ranks_a:
+        return {}
+    base, new = fn(ranks_a), fn(ranks_b)
+    rng = random.Random(seed)
+    n = len(ranks_a)
+    samples: dict[str, list[float]] = defaultdict(list)
+    for _ in range(n_boot):
+        idx = [rng.randrange(n) for _ in range(n)]
+        a, b = fn([ranks_a[i] for i in idx]), fn([ranks_b[i] for i in idx])
+        for key in base:
+            samples[key].append(b[key] - a[key])
+    out = {}
+    for key, vals in samples.items():
+        vals.sort()
+        out[key] = {"delta": new[key] - base[key],
+                    "ci95": [vals[int(0.025 * n_boot)], vals[min(int(0.975 * n_boot),
+                                                                 n_boot - 1)]]}
+    return out
