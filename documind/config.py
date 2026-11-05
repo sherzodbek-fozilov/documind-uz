@@ -42,6 +42,17 @@ class Settings(BaseSettings):
     api_top_k: int = Field(3, ge=1, le=10)  # passages returned by /ask by default
     quote_max_sentences: int = Field(2, ge=1, le=5)  # length of an extractive quote
 
+    # Uploads (stage 3): the "user" corpus lives in its OWN database and storage directory,
+    # so uploaded files can never reach the evaluation corpora or training pairs
+    user_database_url: str = "sqlite:///documind_user.sqlite"
+    user_storage_dir: Path = Path("data/user_store")
+    upload_max_bytes: int = Field(20 * 1024 * 1024, ge=1)  # size of the uploaded file
+    upload_max_pages: int = Field(50, ge=1)  # PDF pages / image frames (OCR is slow)
+    # pixels per image frame, and per PDF page when rendered at ocr_dpi for OCR
+    upload_max_pixels: int = Field(40_000_000, ge=1)
+    upload_max_unzipped_bytes: int = Field(100 * 1024 * 1024, ge=1)  # DOCX, all parts
+    upload_max_zip_entries: int = Field(2000, ge=1)  # DOCX
+
     # LLM (stage 3). The key only ever comes from the environment.
     # "package.module:factory" returning an object with
     # ``complete(prompt: str, max_tokens: int) -> str``; used only when answer_mode="llm"
