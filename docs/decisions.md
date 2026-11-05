@@ -310,3 +310,69 @@ written by the annotator.
   bootstrap CIs of the deltas. Checked with the base export as a stand-in "fine-tuned"
   model: all deltas 0 and baseline results identical to the committed ones (results
   files restored afterwards, nothing chosen from them).
+
+## Uploads: a separate "user" corpus and checks for untrusted files (2026-11-05)
+
+- **Uploads live in their own database and storage directory**
+  (`DOCUMIND_USER_DATABASE_URL`, default `documind_user.sqlite`; `DOCUMIND_USER_STORAGE_DIR`,
+  default `data/user_store/`), asked with `"corpus": "user"`. The eval scripts,
+  `documind split` / `stats` and `make_training_pairs.py` only open the main database, so
+  an upload cannot reach an evaluation corpus, the train/test split or fine-tuning pairs,
+  whatever their filters say. Alternatives: a `corpus` column in the main `documents`
+  table (one forgotten filter, e.g. in `load_corpus(session, "real")`, would mix uploads
+  into the real eval set and the training pairs; also needs a migration, and there is no
+  Alembic yet); `is_synthetic = True` for uploads (wrong label, and they would enter the
+  synthetic eval set). Cost: two databases, and an uploaded copy of an evaluation document
+  is stored twice. Uploaded documents still get a train/test label from `ingest_file`;
+  it is not used anywhere.
+- **Accepted:** `.pdf`, `.docx`, `.png`, `.jpg`/`.jpeg`, `.tif`/`.tiff`, each only with its
+  own content type. `application/octet-stream` is rejected: browsers send the right
+  types, and curl 8.5 guesses them for PDF, PNG and JPEG but sends octet-stream for DOCX
+  and TIFF, which then need `-F 'file=@x.docx;type=...'`. Not accepted: HTML (the lex.uz parser is only for registry sources),
+  legacy `.doc`, other image formats. The file signature must match the extension.
+- **Checks before any parser runs** (`documind/ingestion/uploads.py`): size while
+  receiving (an ASGI middleware stops a body over the limit before Starlette spools it to
+  disk; the endpoint checks the file itself again); PDF: opens, not encrypted, at most 50
+  pages, every page small enough when rendered at the OCR resolution; images: format
+  matches, at most 50 frames, at most 40 M pixels per frame (read from the header);
+  DOCX: at most 2000 zip entries, at most 100 MB unpacked (declared sizes; Python's
+  `zipfile` stops reading a member at its declared size), required Word parts present.
+  Files with no text are rejected and not kept. One upload is ingested at a time.
+- **File names:** the client's file name is reduced to its last component without
+  control characters and is only stored as `documents.filename`. The file is written to
+  a fresh private temp directory (mode 0700) under a fixed name (`upload<ext>`), removed
+  afterwards; the stored copy is named by its sha256. So `../../x.pdf` cannot write
+  outside these directories.
+- **Errors:** 413 too large; 415 type, content type or signature not accepted; 422
+  damaged, over a limit, unreadable by the parser (only the exception class is shown,
+  not its message) or no text; 503 OCR needed but tesseract missing, or uploads not
+  configured. A duplicate file returns 200 with the earlier upload.
+
+### Risks of parsing untrusted files (not solved by the checks above)
+
+- **Parser vulnerabilities.** PDF (MuPDF, via PyMuPDF), images (Pillow's libpng, libjpeg,
+  libtiff), OCR (tesseract, leptonica) and DOCX (lxml / libxml2) are C libraries
+  parsing attacker-controlled bytes **inside the API process**. A memory-safety bug in
+  one of them could give code execution with the API's rights (both databases, the
+  stored files, any keys in its environment). The whitelist and signature checks only
+  shrink the attack surface. Mitigations to do: parse in a sandboxed worker (separate
+  container, no network, read-only file system, non-root, seccomp, memory and CPU
+  limits); keep these libraries updated (PyMuPDF is also AGPL-3.0, see open questions).
+- **Resource exhaustion.** Not bounded yet: wall-clock time of parsing and OCR (threads
+  cannot be killed; 50 scanned pages can take minutes of CPU); memory used while
+  decompressing PDF content streams during text extraction (a small PDF can expand a lot
+  without many pages or large pages); several clients uploading at once (one ingestion
+  at a time, but requests queue). The sandboxed worker with limits and a timeout is the
+  fix.
+- **XML.** python-docx parses with `resolve_entities=False` (checked in python-docx
+  1.2.0, and tested: an external entity pointing at a local file is not resolved).
+  Billion-laughs style expansion is limited by libxml2's own entity limits.
+- **No authentication or rate limit.** Anyone who can reach the port can fill the disk
+  (20 MB per request) and the CPU. `documind serve` binds to 127.0.0.1 by default; the
+  API must not be exposed until auth, quotas and the worker exist.
+- **Stored originals.** Kept by hash in `data/user_store/`, never served by the API. If a
+  later UI serves them, it must send them as attachments with `nosniff` (a PDF or image
+  can carry active content for a browser).
+- **Personal data.** The project uses no real personal data, but uploads may contain
+  some. There is no delete endpoint or retention rule yet (listed in `docs/issues.md`).
+

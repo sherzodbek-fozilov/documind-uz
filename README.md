@@ -163,12 +163,16 @@ pip install -e ".[dev,api]"
 documind serve                    # http://127.0.0.1:8000/docs
 curl -s localhost:8000/ask -H 'content-type: application/json' \
      -d '{"question": "Ijara haqi qachon toʻlanadi?", "top_k": 3}'
+curl -s localhost:8000/documents/upload -F 'file=@contract.pdf;type=application/pdf'
+curl -s localhost:8000/ask -H 'content-type: application/json' \
+     -d '{"question": "Shartnoma muddati qancha?", "corpus": "user"}'
 ```
 
 | Endpoint | Returns |
 |---|---|
-| `GET /health` | status, answer mode, retriever, document and chunk counts |
-| `GET /documents?corpus=real\|synthetic` | id, title, language, source URL, edition, chunk count |
+| `GET /health` | status, answer mode, retriever, document and chunk counts, uploaded documents |
+| `GET /documents?corpus=real\|synthetic\|user` | id, title, file name, language, source URL, edition, chunk count |
+| `POST /documents/upload` | multipart `file` (PDF, DOCX, PNG, JPEG, TIFF) → `201` with document id, pages, OCR pages, chunks, language; `200` if the same file was uploaded before; `413` / `415` / `422` / `503` with a message |
 | `POST /ask` | `{question, corpus, document_id?, top_k?}` → the best passages, each with an exact `quote`, `quote_start`/`quote_end` in the chunk, `document_id`, `chunk_id`, lex.uz `anchor` and `link` (`<page>#<element id>`) |
 
 - **Extractive mode** (default, no LLM key): for each retrieved chunk the best window of
@@ -183,6 +187,14 @@ curl -s localhost:8000/ask -H 'content-type: application/json' \
   so 100 % is expected: the metric guards against offset bugs and becomes informative in
   LLM mode.
 - Retriever: `DOCUMIND_API_RETRIEVER=bm25` (default) or `hybrid` (needs the e5 model).
+- **Uploads** go to the **user** corpus, which has its own database and storage
+  directory (`DOCUMIND_USER_DATABASE_URL`, `DOCUMIND_USER_STORAGE_DIR`). They never reach
+  the evaluation corpora, the train/test split or training pairs. Checks before parsing:
+  extension and content-type whitelist, file signature, size (20 MB), pages (50), pixels
+  per page, DOCX unpacked size; the client's file name is never used in a path. Scanned
+  pages are OCR'd with the existing pipeline. **Not for a public server yet**: no
+  authentication or rate limit, and the parsers run in the API process (see
+  `docs/decisions.md`).
 
 ## Configuration
 
