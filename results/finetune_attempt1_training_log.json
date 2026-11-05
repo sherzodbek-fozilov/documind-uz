@@ -1,0 +1,673 @@
+{
+  "config": {
+    "base_model": "intfloat/multilingual-e5-small",
+    "base_revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+    "epochs": 3,
+    "batch_size": 32,
+    "lr": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "max_grad_norm": 1.0,
+    "max_seq_length": 512,
+    "mnrl_scale": 20.0,
+    "fp16": true,
+    "seed": 42,
+    "eval_batch_size": 128,
+    "selection_metric": "mrr"
+  },
+  "device": "cuda",
+  "source": {
+    "repo_url": "https://github.com/sherzodbek-fozilov/documind-uz.git",
+    "ref": "main",
+    "repo_commit": "75e254e09fad82fe452281aa13a2c8873a7b1969",
+    "data_check": {
+      "identical": true,
+      "problems": []
+    }
+  },
+  "gpu": "Tesla T4",
+  "versions": {
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.20.2",
+    "sentence_transformers": "5.7.0"
+  },
+  "data_sha256": {
+    "pairs_train.jsonl": "3e67d4501e12105958ff4bdb0346a3ee7f5327a5199484364c2e2bf7cb0d655e",
+    "pairs_val.jsonl": "b30e5aaa83d0f842f2e138cc655c3b1e3275482f3a17e8a2dea715b9040bd6fa",
+    "corpus.jsonl": "9f180cb6485efb262b162c7b1d86dcc81033be23aed0321c10459d145a2d1d6c"
+  },
+  "data_counts": {
+    "train_pairs": 10327,
+    "val_pairs": 1573,
+    "corpus": 2300
+  },
+  "epochs": [
+    {
+      "epoch": 0,
+      "val": {
+        "chunk": {
+          "n": 1573,
+          "recall@1": 0.5022,
+          "recall@5": 0.609,
+          "recall@10": 0.644,
+          "mrr": 0.5498
+        },
+        "article": {
+          "n": 1573,
+          "recall@1": 0.7699,
+          "recall@5": 0.8976,
+          "recall@10": 0.9275,
+          "mrr": 0.8254
+        },
+        "groups": {
+          "lang:mixed->ru": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.0909,
+            "recall@10": 0.1818,
+            "mrr": 0.0295
+          },
+          "lang:mixed->uz-Latn": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.2727,
+            "recall@10": 0.2727,
+            "mrr": 0.1364
+          },
+          "lang:ru->ru": {
+            "n": 519,
+            "recall@1": 0.8825,
+            "recall@5": 0.9692,
+            "recall@10": 0.9769,
+            "mrr": 0.9219
+          },
+          "lang:ru->uz-Latn": {
+            "n": 258,
+            "recall@1": 0.0,
+            "recall@5": 0.0775,
+            "recall@10": 0.1395,
+            "mrr": 0.038
+          },
+          "lang:uz-Cyrl->ru": {
+            "n": 77,
+            "recall@1": 0.013,
+            "recall@5": 0.026,
+            "recall@10": 0.0519,
+            "mrr": 0.0208
+          },
+          "lang:uz-Cyrl->uz-Latn": {
+            "n": 145,
+            "recall@1": 0.2828,
+            "recall@5": 0.5586,
+            "recall@10": 0.6345,
+            "mrr": 0.3974
+          },
+          "lang:uz-Latn->ru": {
+            "n": 181,
+            "recall@1": 0.0,
+            "recall@5": 0.0276,
+            "recall@10": 0.0552,
+            "mrr": 0.01
+          },
+          "lang:uz-Latn->uz-Latn": {
+            "n": 371,
+            "recall@1": 0.7817,
+            "recall@5": 0.9245,
+            "recall@10": 0.9677,
+            "mrr": 0.8455
+          },
+          "noise:cyrillic": {
+            "n": 134,
+            "recall@1": 0.1567,
+            "recall@5": 0.3731,
+            "recall@10": 0.4403,
+            "mrr": 0.2512
+          },
+          "noise:cyrillic_no_diacritics": {
+            "n": 88,
+            "recall@1": 0.2386,
+            "recall@5": 0.375,
+            "recall@10": 0.4205,
+            "mrr": 0.2903
+          },
+          "noise:no_apostrophes": {
+            "n": 45,
+            "recall@1": 0.5556,
+            "recall@5": 0.7111,
+            "recall@10": 0.7556,
+            "mrr": 0.6084
+          },
+          "noise:no_diacritics": {
+            "n": 89,
+            "recall@1": 0.7416,
+            "recall@5": 0.8315,
+            "recall@10": 0.8427,
+            "mrr": 0.7801
+          },
+          "noise:none": {
+            "n": 798,
+            "recall@1": 0.5589,
+            "recall@5": 0.6441,
+            "recall@10": 0.6754,
+            "mrr": 0.5986
+          },
+          "noise:typos": {
+            "n": 419,
+            "recall@1": 0.5036,
+            "recall@5": 0.6086,
+            "recall@10": 0.642,
+            "mrr": 0.5517
+          },
+          "type:first_sentence": {
+            "n": 518,
+            "recall@1": 0.7934,
+            "recall@5": 0.9093,
+            "recall@10": 0.9344,
+            "mrr": 0.846
+          },
+          "type:mixed": {
+            "n": 22,
+            "recall@1": 0.0,
+            "recall@5": 0.1818,
+            "recall@10": 0.2273,
+            "mrr": 0.083
+          },
+          "type:title": {
+            "n": 517,
+            "recall@1": 0.7311,
+            "recall@5": 0.882,
+            "recall@10": 0.9168,
+            "mrr": 0.796
+          },
+          "type:xling_title": {
+            "n": 516,
+            "recall@1": 0.0019,
+            "recall@5": 0.0523,
+            "recall@10": 0.0969,
+            "mrr": 0.0256
+          }
+        }
+      }
+    },
+    {
+      "epoch": 1,
+      "steps": 323,
+      "mean_loss": 0.64252,
+      "loss_every_50": [
+        2.45989,
+        0.64504,
+        0.30006,
+        0.2626,
+        0.22628,
+        0.18293,
+        0.16054
+      ],
+      "seconds": 252.1,
+      "val": {
+        "chunk": {
+          "n": 1573,
+          "recall@1": 0.5931,
+          "recall@5": 0.8894,
+          "recall@10": 0.9313,
+          "mrr": 0.7214
+        },
+        "article": {
+          "n": 1573,
+          "recall@1": 0.9275,
+          "recall@5": 0.972,
+          "recall@10": 0.9797,
+          "mrr": 0.9474
+        },
+        "groups": {
+          "lang:mixed->ru": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.8182,
+            "recall@10": 1.0,
+            "mrr": 0.3601
+          },
+          "lang:mixed->uz-Latn": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.7273,
+            "recall@10": 0.7273,
+            "mrr": 0.2833
+          },
+          "lang:ru->ru": {
+            "n": 519,
+            "recall@1": 0.9326,
+            "recall@5": 0.9884,
+            "recall@10": 0.9904,
+            "mrr": 0.9598
+          },
+          "lang:ru->uz-Latn": {
+            "n": 258,
+            "recall@1": 0.0,
+            "recall@5": 0.7364,
+            "recall@10": 0.845,
+            "mrr": 0.3097
+          },
+          "lang:uz-Cyrl->ru": {
+            "n": 77,
+            "recall@1": 0.1299,
+            "recall@5": 0.6883,
+            "recall@10": 0.7532,
+            "mrr": 0.3742
+          },
+          "lang:uz-Cyrl->uz-Latn": {
+            "n": 145,
+            "recall@1": 0.6345,
+            "recall@5": 0.8759,
+            "recall@10": 0.9103,
+            "mrr": 0.7398
+          },
+          "lang:uz-Latn->ru": {
+            "n": 181,
+            "recall@1": 0.011,
+            "recall@5": 0.7403,
+            "recall@10": 0.8619,
+            "mrr": 0.3286
+          },
+          "lang:uz-Latn->uz-Latn": {
+            "n": 371,
+            "recall@1": 0.9299,
+            "recall@5": 0.9838,
+            "recall@10": 0.9919,
+            "mrr": 0.9545
+          },
+          "noise:cyrillic": {
+            "n": 134,
+            "recall@1": 0.4478,
+            "recall@5": 0.806,
+            "recall@10": 0.8657,
+            "mrr": 0.6043
+          },
+          "noise:cyrillic_no_diacritics": {
+            "n": 88,
+            "recall@1": 0.4773,
+            "recall@5": 0.8182,
+            "recall@10": 0.8409,
+            "mrr": 0.6263
+          },
+          "noise:no_apostrophes": {
+            "n": 45,
+            "recall@1": 0.6667,
+            "recall@5": 0.9111,
+            "recall@10": 0.9556,
+            "mrr": 0.7719
+          },
+          "noise:no_diacritics": {
+            "n": 89,
+            "recall@1": 0.7528,
+            "recall@5": 0.9663,
+            "recall@10": 0.9888,
+            "mrr": 0.8488
+          },
+          "noise:none": {
+            "n": 798,
+            "recall@1": 0.6128,
+            "recall@5": 0.906,
+            "recall@10": 0.9499,
+            "mrr": 0.7403
+          },
+          "noise:typos": {
+            "n": 419,
+            "recall@1": 0.5847,
+            "recall@5": 0.8807,
+            "recall@10": 0.9212,
+            "mrr": 0.7106
+          },
+          "type:first_sentence": {
+            "n": 518,
+            "recall@1": 0.9015,
+            "recall@5": 0.9691,
+            "recall@10": 0.9807,
+            "mrr": 0.933
+          },
+          "type:mixed": {
+            "n": 22,
+            "recall@1": 0.0,
+            "recall@5": 0.7727,
+            "recall@10": 0.8636,
+            "mrr": 0.3217
+          },
+          "type:title": {
+            "n": 517,
+            "recall@1": 0.8781,
+            "recall@5": 0.9729,
+            "recall@10": 0.9787,
+            "mrr": 0.9212
+          },
+          "type:xling_title": {
+            "n": 516,
+            "recall@1": 0.0233,
+            "recall@5": 0.7306,
+            "recall@10": 0.8372,
+            "mrr": 0.326
+          }
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "steps": 323,
+      "mean_loss": 0.10452,
+      "loss_every_50": [
+        0.11783,
+        0.12104,
+        0.10708,
+        0.10879,
+        0.09052,
+        0.08849,
+        0.09009
+      ],
+      "seconds": 255.0,
+      "val": {
+        "chunk": {
+          "n": 1573,
+          "recall@1": 0.6039,
+          "recall@5": 0.911,
+          "recall@10": 0.9415,
+          "mrr": 0.7383
+        },
+        "article": {
+          "n": 1573,
+          "recall@1": 0.939,
+          "recall@5": 0.9809,
+          "recall@10": 0.9847,
+          "mrr": 0.9571
+        },
+        "groups": {
+          "lang:mixed->ru": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.8182,
+            "recall@10": 1.0,
+            "mrr": 0.3972
+          },
+          "lang:mixed->uz-Latn": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.7273,
+            "recall@10": 0.7273,
+            "mrr": 0.2758
+          },
+          "lang:ru->ru": {
+            "n": 519,
+            "recall@1": 0.9326,
+            "recall@5": 0.9904,
+            "recall@10": 0.9904,
+            "mrr": 0.9591
+          },
+          "lang:ru->uz-Latn": {
+            "n": 258,
+            "recall@1": 0.0,
+            "recall@5": 0.7713,
+            "recall@10": 0.8527,
+            "mrr": 0.332
+          },
+          "lang:uz-Cyrl->ru": {
+            "n": 77,
+            "recall@1": 0.1558,
+            "recall@5": 0.7013,
+            "recall@10": 0.7792,
+            "mrr": 0.3984
+          },
+          "lang:uz-Cyrl->uz-Latn": {
+            "n": 145,
+            "recall@1": 0.7103,
+            "recall@5": 0.9379,
+            "recall@10": 0.9448,
+            "mrr": 0.8094
+          },
+          "lang:uz-Latn->ru": {
+            "n": 181,
+            "recall@1": 0.011,
+            "recall@5": 0.8066,
+            "recall@10": 0.9006,
+            "mrr": 0.3589
+          },
+          "lang:uz-Latn->uz-Latn": {
+            "n": 371,
+            "recall@1": 0.9407,
+            "recall@5": 0.9892,
+            "recall@10": 0.9919,
+            "mrr": 0.9636
+          },
+          "noise:cyrillic": {
+            "n": 134,
+            "recall@1": 0.4851,
+            "recall@5": 0.8507,
+            "recall@10": 0.8806,
+            "mrr": 0.6459
+          },
+          "noise:cyrillic_no_diacritics": {
+            "n": 88,
+            "recall@1": 0.5682,
+            "recall@5": 0.8636,
+            "recall@10": 0.8977,
+            "mrr": 0.6989
+          },
+          "noise:no_apostrophes": {
+            "n": 45,
+            "recall@1": 0.6889,
+            "recall@5": 0.9556,
+            "recall@10": 0.9778,
+            "mrr": 0.8019
+          },
+          "noise:no_diacritics": {
+            "n": 89,
+            "recall@1": 0.7416,
+            "recall@5": 0.9663,
+            "recall@10": 0.9888,
+            "mrr": 0.8478
+          },
+          "noise:none": {
+            "n": 798,
+            "recall@1": 0.6153,
+            "recall@5": 0.9248,
+            "recall@10": 0.9599,
+            "mrr": 0.751
+          },
+          "noise:typos": {
+            "n": 419,
+            "recall@1": 0.5895,
+            "recall@5": 0.8974,
+            "recall@10": 0.9212,
+            "mrr": 0.7219
+          },
+          "type:first_sentence": {
+            "n": 518,
+            "recall@1": 0.9208,
+            "recall@5": 0.9884,
+            "recall@10": 0.9903,
+            "mrr": 0.9504
+          },
+          "type:mixed": {
+            "n": 22,
+            "recall@1": 0.0,
+            "recall@5": 0.7727,
+            "recall@10": 0.8636,
+            "mrr": 0.3365
+          },
+          "type:title": {
+            "n": 517,
+            "recall@1": 0.8878,
+            "recall@5": 0.9768,
+            "recall@10": 0.9787,
+            "mrr": 0.9292
+          },
+          "type:xling_title": {
+            "n": 516,
+            "recall@1": 0.0271,
+            "recall@5": 0.7733,
+            "recall@10": 0.8585,
+            "mrr": 0.3513
+          }
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "steps": 324,
+      "mean_loss": 0.06413,
+      "loss_every_50": [
+        0.07308,
+        0.0633,
+        0.06618,
+        0.06122,
+        0.06376,
+        0.0606,
+        0.05714
+      ],
+      "seconds": 255.0,
+      "val": {
+        "chunk": {
+          "n": 1573,
+          "recall@1": 0.6052,
+          "recall@5": 0.9142,
+          "recall@10": 0.9402,
+          "mrr": 0.7421
+        },
+        "article": {
+          "n": 1573,
+          "recall@1": 0.9441,
+          "recall@5": 0.9809,
+          "recall@10": 0.9847,
+          "mrr": 0.9602
+        },
+        "groups": {
+          "lang:mixed->ru": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.8182,
+            "recall@10": 1.0,
+            "mrr": 0.382
+          },
+          "lang:mixed->uz-Latn": {
+            "n": 11,
+            "recall@1": 0.0,
+            "recall@5": 0.7273,
+            "recall@10": 0.7273,
+            "mrr": 0.2833
+          },
+          "lang:ru->ru": {
+            "n": 519,
+            "recall@1": 0.9306,
+            "recall@5": 0.9904,
+            "recall@10": 0.9923,
+            "mrr": 0.9593
+          },
+          "lang:ru->uz-Latn": {
+            "n": 258,
+            "recall@1": 0.0,
+            "recall@5": 0.7791,
+            "recall@10": 0.8527,
+            "mrr": 0.3386
+          },
+          "lang:uz-Cyrl->ru": {
+            "n": 77,
+            "recall@1": 0.1558,
+            "recall@5": 0.7013,
+            "recall@10": 0.7662,
+            "mrr": 0.4048
+          },
+          "lang:uz-Cyrl->uz-Latn": {
+            "n": 145,
+            "recall@1": 0.7241,
+            "recall@5": 0.9448,
+            "recall@10": 0.9448,
+            "mrr": 0.8226
+          },
+          "lang:uz-Latn->ru": {
+            "n": 181,
+            "recall@1": 0.0166,
+            "recall@5": 0.8177,
+            "recall@10": 0.8895,
+            "mrr": 0.3684
+          },
+          "lang:uz-Latn->uz-Latn": {
+            "n": 371,
+            "recall@1": 0.9407,
+            "recall@5": 0.9892,
+            "recall@10": 0.9919,
+            "mrr": 0.9642
+          },
+          "noise:cyrillic": {
+            "n": 134,
+            "recall@1": 0.5075,
+            "recall@5": 0.8507,
+            "recall@10": 0.8806,
+            "mrr": 0.6644
+          },
+          "noise:cyrillic_no_diacritics": {
+            "n": 88,
+            "recall@1": 0.5568,
+            "recall@5": 0.875,
+            "recall@10": 0.8864,
+            "mrr": 0.698
+          },
+          "noise:no_apostrophes": {
+            "n": 45,
+            "recall@1": 0.7111,
+            "recall@5": 0.9556,
+            "recall@10": 0.9778,
+            "mrr": 0.8137
+          },
+          "noise:no_diacritics": {
+            "n": 89,
+            "recall@1": 0.7303,
+            "recall@5": 0.9663,
+            "recall@10": 0.9888,
+            "mrr": 0.8417
+          },
+          "noise:none": {
+            "n": 798,
+            "recall@1": 0.6153,
+            "recall@5": 0.9323,
+            "recall@10": 0.9561,
+            "mrr": 0.7546
+          },
+          "noise:typos": {
+            "n": 419,
+            "recall@1": 0.5895,
+            "recall@5": 0.8926,
+            "recall@10": 0.926,
+            "mrr": 0.7237
+          },
+          "type:first_sentence": {
+            "n": 518,
+            "recall@1": 0.9382,
+            "recall@5": 0.9903,
+            "recall@10": 0.9903,
+            "mrr": 0.9624
+          },
+          "type:mixed": {
+            "n": 22,
+            "recall@1": 0.0,
+            "recall@5": 0.7727,
+            "recall@10": 0.8636,
+            "mrr": 0.3327
+          },
+          "type:title": {
+            "n": 517,
+            "recall@1": 0.8723,
+            "recall@5": 0.9768,
+            "recall@10": 0.9807,
+            "mrr": 0.9213
+          },
+          "type:xling_title": {
+            "n": 516,
+            "recall@1": 0.0291,
+            "recall@5": 0.781,
+            "recall@10": 0.8527,
+            "mrr": 0.3589
+          }
+        }
+      }
+    }
+  ],
+  "best_epoch": 3,
+  "best_val_mrr": 0.7421
+}
