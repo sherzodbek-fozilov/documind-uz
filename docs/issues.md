@@ -49,11 +49,20 @@ Tracked here until they are moved to GitHub issues. `[x]` = done and committed.
       anchor links)
 - [x] Pluggable LLM mode behind `DOCUMIND_ANSWER_MODE=llm` (off by default)
 - [x] Citation-correctness metric (exact span), real and synthetic question sets
-- [ ] Upload endpoint
+- [x] Upload endpoint (`POST /documents/upload`, separate "user" corpus)
+- [ ] Authentication, rate limits and per-user quotas before the API is exposed beyond
+      localhost
+- [ ] Parse uploads in a sandboxed worker (separate process or container, no network,
+      memory and CPU limits, wall-clock timeout); today they run in the API process
+- [ ] Delete endpoint and a retention rule for uploaded documents
 - [ ] A concrete LLM provider
 - [ ] Per-request token limit and monthly LLM budget guard
 - [ ] Quote selection is a heuristic (idf overlap); measure whether the quoted sentence
       is the one that answers the question (needs gold spans, not only gold chunks)
+- [ ] Extractive quotes can be a heading line in PDFs (seen with an uploaded PDF:
+      "1-modda. Shartnoma muddati" was quoted instead of the sentence after it). Quote
+      selection skips only blocks stored with kind "heading", and PDF (and unstyled
+      DOCX) blocks are stored as "text" even when the chunker treats them as headings
 - [ ] Answer latency p50 on CPU (`results/latency.json`)
 
 ## Stage 4: UI

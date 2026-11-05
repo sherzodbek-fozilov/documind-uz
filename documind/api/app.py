@@ -1,4 +1,5 @@
-"""FastAPI app: ``GET /health``, ``GET /documents``, ``POST /ask``.
+"""FastAPI app: ``GET /health``, ``GET /documents``, ``POST /documents/upload``,
+``POST /ask``.
 
 Endpoints are plain ``def`` functions: retrieval is CPU-bound, so FastAPI runs them in
 its thread pool and they do not block the event loop.
@@ -6,23 +7,42 @@ its thread pool and they do not block the event loop.
 
 from __future__ import annotations
 
-from typing import Literal
+import tempfile
+from pathlib import Path
+from typing import Annotated, Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, File, HTTPException, Query, Response, UploadFile
 
 from ..config import Settings, get_settings
+from ..ingestion.uploads import (
+    UploadRejected,
+    check_limits,
+    check_name_and_type,
+    safe_display_name,
+    save_limited,
+    sniff,
+)
 from ..qa.service import EmptyCorpus, LLMOutputError, QAService, UnknownDocument
 from ..storage.db import make_session_factory
-from .schemas import AskRequest, AskResponse, DocumentOut, HealthOut
+from .limits import MaxBodySize
+from .schemas import AskRequest, AskResponse, DocumentOut, HealthOut, UploadOut
+
+UPLOAD_PATH = "/documents/upload"
+# multipart framing around the file (boundaries, part headers)
+MULTIPART_OVERHEAD = 64 * 1024
 
 
 def create_app(settings: Settings | None = None, service: QAService | None = None) -> FastAPI:
     settings = settings or get_settings()
-    service = service or QAService(make_session_factory(settings.database_url), settings)
+    service = service or QAService(
+        make_session_factory(settings.database_url), settings,
+        user_session_factory=make_session_factory(settings.user_database_url))
     app = FastAPI(title="DocuMind UZ", version="0.1.0",
                   description="Question answering with exact-quote citations over Uzbek and "
                               "Russian legal documents.")
     app.state.service = service
+    app.add_middleware(MaxBodySize, max_bytes=settings.upload_max_bytes + MULTIPART_OVERHEAD,
+                       paths={UPLOAD_PATH})
 
     @app.get("/health", response_model=HealthOut)
     def health() -> HealthOut:
@@ -30,9 +50,40 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
                          **service.counts())
 
     @app.get("/documents", response_model=list[DocumentOut])
-    def documents(corpus: Literal["real", "synthetic"] | None = Query(None)) -> list[dict]:
+    def documents(corpus: Literal["real", "synthetic", "user"] | None = Query(None)
+                  ) -> list[dict]:
         docs = service.documents()
         return [d for d in docs if corpus is None or d["corpus"] == corpus]
+
+    @app.post(UPLOAD_PATH, response_model=UploadOut, status_code=201,
+              responses={200: {"description": "the same file was uploaded before"},
+                         413: {"description": "file too large"},
+                         415: {"description": "file type not accepted"},
+                         422: {"description": "file damaged, over a limit, or no text"},
+                         503: {"description": "OCR needed but not available"}})
+    def upload(response: Response, file: Annotated[UploadFile, File()]) -> dict:
+        """Add a PDF, DOCX or image (PNG, JPEG, TIFF) to the **user** corpus (asked with
+        ``"corpus": "user"``). Uploads never enter the evaluation corpora."""
+        try:
+            suffix = check_name_and_type(file.filename, file.content_type)
+            # private directory (mode 0700) and a fixed file name: the client's file name
+            # is never part of a path
+            with tempfile.TemporaryDirectory(prefix="documind-upload-") as tmp:
+                path = Path(tmp) / f"upload{suffix}"
+                sha, _ = save_limited(file.file.read, path, settings.upload_max_bytes)
+                sniff(path, suffix)
+                check_limits(path, suffix, settings)
+                info = service.add_user_document(path, safe_display_name(file.filename),
+                                                 sha)
+        except UploadRejected as exc:
+            raise HTTPException(exc.status, exc.message) from exc
+        except EmptyCorpus as exc:  # no user database configured
+            raise HTTPException(503, str(exc)) from exc
+        finally:
+            file.file.close()
+        if info["status"] == "duplicate":
+            response.status_code = 200
+        return info
 
     @app.post("/ask", response_model=AskResponse)
     def ask(req: AskRequest) -> AskResponse:

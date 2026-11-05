@@ -71,7 +71,10 @@ def parse_file(path: Path, settings: Settings, *, force_ocr: bool = False) -> Pa
 def ingest_file(path: Path, session: Session, settings: Settings, *, doc_id: str | None = None,
                 group_id: str | None = None, is_synthetic: bool = False,
                 source: str | None = None, force_ocr: bool = False,
-                split_unit: str = "document", meta: dict | None = None) -> IngestResult:
+                split_unit: str = "document", meta: dict | None = None,
+                filename: str | None = None) -> IngestResult:
+    """``filename``: name stored in ``documents.filename`` (default: the file's own name),
+    e.g. the sanitized original name of an upload saved under a temporary name."""
     path = Path(path)
     sha = sha256_file(path)
     existing = session.scalar(select(models.Document).where(models.Document.sha256 == sha))
@@ -104,7 +107,7 @@ def ingest_file(path: Path, session: Session, settings: Settings, *, doc_id: str
 
     pages_by_no = {p.page_no: p for p in parsed.pages}
     doc = models.Document(
-        id=doc_id, group_id=group_id, filename=path.name, mime=parsed.mime, sha256=sha,
+        id=doc_id, group_id=group_id, filename=filename or path.name, mime=parsed.mime, sha256=sha,
         storage_path=str(stored), n_pages=len(parsed.pages),
         n_ocr_pages=sum(p.is_ocr for p in parsed.pages), language=language,
         script_stats={**script_counts(text), "chunk_words_by_language": dict(lang_words)},

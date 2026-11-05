@@ -13,6 +13,8 @@ data/raw/*
 data/synthetic/*
 !data/synthetic/README.md
 data/store/
+# uploaded documents (user corpus)
+data/user_store/
 *.sqlite
 node_modules/
 # downloaded model weights
