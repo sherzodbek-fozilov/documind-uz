@@ -2,13 +2,13 @@
   "metrics": {
     "citation_correctness": 1.0,
     "anchor_correctness": 1.0,
-    "gold_cited": 0.4
+    "gold_cited": 0.2857142857142857
   },
-  "n": 30,
+  "n": 105,
   "n_by_metric": {
-    "citation_correctness": 30,
-    "anchor_correctness": 30,
-    "gold_cited": 10
+    "citation_correctness": 105,
+    "anchor_correctness": 105,
+    "gold_cited": 35
   },
   "failures": {},
   "service_check_failures": {},
@@ -16,7 +16,7 @@
   "split": "test",
   "dataset": "real documents (laws), hand-labeled questions",
   "question_counts": {
-    "used": 10
+    "used": 35
   },
   "config": {
     "mode": "extractive",
@@ -95,9 +95,184 @@
       "n_citations": 3,
       "invalid": 0,
       "gold_cited": false
+    },
+    {
+      "line": 11,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 12,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 13,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 14,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 15,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 16,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 17,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 18,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 19,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 20,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 21,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 22,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 23,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 24,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 25,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 26,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 27,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 28,
+      "language": "uz-Latn",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 29,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 30,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 31,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 32,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 33,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": true
+    },
+    {
+      "line": 34,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
+    },
+    {
+      "line": 35,
+      "language": "ru",
+      "n_citations": 3,
+      "invalid": 0,
+      "gold_cited": false
     }
   ],
-  "generated_at": "2026-11-04T20:57:26+00:00",
-  "git_commit": "690f035",
+  "generated_at": "2026-11-04T22:55:47+00:00",
+  "git_commit": "b5834c1",
   "script": "scripts/eval_citations.py"
 }
