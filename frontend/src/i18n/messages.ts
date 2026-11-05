@@ -7,7 +7,7 @@ export type Lang = (typeof LANGS)[number];
 export const LANG_NAMES: Record<Lang, string> = { uz: "Oʻzbekcha", ru: "Русский", en: "English" };
 
 const en = {
-  "app.tagline": "Answers with exact quotes from Uzbek and Russian legal documents",
+  "app.tagline": "Answers with exact quotes from the legislation of Uzbekistan, in Uzbek and Russian",
   "lang.label": "Interface language",
 
   "ask.label": "Your question",
@@ -64,7 +64,7 @@ export type MessageKey = keyof typeof en;
 export type Messages = Record<MessageKey, string>;
 
 const ru: Messages = {
-  "app.tagline": "Ответы с точными цитатами из узбекских и российских правовых документов",
+  "app.tagline": "Ответы с точными цитатами из законодательства Узбекистана на узбекском и русском языках",
   "lang.label": "Язык интерфейса",
 
   "ask.label": "Ваш вопрос",
@@ -118,7 +118,7 @@ const ru: Messages = {
 };
 
 const uz: Messages = {
-  "app.tagline": "Oʻzbek va rus huquqiy hujjatlaridan aniq iqtiboslar bilan javoblar",
+  "app.tagline": "Oʻzbekiston qonunchiligidan aniq iqtiboslar bilan javoblar (oʻzbek va rus tillarida)",
   "lang.label": "Interfeys tili",
 
   "ask.label": "Savolingiz",
