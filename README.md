@@ -53,7 +53,7 @@ Values in parentheses: 95% bootstrap confidence interval over questions.
 | OCR CER, synthetic scans, uz-Latn | 0.1% | 8 | `results/ocr_synthetic.json` |
 | OCR CER, synthetic scans, uz-Cyrl | 0.7% | 8 | `results/ocr_synthetic.json` |
 | OCR CER, synthetic scans, ru | 0.6% | 8 | `results/ocr_synthetic.json` |
-| Citation correctness (exact span), real questions | 100.0% | 30 | `results/citations_real.json` |
+| Citation correctness (exact span), real questions | 100.0% | 105 | `results/citations_real.json` |
 | Citation correctness (exact span), SYNTHETIC questions | 100.0% | 376 | `results/citations_synthetic.json` |
 | Answer latency p50, CPU (s) | TBD | TBD | `results/latency.json` |
 <!-- END METRICS -->
