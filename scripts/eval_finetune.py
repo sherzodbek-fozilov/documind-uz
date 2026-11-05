@@ -13,7 +13,12 @@ The comparison refuses to run unless both files were made from the same question
 only reports: the training epoch and all settings must already be fixed on the
 validation pairs before it is run (see kaggle/finetune_e5.py).
 
+With ``--eval-set v1`` both runs use only the frozen questions of that set
+(data/eval/sets/v1.json) and the files are named ``..._<set>_v1.json``; the comparison
+then also requires the same eval set and the same question ids.
+
 Usage:
+  python scripts/eval_finetune.py --ft-model-dir models/multilingual-e5-small-ft --eval-set v1
   python scripts/eval_finetune.py --ft-model-dir models/multilingual-e5-small-ft
   python scripts/eval_finetune.py --compare-only          # reuse existing result files
 """
@@ -36,8 +41,9 @@ from documind.evaluation import paired_bootstrap_delta  # noqa: E402
 PAIRS = (("e5_small", "e5_small_ft"), ("hybrid_rrf", "hybrid_rrf_ft"))
 
 
-def load(method: str, kind: str) -> dict:
-    path = ROOT / "results" / f"retrieval_{method}_{kind}.json"
+def load(method: str, kind: str, eval_set: str | None = None) -> dict:
+    suffix = f"_{eval_set}" if eval_set else ""
+    path = ROOT / "results" / f"retrieval_{method}_{kind}{suffix}.json"
     if not path.exists():
         raise SystemExit(f"{path} not found; run without --compare-only")
     return json.loads(path.read_text(encoding="utf-8"))
@@ -51,6 +57,10 @@ def same_questions(a: dict, b: dict) -> list[str]:
         problems.append("different set or split")
     if a["corpus"] != b["corpus"]:
         problems.append("different corpus")
+    if a.get("eval_set") != b.get("eval_set"):
+        problems.append("different eval sets")
+    if [q.get("id") for q in a["per_question"]] != [q.get("id") for q in b["per_question"]]:
+        problems.append("different question ids")
     qa = [(q["line"], q["language"]) for q in a["per_question"]]
     qb = [(q["line"], q["language"]) for q in b["per_question"]]
     if qa != qb:
@@ -100,7 +110,10 @@ def main() -> None:
                     help="default: DOCUMIND_EMBED_MODEL_DIR (the base model)")
     ap.add_argument("--set", default="real", choices=["real", "synthetic"])
     ap.add_argument("--compare-only", action="store_true")
+    ap.add_argument("--eval-set", default=None,
+                    help="compare on a frozen question set only, e.g. v1")
     args = ap.parse_args()
+    es_extra = ["--eval-set", args.eval_set] if args.eval_set else []
     split = "test"  # before/after is reported on the test split only
     if not args.compare_only:
         if not (args.ft_model_dir / "onnx" / "model.onnx").exists():
@@ -108,13 +121,13 @@ def main() -> None:
                              "scripts/export_onnx.py")
         base_extra = (["--embed-model-dir", str(args.base_model_dir)]
                       if args.base_model_dir else [])
-        run_eval(args.set, split, base_extra)
+        run_eval(args.set, split, base_extra + es_extra)
         run_eval(args.set, split, ["--embed-model-dir", str(args.ft_model_dir),
-                                   "--variant", "ft"])
-    payload = {"set": args.set, "split": split, "methods": {}}
+                                   "--variant", "ft", *es_extra])
+    payload = {"set": args.set, "split": split, "eval_set": args.eval_set, "methods": {}}
     print(f"\n{'method':12} {'n':>4} {'metric':10} {'base':>6} {'ft':>6} {'delta':>7}  95% CI")
     for base_m, ft_m in PAIRS:
-        base, ft = load(base_m, args.set), load(ft_m, args.set)
+        base, ft = load(base_m, args.set, args.eval_set), load(ft_m, args.set, args.eval_set)
         problems = same_questions(base, ft)
         if problems:
             raise SystemExit(f"{base_m} vs {ft_m}: not comparable: {'; '.join(problems)}")
@@ -126,7 +139,8 @@ def main() -> None:
             print(f"{base_m:12} {cmp['n']:4d} {metric:10} {base['metrics'][metric]:6.3f} "
                   f"{ft['metrics'][metric]:6.3f} {d['delta']:+7.3f}  "
                   f"[{d['ci95'][0]:+.3f}, {d['ci95'][1]:+.3f}]")
-    path = write_result(f"finetune_compare_{args.set}.json", payload,
+    es_suffix = f"_{args.eval_set}" if args.eval_set else ""
+    path = write_result(f"finetune_compare_{args.set}{es_suffix}.json", payload,
                         "scripts/eval_finetune.py")
     print(f"written {path}")
 

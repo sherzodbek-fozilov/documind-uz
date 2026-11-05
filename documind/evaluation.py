@@ -15,6 +15,7 @@ chunk-level matching.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import random
 from collections import defaultdict
@@ -43,6 +44,37 @@ class Question:
     def __post_init__(self):
         if not self.gold_chunks:
             self.gold_chunks = (self.gold_chunk,)
+
+    @property
+    def id(self) -> str:
+        return question_id(self.question, self.gold_chunks)
+
+
+def question_id(question: str, gold_chunks: Iterable[str]) -> str:
+    """Stable id of a labeled question: derived from its text and gold chunks only, so it
+    does not change when lines are appended, reordered or re-tagged, and it is not stored
+    in questions.jsonl (the annotator's lines stay untouched)."""
+    payload = question + "\x1f" + "\x1e".join(gold_chunks)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+
+
+def load_eval_set(path: Path) -> dict:
+    """A frozen eval set: {"name", "set", "question_ids": [...], ...}."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    ids = data.get("question_ids") or []
+    if not data.get("name") or not ids or len(ids) != len(set(ids)):
+        raise ValueError(f"{path}: needs a name and a non-empty list of unique question_ids")
+    return data
+
+
+def select_eval_set(questions: list[Question],
+                    eval_set: dict) -> tuple[list[Question], list[str]]:
+    """Questions of a frozen set (in file order), and the set's ids that were not found,
+    e.g. because a frozen question was edited or removed."""
+    wanted = set(eval_set["question_ids"])
+    selected = [q for q in questions if q.id in wanted]
+    found = {q.id for q in selected}
+    return selected, [i for i in eval_set["question_ids"] if i not in found]
 
 
 def load_questions(path: Path) -> tuple[list[Question], list[str]]:

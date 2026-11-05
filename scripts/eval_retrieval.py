@@ -22,6 +22,9 @@ Usage:
       --embed-model-dir models/multilingual-e5-small-ft --variant ft
       # fine-tuned model: writes retrieval_e5_small_ft_real.json, retrieval_hybrid_rrf_ft_...
       # (scripts/eval_finetune.py runs base and fine-tuned on the same questions)
+  python scripts/eval_retrieval.py --set real --eval-set v1
+      # only the questions frozen in data/eval/sets/v1.json; writes
+      # results/retrieval_<method>_real_v1.json and fails if a frozen question is missing
 """
 
 from __future__ import annotations
@@ -42,9 +45,11 @@ from documind.config import get_settings  # noqa: E402
 from documind.evaluation import (  # noqa: E402
     article_rank,
     bootstrap_ci,
+    load_eval_set,
     load_questions,
     metrics_from_ranks,
     rank_of,
+    select_eval_set,
 )
 from documind.retrieval.corpus import load_corpus  # noqa: E402
 from documind.retrieval.retrievers import (  # noqa: E402
@@ -73,7 +78,8 @@ def evaluate(retriever, questions, key_of: dict) -> tuple[list, list, list]:
         ra = article_rank(q.gold_chunks, results, key_of)
         ranks.append(r)
         art_ranks.append(ra)
-        per_q.append({"line": q.line, "language": q.language, "tags": list(q.tags), "rank": r,
+        per_q.append({"id": q.id, "line": q.line, "language": q.language, "tags": list(q.tags),
+                      "rank": r,
                       "rank_article": ra, "top1": results[0] if results else None,
                       "latency_s": round(latency, 4)})
     return ranks, art_ranks, per_q
@@ -88,6 +94,8 @@ def main() -> None:
                     help="comma-separated analyzers to compare (default: the configured one)")
     ap.add_argument("--embed-model-dir", type=Path, default=None,
                     help="ONNX embedding model (default: DOCUMIND_EMBED_MODEL_DIR)")
+    ap.add_argument("--eval-set", default=None,
+                    help="evaluate only a frozen question set, e.g. v1 (data/eval/sets/v1.json)")
     ap.add_argument("--variant", default="",
                     help="suffix for the dense and hybrid method names, e.g. 'ft' for the "
                          "fine-tuned model (results/retrieval_e5_small_ft_<set>.json)")
@@ -97,6 +105,14 @@ def main() -> None:
     suffix = f"_{args.variant}" if args.variant else ""
     if suffix and "bm25" in args.methods.split(","):
         ap.error("--variant changes the embedding model only; leave bm25 out of --methods")
+    eval_set = None
+    if args.eval_set:
+        es_path = ROOT / "data/eval/sets" / f"{args.eval_set}.json"
+        eval_set = load_eval_set(es_path)
+        if args.set != eval_set["set"]:
+            ap.error(f"eval set {args.eval_set} is for --set {eval_set['set']}")
+        eval_set["file_sha256"] = hashlib.sha256(es_path.read_bytes()).hexdigest()
+    es_suffix = f"_{args.eval_set}" if args.eval_set else ""
     Session = make_session_factory(settings.database_url)
     methods = args.methods.split(",")
     analyzers = (args.bm25_analyzers.split(",") if args.bm25_analyzers
@@ -110,6 +126,11 @@ def main() -> None:
         questions_sha256 = hashlib.sha256(QUESTION_FILES[kind].read_bytes()).hexdigest()
         for p in problems:
             print(f"WARNING {p}", file=sys.stderr)
+        if eval_set is not None:
+            questions, missing = select_eval_set(questions, eval_set)
+            if missing:
+                raise SystemExit(f"eval set {eval_set['name']}: {len(missing)} frozen questions "
+                                 f"not found (edited or removed?): {missing}")
         with Session() as session:
             chunks = load_corpus(session, kind)
         if not chunks:
@@ -132,6 +153,10 @@ def main() -> None:
                 counts["other_split"] += 1
             else:
                 selected.append(q)
+        if eval_set is not None and len(selected) != eval_set["n"]:
+            raise SystemExit(f"eval set {eval_set['name']}: only {len(selected)} of "
+                             f"{eval_set['n']} frozen questions are usable ({dict(counts)}); "
+                             "the corpus or split changed")
         if not selected:
             print(f"[{kind}] no usable questions for split {args.split!r} "
                   f"({dict(counts)}); nothing written", file=sys.stderr)
@@ -194,6 +219,8 @@ def main() -> None:
                            "chunker_versions": chunker_versions},
                 "question_counts": {"used": len(selected), **counts},
                 "questions_sha256": questions_sha256,
+                "eval_set": ({"name": eval_set["name"], "n": eval_set["n"],
+                              "file_sha256": eval_set["file_sha256"]} if eval_set else None),
                 "config": {"method": method, "bm25_analyzer": analyzer,
                            "embed_model": getattr(embedder, "model_id", None)
                            if method != "bm25" else None,
@@ -206,10 +233,10 @@ def main() -> None:
                 "per_question": per_q,
             }
             if args.split == "test" and (analyzer in (None, settings.bm25_analyzer)):
-                name = f"retrieval_{method}_{kind}.json"
+                name = f"retrieval_{method}_{kind}{es_suffix}.json"
             else:
                 tag = f"_{analyzer.replace('+', '-')}" if analyzer else ""
-                name = f"tuning/retrieval_{method}{tag}_{kind}_{args.split}.json"
+                name = f"tuning/retrieval_{method}{tag}_{kind}{es_suffix}_{args.split}.json"
             (ROOT / "results" / "tuning").mkdir(parents=True, exist_ok=True)
             write_result(name, payload, "scripts/eval_retrieval.py")
             m, ma = payload["metrics"], payload["metrics_article"]
