@@ -117,8 +117,8 @@ above stays `TBD` until at least 80 questions are labeled):
 
 ## Limitations
 
-- **Small test set:** 49 real questions, two laws; intervals are wide, and only 2
-  questions are in Uzbek Cyrillic.
+- **Small test set:** 49 real questions on two acts of Uzbekistan (each in its Uzbek
+  and Russian version); intervals are wide, and only 2 questions are in Uzbek Cyrillic.
 - **Uzbek retrieval is weak**, especially for the dense model (see above).
 - **Dialects and mixed Uzbek–Russian questions are not solved:** the 9 questions tagged
   `mixed-uz-ru` were found in the top 5 (chunk level) at most once by any method.
@@ -136,15 +136,15 @@ Commercial assistants for Uzbek legislation exist (for example Tuzuk,
 which advertises document analysis, drafting and consultations citing
 lex.uz), and recent research reports a legal Uzbek retrieval benchmark
 and an embedder (arXiv 2608.29284). This project does not compete with
-them: it is an open, reproducible retrieval pipeline over Uzbek and
-Russian laws with exact, machine-verified quotes, a frozen evaluation set
-of real questions written by the author, and a documented negative
-fine-tuning result.
+them: it is an open, reproducible retrieval pipeline over the legislation of
+Uzbekistan (Uzbek and Russian versions) with exact, machine-verified quotes,
+a frozen evaluation set of real questions written by the author, and a
+documented negative fine-tuning result.
 
 ## Data and licenses
 
-- **Public laws from lex.uz:** Civil Code part 2 and Labor Code 2022, in Russian and
-  Uzbek (Latin). Fetched only after their terms were checked; every source is listed with
+- **Legislation of Uzbekistan from lex.uz:** Civil Code part 2 and Labor Code 2022, each
+  in its Uzbek (Latin) and Russian version. Fetched only after their terms were checked; every source is listed with
   URL, date and sha256 in [`docs/data.md`](docs/data.md).
 - **Synthetic contracts** for OCR and format tests are marked synthetic in their text,
   file names and database, and reported separately.
