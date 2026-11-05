@@ -42,8 +42,8 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
         make_session_factory(settings.database_url), settings,
         user_session_factory=make_session_factory(settings.user_database_url))
     app = FastAPI(title="DocuMind UZ", version="0.1.0",
-                  description="Question answering with exact-quote citations over Uzbek and "
-                              "Russian legal documents.")
+                  description="Question answering with exact-quote citations over the "
+                              "legislation of Uzbekistan (Uzbek and Russian versions).")
     app.state.service = service
     app.add_middleware(MaxBodySize, max_bytes=settings.upload_max_bytes + MULTIPART_OVERHEAD,
                        paths={UPLOAD_PATH})

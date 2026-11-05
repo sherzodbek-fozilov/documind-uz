@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "documind-uz"
 version = "0.1.0"
-description = "Document Q&A with source citations over Uzbek and Russian legal documents"
+description = "Document Q&A with source citations over the legislation of Uzbekistan (Uzbek and Russian versions)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
