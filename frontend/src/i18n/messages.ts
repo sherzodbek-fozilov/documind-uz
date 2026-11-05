@@ -118,7 +118,7 @@ const ru: Messages = {
 };
 
 const uz: Messages = {
-  "app.tagline": "O'zbekiston qonunchiligidan aniq iqtiboslar bilan javoblar (o'zbek va rus tillarida)",
+  "app.tagline": "Oʻzbekiston qonunchiligidan aniq iqtiboslar bilan javoblar (oʻzbek va rus tillarida)",
   "lang.label": "Interfeys tili",
 
   "ask.label": "Savolingiz",
