@@ -37,10 +37,13 @@ class PassageOut(CitationOut):
     rank: int
     section_title: str | None
     language: str
+    text: str = Field(description="the whole passage (chunk text); "
+                                  "quote == text[quote_start:quote_end]")
 
     @classmethod
     def of_passage(cls, p: Passage) -> PassageOut:
         return cls(rank=p.rank, section_title=p.section_title, language=p.language,
+                   text=p.text,
                    **CitationOut.of(p.citation).model_dump())
 
 
