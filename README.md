@@ -1,18 +1,60 @@
 # DocuMind UZ
 
-Question answering with source citations over Uzbek (Latin and Cyrillic) and Russian
-legal and contract documents, including scanned PDFs via OCR.
+Ask a question about Uzbek law in Uzbek or Russian and get the exact passage of the law
+that answers it: a verbatim quote, checked against the source text, with a link to the
+article on lex.uz.
 
-The language model only *phrases* answers from retrieved passages. The actual work of the
-project is in **retrieval**, **evaluation** and **fine-tuning an embedding model**, and every
-number below is produced by a script in this repository.
+<!-- DEMO GIF: 30-second screen recording goes here, e.g.
+<p align="center"><img src="docs/demo.gif" alt="Asking a question and getting a quoted article with a lex.uz link" width="720"></p>
+-->
 
-> **Status:** work in progress. Stages 0–2 (skeleton, ingestion, retrieval baselines)
-> are implemented; stage 3 has started (API with extractive answers and a citation check). Four real documents are ingested, but real questions are not labeled
-> yet, so the main (real) retrieval table is `TBD`; the synthetic table is only a
-> pipeline sanity check.
-> The OCR numbers are measured on **synthetic, mildly degraded** scans and are an
-> optimistic lower bound for real documents.
+## Quick start
+
+Needs Docker with the Compose plugin. Everything runs locally; the site is served on
+`127.0.0.1` only.
+
+```bash
+git clone https://github.com/sherzodbek-fozilov/documind-uz.git && cd documind-uz
+cp .env.example .env    # set POSTGRES_PASSWORD and DOCUMIND_API_DB_PASSWORD
+docker compose build
+docker compose run --rm ops python scripts/fetch_sources.py --keep-registry --delay 30
+docker compose run --rm ops documind ingest data/raw
+docker compose up -d    # then open http://127.0.0.1:8080
+```
+
+The fetch step downloads the approved lex.uz pages politely (robots.txt, one request at a
+time, a pause between requests). The default retriever is BM25; for the hybrid retriever
+run `docker compose run --rm ops python scripts/download_model.py` and set
+`DOCUMIND_API_RETRIEVER=hybrid` in `.env`. Server setup with HTTPS and the public demo
+mode: [`docs/deploy.md`](docs/deploy.md).
+
+## How it works
+
+```mermaid
+flowchart LR
+  subgraph ingest["Ingest (once)"]
+    A["lex.uz HTML, PDF, DOCX, image"] --> B["Text layer or OCR<br/>(tesseract uzb, uzb_cyrl, rus)"]
+    B --> C["Normalize and chunk<br/>by article; every chunk is<br/>an exact span of the text"]
+    C --> D[("PostgreSQL<br/>documents, chunks")]
+    C --> E[("Qdrant<br/>e5-small vectors")]
+  end
+  subgraph ask["Ask"]
+    Q["Question in Uzbek<br/>or Russian"] --> F["BM25"]
+    Q --> G["multilingual-e5-small"]
+    F --> H["Hybrid: reciprocal<br/>rank fusion"]
+    G --> H
+    H --> I["Quote the best sentences<br/>of each passage verbatim"]
+    I --> J{"Citation check:<br/>quote is an exact span<br/>of the cited chunk?"}
+    J -- yes --> K["Passage, quote,<br/>link to the lex.uz article"]
+    J -- no --> L["Dropped and counted"]
+  end
+  D --> F
+  E --> G
+```
+
+No language model is needed: by default the answer is the quoted passages themselves.
+An optional LLM mode can phrase an answer, but its citations go through the same exact-span
+check, and citations that fail it are dropped.
 
 ## Results
 
@@ -58,190 +100,74 @@ Values in parentheses: 95% bootstrap confidence interval over questions.
 | Answer latency p50, CPU (s) | TBD | TBD | `results/latency.json` |
 <!-- END METRICS -->
 
-## Architecture (planned)
+**In short** (from [`docs/experiments.md`](docs/experiments.md); the real-question table
+above stays `TBD` until at least 80 questions are labeled):
 
-```
-upload (PDF / DOCX / image)
-  └─ ingestion: text layer or OCR (tesseract uzb + uzb_cyrl + rus) → normalize → chunk
-       └─ PostgreSQL (documents, pages, chunks)   Qdrant (dense vectors, stage 2)
-ask
-  └─ retrieval: BM25 | multilingual-e5-small | hybrid (RRF) | optional reranker
-       └─ extractive (default): best sentence(s) of each passage, quoted verbatim
-       └─ LLM (optional, off by default): phrases an answer from the top passages
-            └─ citation check: every quote must be an exact span of the cited chunk
-```
-
-Deployment target: a CPU-only Linux server with Docker Compose (PostgreSQL, Qdrant,
-FastAPI, React + TypeScript). Embedding fine-tuning runs on Kaggle, not on the server.
-
-## Repository layout
-
-| Path | Contents |
-|---|---|
-| `documind/` | Python package (ingestion, storage, retrieval, `qa` answers and citations, `api`) |
-| `tests/` | pytest suite |
-| `scripts/` | data generation, evaluation, README rendering |
-| `data/eval/questions.jsonl` | hand-labeled evaluation questions (see `data/eval/README.md`) |
-| `results/` | metric files written by scripts, the only source of README numbers |
-| `docs/data.md` | every data source: URL, license, date, synthetic or not |
-| `docs/decisions.md` | design decisions and the alternatives considered |
-| `docs/issues.md` | open work items by stage |
-| `frontend/` | React + TypeScript UI (stage 4) |
-| `Dockerfile`, `docker-compose.yml`, `deploy/` | API image, Compose stack (API, web, PostgreSQL, Qdrant), Caddy config, database roles |
-| `docs/deploy.md` | step-by-step deployment on a Hetzner Ubuntu server |
-
-## Quick start (development)
-
-```bash
-pip install -e ".[dev]"
-sudo apt-get install tesseract-ocr tesseract-ocr-uzb tesseract-ocr-uzb-cyrl tesseract-ocr-rus
-cp .env.example .env          # set DOCUMIND_DATABASE_URL; SQLite works for local experiments
-python scripts/make_synthetic_docs.py      # synthetic contracts (clearly marked synthetic)
-documind ingest data/synthetic           # reads data/synthetic/manifest.jsonl
-documind split                           # language-stratified split, frozen in data/splits.json
-documind stats                           # counts per split/language + leakage check
-python scripts/eval_ocr.py               # writes results/ocr_synthetic.json
-python scripts/render_readme.py          # regenerates the tables above
-python -m pytest
-```
-
-Optional: run the PostgreSQL test with
-`TEST_DATABASE_URL=postgresql+psycopg://user:pass@localhost/db_test python -m pytest -m postgres`.
-
-## Ingestion
-
-| Step | What happens |
-|---|---|
-| Parse | PDF text layer (PyMuPDF blocks with bounding boxes); DOCX paragraphs, headings, tables; PNG/JPEG/TIFF; lex.uz act pages (HTML) |
-| OCR | PDF pages with fewer than 30 text characters are rendered at 300 dpi and OCR'd with tesseract `uzb+uzb_cyrl+rus` |
-| Normalize | NFC, whitespace, Uzbek apostrophe variants → ʻ / ʼ |
-| Chunk | new chunk at each article / chapter / section heading; ≤ 180 words; no overlap; each chunk is an exact span of the document text |
-| Label | language per chunk (uz-Latn / uz-Cyrl / ru), document split (train / test) by document group |
-| Store | PostgreSQL tables `documents`, `pages` (with block offsets and boxes), `chunks`; original file by sha256 |
-
-## Retrieval and evaluation
-
-| Method | Details |
-|---|---|
-| BM25 | Okapi BM25 (k1 1.2, b 0.75); analyzer `fold+stem6`: apostrophes removed, Cyrillic → Latin with OCR-confusable letters merged, tokens cut to 6 characters |
-| Dense | multilingual-e5-small, ONNX on CPU (pinned revision), Qdrant |
-| Hybrid | reciprocal rank fusion (k = 60) of the top 100 from each |
-
-```bash
-pip install -e ".[models]"                # huggingface_hub, for the download script
-python scripts/download_model.py          # e5-small ONNX into models/ (git-ignored)
-python scripts/make_synthetic_questions.py # SYNTHETIC sanity questions
-python scripts/eval_retrieval.py           # writes results/retrieval_<method>_<set>.json
-python scripts/draft_questions.py          # drafts for real test documents, for review
-```
-
-Recall@k = share of questions whose gold chunk is in the top k; MRR = mean reciprocal
-rank of the gold chunk (cut at 10). Settings are tuned on the train split and reported
-on the test split.
-
-## Fine-tuning (stage 5)
-
-Step by step: [`docs/finetune-runbook.md`](docs/finetune-runbook.md).
-
-```bash
-python scripts/make_training_pairs.py   # local pairs (git-ignored) + results/training_pairs_stats.json
-# Kaggle (GPU, internet on), in a private notebook: rebuilds the pairs itself, trains,
-# picks the epoch on validation; no data is uploaded
-#   !python finetune_e5.py --ref main --smoke   # setup check first
-#   !python finetune_e5.py --ref main
-python scripts/export_onnx.py --model runs/e5-small-ft/best --out models/multilingual-e5-small-ft \
-    --training-log runs/e5-small-ft/training_log.json
-python scripts/eval_finetune.py         # base vs fine-tuned on the same real test questions
-```
-
-Pairs come only from train chapter groups (test chunks are never read into them); the
-epoch is chosen on held-out train chapter groups. Details and limitations:
-`docs/decisions.md`.
-
-## API
-
-```bash
-pip install -e ".[dev,api]"
-documind serve                    # http://127.0.0.1:8000/docs
-curl -s localhost:8000/ask -H 'content-type: application/json' \
-     -d '{"question": "Ijara haqi qachon toʻlanadi?", "top_k": 3}'
-curl -s localhost:8000/documents/upload -F 'file=@contract.pdf;type=application/pdf'
-curl -s localhost:8000/ask -H 'content-type: application/json' \
-     -d '{"question": "Shartnoma muddati qancha?", "corpus": "user"}'
-```
-
-| Endpoint | Returns |
-|---|---|
-| `GET /health` | status, answer mode, retriever, document and chunk counts, uploaded documents |
-| `GET /documents?corpus=real\|synthetic\|user` | id, title, file name, language, source URL, edition, chunk count |
-| `POST /documents/upload` | multipart `file` (PDF, DOCX, PNG, JPEG, TIFF) → `201` with document id, pages, OCR pages, chunks, language; `200` if the same file was uploaded before; `413` / `415` / `422` / `503` with a message |
-| `POST /ask` | `{question, corpus, document_id?, top_k?}` → the best passages, each with an exact `quote`, `quote_start`/`quote_end` in the chunk, `document_id`, `chunk_id`, lex.uz `anchor` and `link` (`<page>#<element id>`) |
-
-- **Extractive mode** (default, no LLM key): for each retrieved chunk the best window of
-  1–2 sentences inside one source block is quoted (scored by BM25 idf of the query terms).
-- **LLM mode** (`DOCUMIND_ANSWER_MODE=llm`, off by default): a provider is loaded from
-  `DOCUMIND_LLM_PROVIDER="package.module:factory"`. The model must return verbatim quotes;
-  citations that are not an exact span of a passage it was given are dropped and counted.
-- **Citation check**: a citation is valid only if `chunk.text[quote_start:quote_end] ==
-  quote` for the cited chunk of the cited document. `python scripts/eval_citations.py`
-  re-checks every citation against the database (also the anchor) and writes
-  `results/citations_<set>.json`. In extractive mode the quotes are cut from the chunk,
-  so 100 % is expected: the metric guards against offset bugs and becomes informative in
-  LLM mode.
-- Retriever: `DOCUMIND_API_RETRIEVER=bm25` (default) or `hybrid` (needs the e5 model).
-- **Uploads** go to the **user** corpus, which has its own database and storage
-  directory (`DOCUMIND_USER_DATABASE_URL`, `DOCUMIND_USER_STORAGE_DIR`). They never reach
-  the evaluation corpora, the train/test split or training pairs. Checks before parsing:
-  extension and content-type whitelist, file signature, size (20 MB), pages (50), pixels
-  per page, DOCX unpacked size; the client's file name is never used in a path. Scanned
-  pages are OCR'd with the existing pipeline. **Not for a public server yet**: no
-  authentication or rate limit, and the parsers run in the API process (see
-  `docs/decisions.md`).
-- **Public demo** (`DOCUMIND_PUBLIC_DEMO=true`): `POST /documents/upload` answers `403`
-  without reading the request body, the user corpus does not exist, and the main
-  database is opened read-only (PostgreSQL: every transaction `READ ONLY`; SQLite:
-  `mode=ro`), so the corpus must be ingested beforehand with the CLI. `GET /health`
-  reports `public_demo`.
-
-## Deployment
-
-Docker Compose runs the API, the built frontend behind Caddy (HTTPS, per-IP rate
-limits), PostgreSQL and Qdrant; model weights and lex.uz documents are fetched on the
-server into volumes, never committed. A public demo mode (`DOCUMIND_PUBLIC_DEMO=true`)
-disables uploads and keeps the corpus read-only. Step by step for a Hetzner Ubuntu
-server: [`docs/deploy.md`](docs/deploy.md). CI (`.github/workflows/ci.yml`) runs ruff,
-pytest, `render_readme.py --check` and the frontend tests and build; it deploys nothing.
-
-## Configuration
-
-All settings are environment variables with the `DOCUMIND_` prefix; see `.env.example`.
-The LLM API key is read from the environment only and is never committed. A per-request
-token limit and a monthly budget guard are part of stage 3.
-
-## Data
-
-No real personal data is used.
-
-- **Real documents** (laws, official model contracts) are the main evaluation set. They
-  are listed in `data/sources.json` and fetched by `scripts/fetch_sources.py` only after
-  the source's terms were checked and recorded. *Status: Civil Code part 2 and Labor
-  Code 2022 from lex.uz, in Russian and Uzbek (Latin); see [`docs/data.md`](docs/data.md).
-  Real questions are not labeled yet.*
-- **Synthetic documents** are used for OCR and format tests. They are labeled as synthetic
-  in their text, their file names and the database (`documents.is_synthetic`), and
-  their results are always reported separately.
-
-Train/test splits never separate translations: synthetic documents are split by
-document, and the real acts by **chapter group** (the same chapter in all language
-versions of an act stays together; see `docs/decisions.md` for why and for the
-limitation). Splits are stratified by kind (real / synthetic) and frozen in
-`data/splits.json`.
+- On the 49 frozen real test questions (eval set v1: 24 Uzbek Latin, 23 Russian, 2 Uzbek
+  Cyrillic), the hybrid retriever finds the right passage in the top 5 for **0.35** of
+  them (95% CI 0.22–0.49). The intervals of BM25, e5 and hybrid overlap, so the methods
+  are not ranked yet.
+- **Uzbek is the weak side.** e5 alone reaches Recall@5 0.48 on the Russian questions but
+  0.08 on the Uzbek (Latin) ones; hybrid 0.43 vs 0.29.
+- **Fine-tuning did not help:** e5-small fine-tuned on title-style pairs got worse on real
+  questions (Recall@5 0.265 → 0.122; 95% paired interval of the difference −0.265 to
+  −0.020), although its validation score improved.
+- Citation correctness is 100% by construction in extractive mode (quotes are cut from the
+  chunk); the check guards against offset bugs and matters for the LLM mode.
 
 ## Limitations
 
-To be written with measured evidence in stage 6 (OCR errors, dialects, Uzbek Latin vs
-Cyrillic, bias from synthetic data).
+- **Small test set:** 49 real questions, two laws; intervals are wide, and only 2
+  questions are in Uzbek Cyrillic.
+- **Uzbek retrieval is weak**, especially for the dense model (see above).
+- **Dialects and mixed Uzbek–Russian questions are not solved:** the 9 questions tagged
+  `mixed-uz-ru` were found in the top 5 (chunk level) at most once by any method.
+- **OCR is measured on synthetic scans only**, which are cleaner than real ones.
+- **lex.uz states no license** and nothing about automated download or copying (checked
+  and recorded in [`docs/data.md`](docs/data.md)); whether a public demo may show quotes
+  is not decided yet.
+- **Do not expose the API without authentication while uploads are enabled:** there are no
+  user accounts, and uploaded files are parsed inside the API process. The public demo
+  mode (`DOCUMIND_PUBLIC_DEMO=true`) disables uploads and keeps the corpus read-only.
 
-## License
+## Related work
 
-MIT for the code. Data sources keep their own licenses (see `docs/data.md`).
+Commercial assistants for Uzbek legislation exist (for example Tuzuk,
+which advertises document analysis, drafting and consultations citing
+lex.uz), and recent research reports a legal Uzbek retrieval benchmark
+and an embedder (arXiv 2608.29284). This project does not compete with
+them: it is an open, reproducible retrieval pipeline over Uzbek and
+Russian laws with exact, machine-verified quotes, a frozen evaluation set
+of real questions written by the author, and a documented negative
+fine-tuning result.
+
+## Data and licenses
+
+- **Public laws from lex.uz:** Civil Code part 2 and Labor Code 2022, in Russian and
+  Uzbek (Latin). Fetched only after their terms were checked; every source is listed with
+  URL, date and sha256 in [`docs/data.md`](docs/data.md).
+- **Synthetic contracts** for OCR and format tests are marked synthetic in their text,
+  file names and database, and reported separately.
+- **Nothing is redistributed:** downloaded documents and training pairs are git-ignored;
+  only ids, URLs, license notes and hashes are committed. No personal data is used.
+- Code: MIT. Note that PyMuPDF is AGPL-3.0.
+
+Implemented with [Claude Code](https://claude.com/claude-code) under my direction; the
+evaluation design, question labeling and decisions are mine.
+
+## Roadmap
+
+From [`docs/issues.md`](docs/issues.md), in order:
+
+1. A dev question set from train chapters, used for all tuning and model selection
+   (never the test set).
+2. Eval set v2: new real test questions, frozen like v1 and reported separately.
+3. Screen off-the-shelf Uzbek embedding models on v1 and report every one tried.
+4. A held-out third act (consumer protection law) as an out-of-domain test set.
+5. Optional cross-encoder reranker, with its CPU latency measured.
+6. Authentication and sandboxed parsing of uploads before uploads are offered publicly.
+7. A concrete LLM provider with a per-request token limit and a monthly budget guard.
+
+More: [development guide](docs/development.md) · [design decisions](docs/decisions.md) · [experiments](docs/experiments.md) ·
+[deployment](docs/deploy.md) · [fine-tuning runbook](docs/finetune-runbook.md) ·
+[frontend](frontend/README.md)
