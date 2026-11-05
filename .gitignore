@@ -21,3 +21,7 @@ models/
 data/cache/
 # question drafts under review (working files)
 data/eval/drafts/
+# fine-tuning pairs contain lex.uz text, which is not redistributed; see docs/decisions.md
+data/training/
+# fine-tuned model checkpoints and exports
+runs/
