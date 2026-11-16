@@ -18,7 +18,7 @@ export function ErrorMessage({ error, onRetry }: Props) {
       <p>{t(`error.${kind}` as MessageKey)}</p>
       {detail && <p className="error__detail muted">{t("error.detail", { detail })}</p>}
       {onRetry && (
-        <button type="button" className="button button--secondary" onClick={onRetry}>
+        <button type="button" className="btn btn--outline btn--sm" onClick={onRetry}>
           {t("error.retry")}
         </button>
       )}

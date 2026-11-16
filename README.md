@@ -8,6 +8,8 @@ article on lex.uz.
 <p align="center"><img src="docs/demo.gif" alt="Asking a question and getting a quoted article with a lex.uz link" width="720"></p>
 -->
 
+<p align="center"><img src="docs/screenshots/ui-results-source-viewer.jpg" alt="A question answered with exact quotes from the Civil Code; the first quote is open in the source viewer, in its context, with a link to lex.uz" width="860"></p>
+
 ## Quick start
 
 Needs Docker with the Compose plugin. Everything runs locally; the site is served on

@@ -77,6 +77,40 @@ def test_health_and_documents(client):
     assert docs["namuna-uz"]["corpus"] == "real" and docs["syn-1"]["is_synthetic"]
     assert [d["id"] for d in client.get("/documents?corpus=synthetic").json()] == ["syn-1"]
     assert client.get("/documents?corpus=other").status_code == 422
+    assert docs["syn-1"]["kind"] is None  # no type in the manifest: not invented
+
+
+def test_outline_lists_sections_in_reading_order(client):
+    o = client.get("/documents/namuna-uz/outline").json()
+    assert o["document_id"] == "namuna-uz"
+    assert o["n_passages"] == sum(s["n_passages"] for s in o["sections"])
+    titles = [s["title"] for s in o["sections"]]
+    assert titles[0].endswith("1-modda. Ijara haqi")
+    assert titles[-1] == "2-modda. Shartnomani bekor qilish"
+    assert [s["idx"] for s in o["sections"]] == sorted(s["idx"] for s in o["sections"])
+    assert client.get("/documents/nope/outline").status_code == 404
+
+
+def test_passages_are_consecutive_and_match_the_document_text(client, db):
+    body = client.get("/documents/namuna-uz/passages?limit=30").json()
+    assert body["total"] == len(body["passages"]) and body["start"] == 0
+    assert [p["idx"] for p in body["passages"]] == list(range(body["total"]))
+    with db() as s:
+        text = s.get(models.Document, "namuna-uz").text
+    for p in body["passages"]:
+        assert text[p["char_start"]:p["char_end"]] == p["text"]
+
+    last = body["passages"][-1]
+    around = client.get("/documents/namuna-uz/passages",
+                        params={"around": last["chunk_id"], "limit": 1}).json()
+    assert [p["chunk_id"] for p in around["passages"]] == [last["chunk_id"]]
+    assert around["start"] == last["idx"]
+
+    assert client.get("/documents/namuna-uz/passages?start=999").json()["passages"] == []
+    assert client.get("/documents/nope/passages").status_code == 404
+    assert client.get("/documents/namuna-uz/passages",
+                      params={"around": "syn-1#c0000"}).status_code == 404
+    assert client.get("/documents/namuna-uz/passages?limit=31").status_code == 422
 
 
 def test_ask_returns_exact_quotes_with_lexuz_anchor_links(client, db):

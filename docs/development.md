@@ -111,7 +111,9 @@ curl -s localhost:8000/ask -H 'content-type: application/json' \
 | Endpoint | Returns |
 |---|---|
 | `GET /health` | status, answer mode, retriever, document and chunk counts, uploaded documents |
-| `GET /documents?corpus=real\|synthetic\|user` | id, title, file name, language, source URL, edition, chunk count |
+| `GET /documents?corpus=real\|synthetic\|user` | id, title, file name, language, source URL, edition, type (`kind` from the manifest, or `null`), chunk count |
+| `GET /documents/{id}/outline` | read-only: the headings of a document in reading order (`idx` of the first passage, `chunk_id`, heading path `title`, `chapter`, `n_passages`); `404` for an unknown document |
+| `GET /documents/{id}/passages?around=<chunk id>\|start=<idx>&limit=1..30` | read-only: consecutive passages of a document with `char_start`/`char_end` in the document text, a page at a time (the context of a citation in the UI's source viewer); `404` for an unknown document or passage |
 | `POST /documents/upload` | multipart `file` (PDF, DOCX, PNG, JPEG, TIFF) → `201` with document id, pages, OCR pages, chunks, language; `200` if the same file was uploaded before; `413` / `415` / `422` / `503` with a message |
 | `POST /ask` | `{question, corpus, document_id?, top_k?}` → the best passages, each with an exact `quote`, `quote_start`/`quote_end` in the chunk, `document_id`, `chunk_id`, lex.uz `anchor` and `link` (`<page>#<element id>`) |
 

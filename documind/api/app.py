@@ -1,5 +1,5 @@
-"""FastAPI app: ``GET /health``, ``GET /documents``, ``POST /documents/upload``,
-``POST /ask``.
+"""FastAPI app: ``GET /health``, ``GET /documents``, ``GET /documents/{id}/outline``,
+``GET /documents/{id}/passages``, ``POST /documents/upload``, ``POST /ask``.
 
 Endpoints are plain ``def`` functions: retrieval is CPU-bound, so FastAPI runs them in
 its thread pool and they do not block the event loop.
@@ -25,7 +25,15 @@ from ..ingestion.uploads import (
 from ..qa.service import EmptyCorpus, LLMOutputError, QAService, UnknownDocument
 from ..storage.db import make_session_factory
 from .limits import MaxBodySize
-from .schemas import AskRequest, AskResponse, DocumentOut, HealthOut, UploadOut
+from .schemas import (
+    AskRequest,
+    AskResponse,
+    DocumentOut,
+    DocumentPassagesOut,
+    HealthOut,
+    OutlineOut,
+    UploadOut,
+)
 
 UPLOAD_PATH = "/documents/upload"
 # multipart framing around the file (boundaries, part headers)
@@ -58,6 +66,29 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
                   ) -> list[dict]:
         docs = service.documents()
         return [d for d in docs if corpus is None or d["corpus"] == corpus]
+
+    @app.get("/documents/{document_id}/outline", response_model=OutlineOut,
+             responses={404: {"description": "unknown document"}})
+    def outline(document_id: str) -> dict:
+        """Headings of a document in reading order (read-only)."""
+        try:
+            return service.outline(document_id)
+        except UnknownDocument as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.get("/documents/{document_id}/passages", response_model=DocumentPassagesOut,
+             responses={404: {"description": "unknown document or passage"}})
+    def passages(document_id: str,
+                 around: Annotated[str | None, Query(
+                     max_length=160, description="chunk id to centre the window on")] = None,
+                 start: Annotated[int, Query(ge=0)] = 0,
+                 limit: Annotated[int, Query(ge=1, le=30)] = 7) -> dict:
+        """Consecutive passages of a document with their offsets in the document text
+        (read-only): the context of a citation, a page at a time."""
+        try:
+            return service.passages(document_id, around, start, limit)
+        except UnknownDocument as exc:
+            raise HTTPException(404, str(exc)) from exc
 
     def upload_disabled() -> None:
         """Disabled in the public demo."""
