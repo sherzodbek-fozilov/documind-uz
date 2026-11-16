@@ -59,14 +59,19 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
     service = service or QAService(
         make_session_factory(settings.database_url), settings,
         user_session_factory=make_session_factory(settings.user_database_url))
-    app = FastAPI(title="DocuMind UZ", version="0.1.0",
-    description="Question answering with exact-quote citations over the "
-    "legislation of Uzbekistan (Uzbek and Russian versions).",
-    # Interactive API documentation is available only in private mode.
-    docs_url=None if demo else "/docs",
-    redoc_url=None if demo else "/redoc",
-    openapi_url=None if demo else "/openapi.json",
+
+    app = FastAPI(
+        title="DocuMind UZ",
+        version="0.1.0",
+        description="Question answering with exact-quote citations over the "
+                    "legislation of Uzbekistan (Uzbek and Russian versions).",
+        # Interactive API documentation is available only in private mode.
+        docs_url=None if demo else "/docs",
+        redoc_url=None if demo else "/redoc",
+        openapi_url=None if demo else "/openapi.json",
+    )
     app.state.service = service
+
     # small bodies everywhere; only the upload path may be large (in demo mode that route
     # answers 403 without reading the body, so its limit is never reached)
     app.add_middleware(MaxBodySize, max_bytes=settings.api_max_body_bytes,
