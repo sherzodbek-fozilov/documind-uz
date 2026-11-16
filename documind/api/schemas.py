@@ -82,7 +82,38 @@ class DocumentOut(BaseModel):
     filename: str
     source: str | None
     edition: str | None
+    kind: str | None = Field(None, description="type from the source manifest, e.g. 'law'")
     n_chunks: int
+
+
+class OutlineSectionOut(BaseModel):
+    idx: int = Field(description="index of the section's first passage in the document")
+    chunk_id: str
+    title: str | None = Field(description="heading path, parts joined with ' / '")
+    chapter: int | None
+    n_passages: int
+
+
+class OutlineOut(BaseModel):
+    document_id: str
+    n_passages: int
+    sections: list[OutlineSectionOut]
+
+
+class DocumentPassageOut(BaseModel):
+    idx: int
+    chunk_id: str
+    section_title: str | None
+    char_start: int = Field(description="offset of the passage in the document text")
+    char_end: int
+    text: str
+
+
+class DocumentPassagesOut(BaseModel):
+    document_id: str
+    total: int = Field(description="number of passages in the document")
+    start: int = Field(description="index of the first passage returned")
+    passages: list[DocumentPassageOut]
 
 
 class HealthOut(BaseModel):

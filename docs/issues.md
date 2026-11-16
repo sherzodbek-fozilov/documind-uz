@@ -126,10 +126,28 @@ After fine-tuning attempt 1 gave no improvement on real questions
 - [x] CI: ruff, pytest (with PostgreSQL and tesseract), README check, frontend tests and
       build
 - [x] Deployment guide for a Hetzner Ubuntu server (`docs/deploy.md`)
-- [ ] Decide whether a public demo may show quotes of lex.uz text (no license stated);
-      record the decision before a domain is set
-- [ ] First build of the API image with the tesseract packages and an OCR check on the
-      server (the apt step has not been run yet; everything else in both images has)
+- [ ] **Legal status of the lex.uz texts: not established.** lex.uz has a page of terms
+      (https://lex.uz/ru/axborot; see the correction in `docs/data.md`). Get a qualified reading of it, or
+      written permission from the owner, or serve only synthetic documents; record the
+      outcome in `docs/decisions.md` before a domain is set. Until then: no public demo
+      with this corpus, and decide what to do with `docs/screenshots/`
+- [x] Protections for a published service (2026-11-17): 16 KB request bodies outside
+      uploads, validation errors without the input, read-only mode forced by a public
+      bind or a domain name, API docs off in demo mode, log rotation, memory limits,
+      `pool_pre_ping` (tested with pytest and under uvicorn; not with Docker)
+- [ ] Run `docs/arm64-verification.md` on the server (CAX11, ARM64): first Docker build
+      of both images since those changes, first build ever with the tesseract packages,
+      first check of the Caddyfile with a Caddy binary, PostgreSQL roles, limits
+- [ ] The release workflow publishes amd64 images only; add `linux/arm64` if images are
+      to be pulled instead of built on the server
+- [ ] Monitoring of `/api/health` from outside; a retention rule for the Caddy access
+      log (it holds IP addresses)
+- [ ] Three tests fail on Windows because they read or write files without
+      `encoding="utf-8"` (`tests/test_draft_questions.py`, `tests/test_render_readme.py`)
+      or use a POSIX path (`tests/test_kaggle_finetune.py`, which then creates
+      `C:\kaggle\working`); two upload tests fail there on file locking and on a
+      `file://` URL built from a Windows path. None of them fails for a reason that
+      applies to Linux, but that has only been reasoned, not run
 - [ ] Image build in CI (catches Dockerfile breakage before a deploy)
 - [ ] FastAPI docs behind the `/api` prefix (`root_path`) if they should be public
 

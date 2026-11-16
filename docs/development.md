@@ -111,7 +111,9 @@ curl -s localhost:8000/ask -H 'content-type: application/json' \
 | Endpoint | Returns |
 |---|---|
 | `GET /health` | status, answer mode, retriever, document and chunk counts, uploaded documents |
-| `GET /documents?corpus=real\|synthetic\|user` | id, title, file name, language, source URL, edition, chunk count |
+| `GET /documents?corpus=real\|synthetic\|user` | id, title, file name, language, source URL, edition, type (`kind` from the manifest, or `null`), chunk count |
+| `GET /documents/{id}/outline` | read-only: the headings of a document in reading order (`idx` of the first passage, `chunk_id`, heading path `title`, `chapter`, `n_passages`); `404` for an unknown document |
+| `GET /documents/{id}/passages?around=<chunk id>\|start=<idx>&limit=1..30` | read-only: consecutive passages of a document with `char_start`/`char_end` in the document text, a page at a time (the context of a citation in the UI's source viewer); `404` for an unknown document or passage |
 | `POST /documents/upload` | multipart `file` (PDF, DOCX, PNG, JPEG, TIFF) → `201` with document id, pages, OCR pages, chunks, language; `200` if the same file was uploaded before; `413` / `415` / `422` / `503` with a message |
 | `POST /ask` | `{question, corpus, document_id?, top_k?}` → the best passages, each with an exact `quote`, `quote_start`/`quote_end` in the chunk, `document_id`, `chunk_id`, lex.uz `anchor` and `link` (`<page>#<element id>`) |
 
@@ -138,8 +140,21 @@ curl -s localhost:8000/ask -H 'content-type: application/json' \
 - **Public demo** (`DOCUMIND_PUBLIC_DEMO=true`): `POST /documents/upload` answers `403`
   without reading the request body, the user corpus does not exist, and the main
   database is opened read-only (PostgreSQL: every transaction `READ ONLY`; SQLite:
-  `mode=ro`), so the corpus must be ingested beforehand with the CLI. `GET /health`
-  reports `public_demo`.
+  `mode=ro`), so the corpus must be ingested beforehand with the CLI. `/docs`, `/redoc`
+  and `/openapi.json` answer 404. `GET /health` reports `public_demo`.
+- **The same mode is forced when the service is published beyond this machine**, even
+  with `DOCUMIND_PUBLIC_DEMO=false`: when `DOCUMIND_WEB_BIND` is not a loopback address
+  or `DOCUMIND_SITE_ADDRESS` names a host other than `localhost`
+  (`Settings.read_only_demo`). `docker-compose.yml` fills both from `WEB_BIND` and
+  `SITE_ADDRESS`; the API image defaults `DOCUMIND_WEB_BIND` to `0.0.0.0`, so a
+  container started by hand is read-only unless told that it is local; and
+  `documind serve --host <not loopback>` sets it too. A value that cannot be read as a
+  loopback address counts as public. `documind serve` on the default `127.0.0.1` is
+  unaffected: uploads and the docs work as before.
+- **Request size:** bodies over `DOCUMIND_API_MAX_BODY_BYTES` (16 KB) are refused with
+  `413` on every path except `/documents/upload`, before they are parsed. A request
+  that fails validation gets `422` with `type`, `loc` and `msg` for each error; the
+  rejected input is not included.
 
 ## Configuration
 

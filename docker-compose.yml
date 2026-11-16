@@ -7,6 +7,15 @@
 #
 # Only the web service publishes ports (by default on 127.0.0.1). Models and data live
 # in named volumes; nothing from data/raw is part of an image or of the repository.
+#
+# Memory limits are sized for a 4 GB server (docs/deploy.md); together they stay under
+# 3.1 GB. Container logs are rotated: at most 5 files of 10 MB per service.
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
 
 x-documind-volumes: &documind-volumes
   - models:/app/models
@@ -18,6 +27,8 @@ services:
   postgres:
     image: postgres:17-trixie
     restart: unless-stopped
+    logging: *default-logging
+    mem_limit: 768m
     environment:
       POSTGRES_USER: documind
       POSTGRES_DB: documind
@@ -35,6 +46,8 @@ services:
   qdrant:
     image: qdrant/qdrant:v1.19.2
     restart: unless-stopped
+    logging: *default-logging
+    mem_limit: 512m
     environment:
       QDRANT__TELEMETRY_DISABLED: "true"
     volumes:
@@ -50,8 +63,17 @@ services:
     build: .
     image: documind-api
     restart: unless-stopped
+    logging: *default-logging
+    # bm25 needs a few hundred MB; hybrid also loads the ONNX embedding model
+    mem_limit: ${API_MEM_LIMIT:-1536m}
+    cpus: 1.5
+    pids_limit: 256
     env_file: .env
     environment:
+      # Where the site is published. If either value reaches beyond this machine, the
+      # API runs as a read-only public demo whatever DOCUMIND_PUBLIC_DEMO says.
+      DOCUMIND_WEB_BIND: ${WEB_BIND:-127.0.0.1}
+      DOCUMIND_SITE_ADDRESS: ${SITE_ADDRESS:-:80}
       # SELECT-only role on the main database (deploy/postgres/init-roles.sh)
       DOCUMIND_DATABASE_URL: postgresql+psycopg://documind_api:${DOCUMIND_API_DB_PASSWORD}@postgres:5432/documind
       DOCUMIND_USER_DATABASE_URL: postgresql+psycopg://documind_api:${DOCUMIND_API_DB_PASSWORD}@postgres:5432/documind_user
@@ -81,6 +103,9 @@ services:
       dockerfile: deploy/web/Dockerfile
     image: documind-web
     restart: unless-stopped
+    logging: *default-logging
+    mem_limit: 256m
+    pids_limit: 256
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-:80}
       RATE_LIMIT_ASK_PER_MINUTE: ${RATE_LIMIT_ASK_PER_MINUTE:-20}
@@ -106,6 +131,8 @@ services:
     image: documind-api
     pull_policy: never  # built by "docker compose build" (same image as api)
     profiles: ["ops"]
+    logging: *default-logging
+    # no memory limit: OCR during ingest and the model download are one-off jobs
     env_file: .env
     environment:
       DOCUMIND_DATABASE_URL: postgresql+psycopg://documind:${POSTGRES_PASSWORD}@postgres:5432/documind

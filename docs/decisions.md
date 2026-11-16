@@ -438,6 +438,47 @@ written by the annotator.
   images were otherwise built and the stack was run end to end (ask, upload, demo mode,
   role permissions, rate limits) with that one step left out.
 
+## Protections for a published service (2026-11-17)
+
+From the pre-deployment audit of 2026-11-16. Target: Hetzner CAX11 (ARM64, 2 vCPU, 4 GB).
+
+- **Small request bodies everywhere, large only for uploads.** `/ask` accepted bodies up
+  to Caddy's 21 MB upload limit, and FastAPI's validation error repeated the input, so a
+  20 MB question came back as a 21 MB answer. Now: 16 KB on every path except
+  `/documents/upload`, in Caddy and in the API's `MaxBodySize` middleware
+  (`DOCUMIND_API_MAX_BODY_BYTES`); the middleware answers 413 from `Content-Length`
+  without reading the body. 16 KB holds the longest valid question (1000 characters)
+  several times over. Validation errors keep `type`, `loc`, `msg` and drop `input` and
+  `ctx`; the frontend only reads `msg`.
+- **Read-only is decided by where the site is published, not only by a flag.**
+  `DOCUMIND_PUBLIC_DEMO=false` with a public bind left uploads (untrusted files parsed
+  in the API process) open to anyone. The API now also takes `WEB_BIND` and
+  `SITE_ADDRESS` and runs read-only when either reaches beyond loopback
+  (`Settings.read_only_demo`). Fail closed: an empty or unreadable value counts as
+  public, the API image defaults to public, and **there is no override** that enables
+  uploads for a published site. Rejected alternative: treating private address ranges
+  (a LAN, a VPN interface) as private; an address being RFC 1918 says nothing about who
+  can reach it. Cost: uploads on a LAN or VPN address no longer work; use loopback and
+  an SSH tunnel (`docs/deploy.md`, step 9a).
+- **API docs off in demo mode** (`docs_url`, `redoc_url`, `openapi_url` set to `None`).
+- **Logs:** `json-file` with `max-size: 10m`, `max-file: 5` for every service. Docker's
+  default keeps everything, and Caddy writes a line per request.
+- **Limits for 4 GB:** `mem_limit` postgres 768 MB, qdrant 512 MB, api 1536 MB
+  (`API_MEM_LIMIT`), web 256 MB; `cpus: 1.5` and `pids_limit: 256` for the API,
+  `pids_limit: 256` for the web server. No `pids_limit` for PostgreSQL and Qdrant, and
+  no limits for the one-off `ops` jobs: their needs were not measured, and a wrong
+  guess would break ingest. The memory figures are estimates, not measurements.
+- **Concurrency:** `uvicorn --limit-concurrency 64` (503 beyond it) and
+  `--no-server-header`. One worker: the search index lives in the process, and a second
+  worker would double it.
+- **`pool_pre_ping` for PostgreSQL**, so a database restart costs a reconnect, not a 500.
+- **Not verified:** none of this was run with Docker (not installed where the changes
+  were made), and the two `request_body` matchers in the Caddyfile were written without
+  a Caddy binary. `docs/arm64-verification.md` is the plan; its results table is empty.
+- **lex.uz:** the page of terms found during the audit (https://lex.uz/ru/axborot) is recorded in
+  `docs/data.md`. No legal conclusion is drawn here and the corpus is unchanged; the
+  question stays open in `docs/issues.md`.
+
 ## After fine-tuning attempt 1: deployment and rules for the next experiments (2026-11-05)
 
 - **Deployment keeps the base multilingual-e5-small in the hybrid; the fine-tuned model

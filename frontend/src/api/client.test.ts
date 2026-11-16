@@ -61,6 +61,21 @@ describe("createClient", () => {
     expect(calls.map((c) => c.url)).toEqual(["/api/documents", "/api/documents?corpus=synthetic"]);
   });
 
+  it("builds the outline and passages URLs, encoding the ids", async () => {
+    const calls: Call[] = [];
+    const api = createClient("/api", fakeFetch(200, { document_id: "a/b", sections: [], passages: [] }, calls));
+    await api.outline("a/b");
+    await api.passages("namuna-uz");
+    await api.passages("namuna-uz", { around: "namuna-uz#c0007", limit: 7 });
+    await api.passages("namuna-uz", { start: 0, limit: 6 });
+    expect(calls.map((c) => c.url)).toEqual([
+      "/api/documents/a%2Fb/outline",
+      "/api/documents/namuna-uz/passages",
+      "/api/documents/namuna-uz/passages?around=namuna-uz%23c0007&limit=7",
+      "/api/documents/namuna-uz/passages?start=0&limit=6",
+    ]);
+  });
+
   it("maps HTTP errors to kinds and keeps FastAPI's detail", async () => {
     const notFound = await failure(createClient("", fakeFetch(404, {
       detail: "document 'x' is not in the real corpus",

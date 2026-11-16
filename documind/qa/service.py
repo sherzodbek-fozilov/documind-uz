@@ -124,8 +124,63 @@ class QAService:
                                     "synthetic" if d.is_synthetic else "real"),
                          "filename": d.filename, "source": d.source,
                          "edition": (d.meta or {}).get("edition"),
+                         "kind": (d.meta or {}).get("kind"),
                          "n_chunks": n_chunks.get(d.id, 0)} for d in docs]
         return out
+
+    # --- reading a document (source viewer) ---------------------------------------------
+    def _document_factory(self, document_id: str) -> sessionmaker[Session]:
+        """The database that holds this document (main first, then uploads)."""
+        for factory in (self.session_factory, self.user_session_factory):
+            if factory is None:
+                continue
+            with factory() as s:
+                if s.scalar(select(models.Document.id)
+                            .where(models.Document.id == document_id)) is not None:
+                    return factory
+        raise UnknownDocument(f"document {document_id!r} does not exist")
+
+    def outline(self, document_id: str) -> dict:
+        """Sections of a document in reading order: consecutive passages (chunks) with
+        the same heading form one section."""
+        with self._document_factory(document_id)() as s:
+            rows = s.execute(select(models.Chunk.idx, models.Chunk.id,
+                                    models.Chunk.section_title, models.Chunk.chapter)
+                             .where(models.Chunk.document_id == document_id)
+                             .order_by(models.Chunk.idx)).all()
+        sections: list[dict] = []
+        for idx, chunk_id, title, chapter in rows:
+            if sections and sections[-1]["title"] == title:
+                sections[-1]["n_passages"] += 1
+                continue
+            sections.append({"idx": idx, "chunk_id": chunk_id, "title": title,
+                             "chapter": chapter, "n_passages": 1})
+        return {"document_id": document_id, "n_passages": len(rows), "sections": sections}
+
+    def passages(self, document_id: str, around: str | None = None, start: int = 0,
+                 limit: int = 7) -> dict:
+        """A window of consecutive passages of a document, with their text and offsets
+        in the document text. ``around`` (a chunk id) centres the window on that passage;
+        otherwise it begins at passage ``start``."""
+        with self._document_factory(document_id)() as s:
+            of_doc = models.Chunk.document_id == document_id
+            total = s.scalar(select(func.count()).select_from(models.Chunk).where(of_doc))
+            if around is not None:
+                centre = s.scalar(select(models.Chunk.idx)
+                                  .where(of_doc, models.Chunk.id == around))
+                if centre is None:
+                    raise UnknownDocument(f"passage {around!r} is not in document "
+                                          f"{document_id!r}")
+                start = max(centre - limit // 2, 0)
+            rows = s.execute(select(models.Chunk.idx, models.Chunk.id,
+                                    models.Chunk.section_title, models.Chunk.char_start,
+                                    models.Chunk.char_end, models.Chunk.text)
+                             .where(of_doc, models.Chunk.idx >= start)
+                             .order_by(models.Chunk.idx).limit(limit)).all()
+        return {"document_id": document_id, "total": total, "start": start,
+                "passages": [{"idx": idx, "chunk_id": cid, "section_title": title,
+                              "char_start": a, "char_end": b, "text": text}
+                             for idx, cid, title, a, b, text in rows]}
 
     def counts(self) -> dict[str, int]:
         def count(factory, model) -> int:

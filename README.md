@@ -8,6 +8,8 @@ article on lex.uz.
 <p align="center"><img src="docs/demo.gif" alt="Asking a question and getting a quoted article with a lex.uz link" width="720"></p>
 -->
 
+<p align="center"><img src="docs/screenshots/ui-results-source-viewer.jpg" alt="A question answered with exact quotes from the Civil Code; the first quote is open in the source viewer, in its context, with a link to lex.uz" width="860"></p>
+
 ## Quick start
 
 Needs Docker with the Compose plugin. Everything runs locally; the site is served on
@@ -123,12 +125,16 @@ above stays `TBD` until at least 80 questions are labeled):
 - **Dialects and mixed Uzbek–Russian questions are not solved:** the 9 questions tagged
   `mixed-uz-ru` were found in the top 5 (chunk level) at most once by any method.
 - **OCR is measured on synthetic scans only**, which are cleaner than real ones.
-- **lex.uz states no license** and nothing about automated download or copying (checked
-  and recorded in [`docs/data.md`](docs/data.md)); whether a public demo may show quotes
-  is not decided yet.
-- **Do not expose the API without authentication while uploads are enabled:** there are no
-  user accounts, and uploaded files are parsed inside the API process. The public demo
-  mode (`DOCUMIND_PUBLIC_DEMO=true`) disables uploads and keeps the corpus read-only.
+- **The legal status of the lex.uz texts is not established.** lex.uz has a page of
+  terms (https://lex.uz/ru/axborot); what it allows for the texts of legal acts has not been determined,
+  and no permission has been asked for (recorded in [`docs/data.md`](docs/data.md)).
+  Whether a public demo may show this text is not decided.
+- **Uploads are for private use only:** there are no user accounts, and uploaded files
+  are parsed inside the API process. The API refuses uploads and keeps the corpus
+  read-only in public demo mode (`DOCUMIND_PUBLIC_DEMO=true`), and also whenever it is
+  published beyond the local machine, even if that setting was forgotten.
+- **The Docker stack has not been verified on the deployment target** (ARM64): see
+  [`docs/arm64-verification.md`](docs/arm64-verification.md).
 
 ## Related work
 

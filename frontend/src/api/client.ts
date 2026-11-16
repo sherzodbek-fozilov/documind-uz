@@ -1,4 +1,7 @@
-import type { AskRequest, AskResponse, DocumentInfo, Health } from "./types";
+import type {
+  AskRequest, AskResponse, DocumentInfo, DocumentOutline, DocumentPassages, Health,
+  PassageWindow,
+} from "./types";
 
 /**
  * Why a request failed, so the UI can show a clear message:
@@ -44,6 +47,10 @@ export interface ApiClient {
   health(): Promise<Health>;
   documents(corpus?: AskRequest["corpus"]): Promise<DocumentInfo[]>;
   ask(req: AskRequest, signal?: AbortSignal): Promise<AskResponse>;
+  /** headings of a document in reading order */
+  outline(documentId: string, signal?: AbortSignal): Promise<DocumentOutline>;
+  /** consecutive passages of a document: the context of a citation */
+  passages(documentId: string, window?: PassageWindow, signal?: AbortSignal): Promise<DocumentPassages>;
 }
 
 export function createClient(
@@ -82,5 +89,16 @@ export function createClient(
         body: JSON.stringify(req),
         signal,
       }),
+    outline: (documentId, signal) =>
+      request<DocumentOutline>(`/documents/${encodeURIComponent(documentId)}/outline`, { signal }),
+    passages: (documentId, window = {}, signal) => {
+      const q = new URLSearchParams();
+      if (window.around !== undefined) q.set("around", window.around);
+      if (window.start !== undefined) q.set("start", String(window.start));
+      if (window.limit !== undefined) q.set("limit", String(window.limit));
+      const query = q.toString();
+      return request<DocumentPassages>(
+        `/documents/${encodeURIComponent(documentId)}/passages${query ? `?${query}` : ""}`, { signal });
+    },
   };
 }
