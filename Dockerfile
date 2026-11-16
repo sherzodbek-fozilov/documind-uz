@@ -27,6 +27,10 @@ RUN groupadd --system --gid 10001 documind \
       documind
 COPY --from=build /venv /venv
 ENV PATH=/venv/bin:$PATH PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+# Fail closed: a container started without saying where it is published counts as
+# public and serves read-only (documind/config.py). docker-compose.yml sets the real
+# value from WEB_BIND.
+ENV DOCUMIND_WEB_BIND=0.0.0.0
 WORKDIR /app
 # code and committed data stay owned by root (read-only for the service user)
 COPY scripts ./scripts
@@ -38,4 +42,6 @@ USER documind
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)"]
-CMD ["uvicorn", "documind.api.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+# at most 64 connections at a time (more get 503 at once instead of queueing in memory)
+CMD ["uvicorn", "documind.api.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", \
+     "--limit-concurrency", "64", "--no-server-header"]

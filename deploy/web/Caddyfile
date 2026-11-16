@@ -52,11 +52,18 @@
 
 	# /api/* -> the FastAPI service, without the /api prefix (as in the Vite dev proxy)
 	handle_path /api/* {
-		# uploads are at most 20 MB (DOCUMIND_UPLOAD_MAX_BYTES) plus multipart framing;
-		# the API enforces its own limit as well
-		request_body {
+		# (paths here are already without the /api prefix)
+		# uploads are at most 20 MB (DOCUMIND_UPLOAD_MAX_BYTES) plus multipart framing
+		@upload path /documents/upload
+		request_body @upload {
 			max_size 21MB
 		}
+		# everything else is a short JSON question (DOCUMIND_API_MAX_BODY_BYTES)
+		@not_upload not path /documents/upload
+		request_body @not_upload {
+			max_size 16KB
+		}
+		# the API enforces both limits as well
 		reverse_proxy api:8000
 	}
 

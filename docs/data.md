@@ -77,6 +77,35 @@ Compared uz-Latn (edition 19.07.2026, 809 articles) with ru (edition 08.08.2026,
 - Not redistributed: `data/raw/` is git-ignored; only `data/raw/manifest.jsonl`
   (ids, URLs, license text, edition, sha256) and `data/sources.json` are committed.
 
+### Correction on 2026-11-17: lex.uz does have a page of terms
+
+The entries above say that no statement about copying was found on lex.uz. That check
+missed a page: **«Условия предоставления информации»**, https://lex.uz/ru/axborot (read on 2026-11-16,
+one request). In summary, it says that the resource is the property of the Centre for
+Legal Informatization under the Ministry of Justice and is protected by the Civil Code
+and the copyright law; that information obtained from it may be used for personal
+purposes only; that copying, distribution, sale or transfer of the data for profit is
+not allowed without the owner's written permission; and that information "(за
+исключением текста нормативно-правовых актов)" may be used on other resources with a
+reference to the source.
+
+What this means for this project **has not been established**:
+
+- Whether the texts of legal acts are covered by these terms, are excluded from them, or
+  are free to reuse under the copyright law has not been determined by anyone qualified
+  to say. The bracketed exception can be read more than one way. No legal opinion has
+  been obtained and no permission has been requested.
+- The `terms.status = approved` entries in `data/sources.json`, and the table and notes
+  generated from them above, record the earlier check as it was made. They have been
+  left unchanged and are **not** evidence that reuse is permitted.
+- Nothing about the corpus was changed on this date: no documents were fetched, removed
+  or re-ingested.
+- The repository contains screenshots of the UI (`docs/screenshots/`) that show a few
+  paragraphs of the Civil Code. They were committed before this page was read; whether
+  they may stay is part of the same open question.
+
+Open item: `docs/issues.md`, "Packaging and deployment".
+
 ## Synthetic data
 
 | ID | Description | URL | License | Obtained | Synthetic | Used for |

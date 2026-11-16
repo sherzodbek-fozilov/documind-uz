@@ -17,16 +17,36 @@ Data lives in named Docker volumes (`pgdata`, `qdrant`, `models`, `raw`, `store`
 `user_store`, `caddy_data`, `caddy_config`). Model weights and lex.uz documents are
 fetched **on the server**; they are never part of an image or of the repository.
 
-> **Before making the demo public:** the lex.uz pages state no license and nothing about
-> copying (see `docs/data.md`). A public demo shows quotes of that text to anyone, which is
-> a form of redistribution that this project has so far avoided (`docs/decisions.md`).
-> Decide this, and record the decision in `docs/decisions.md`, before setting a domain
-> name. Until then, use the private setup (step 9a).
+> **Verification status (2026-11-17):** the stack as it is now has **not been built or
+> run with Docker**, on any architecture, and never on ARM64. The changes of 2026-11-17
+> (request limits, forced read-only mode, log rotation, memory limits) were tested with
+> pytest and against the API under uvicorn only. Run
+> [`docs/arm64-verification.md`](arm64-verification.md) on the server before relying on
+> any of it.
+
+> **Before making the demo public: the legal status of the lex.uz texts is not
+> established.** lex.uz has a page of terms (https://lex.uz/ru/axborot, read on 2026-11-16); what it allows
+> for the texts of legal acts has not been determined by anyone qualified, and no
+> permission has been asked for (see `docs/data.md`). A public demo shows that text to
+> anyone: quotes in the answers, and whole documents a page at a time through
+> `GET /documents/{id}/passages`. This project has made **no decision** on it
+> (`docs/issues.md`). Until one is recorded in `docs/decisions.md`, use the private setup
+> (step 9a), or serve only synthetic documents.
 
 ## 1. Server
 
-- Hetzner Cloud, **Ubuntu 24.04**, x86 or Arm. 2 vCPU / 4 GB RAM is enough for BM25; for `hybrid` (e5 embeddings, Qdrant) take 4 GB or more. Building the
-  web image compiles Caddy with Go and needs about 1.5 GB of free RAM.
+- Hetzner Cloud, **Ubuntu 24.04**, x86 or Arm. The intended server is **CAX11** (ARM64,
+  2 vCPU, 4 GB RAM, 40 GB SSD). The memory limits in `docker-compose.yml` are sized for
+  4 GB: postgres 768 MB, qdrant 512 MB, api 1536 MB (`API_MEM_LIMIT`), web 256 MB,
+  about 3.1 GB together. That is expected to be enough for BM25; whether `hybrid` (the
+  ONNX e5 model inside the API process) fits has not been measured. Building the web
+  image compiles Caddy with Go and needs about 1.5 GB of free RAM.
+- **ARM64:** both images are built on the server from multi-arch base images; nothing
+  has been built on ARM64 yet. The images published by the release workflow are amd64
+  only and do not run on CAX11.
+- If the server already runs something else (a VPN, another site), read step 0 of
+  [`docs/arm64-verification.md`](arm64-verification.md) first: Docker changes the
+  host's iptables rules, and the public setup needs ports 80 and 443.
 - Add your SSH key when creating the server. Optional but recommended: a Hetzner Cloud
   Firewall that allows only TCP 22, 80, 443 and UDP 443 inbound.
 - For HTTPS: a domain name with an `A` record (and `AAAA` for IPv6) pointing at the
@@ -106,6 +126,8 @@ In `.env` set at least:
 | `DOCUMIND_API_DB_PASSWORD` | another random value (role `documind_api`: SELECT only on the main database, owner of the uploads database) |
 | `DOCUMIND_ANSWER_MODE` | keep `extractive` (no LLM key, no cost) |
 | `DOCUMIND_API_RETRIEVER` | `bm25` (no model needed) or `hybrid` (needs step 6) |
+| `API_MEM_LIMIT` | memory limit of the API container, `1536m` by default; raise only on a larger server |
+| `DOCUMIND_API_MAX_BODY_BYTES` | largest request body outside uploads, `16384` by default; Caddy has the same limit (16 KB) in `deploy/web/Caddyfile` |
 
 The database and Qdrant URLs in `.env` are for local development; `docker-compose.yml`
 replaces them inside the containers. Secrets are only ever read from `.env` at run time:
@@ -192,6 +214,12 @@ then open <http://localhost:8080>. Uploads work in this mode (they go to the sep
 `documind_user` database); remember that uploaded files are parsed inside the API
 process (`docs/decisions.md`).
 
+Uploads work **only** in this configuration: `WEB_BIND` a loopback address
+(`127.0.0.1`, `::1`, `localhost`) and `SITE_ADDRESS` without a domain name. With any
+other value of either, the API runs read-only as in step 9b, whatever
+`DOCUMIND_PUBLIC_DEMO` says; there is no setting that turns uploads on for a published
+site. `docker compose logs api` then shows `DOCUMIND_PUBLIC_DEMO is not set, but ...`.
+
 ## 9b. Start: public demo
 
 In `.env`:
@@ -211,10 +239,17 @@ docker compose up -d
 docker compose logs -f web        # wait for "certificate obtained successfully"
 ```
 
+Set `DOCUMIND_PUBLIC_DEMO=true` explicitly. If it is forgotten, the API still starts in
+this mode, because `WEB_BIND` and `SITE_ADDRESS` are passed to it and neither is local
+any more (`documind/config.py`, `Settings.read_only_demo`); the flag states the intent
+and keeps the mode if those two are ever set back.
+
 What the demo mode changes:
 
 - `POST /api/documents/upload` answers **403** without reading the request body, and
   there is no user corpus (`"corpus": "user"` answers 503).
+- The API schema and interactive docs are off: `/api/docs`, `/api/redoc` and
+  `/api/openapi.json` answer 404.
 - The main database is opened **read-only** (every PostgreSQL transaction is
   `READ ONLY`), on top of the `documind_api` role that has only SELECT rights.
 - Caddy serves HTTPS with a Let's Encrypt certificate (renewed automatically, stored in
@@ -223,12 +258,24 @@ What the demo mode changes:
   `RATE_LIMIT_ASK_PER_MINUTE` (20) for `/api/ask`, `RATE_LIMIT_UPLOAD_PER_HOUR` (10),
   `RATE_LIMIT_ALL_PER_MINUTE` (300) for everything together.
 
+In every mode:
+
+- Request bodies: at most 16 KB, enforced by Caddy and again by the API (**413**); only
+  `/api/documents/upload` accepts up to 21 MB, and in demo mode that route answers 403
+  without reading the body. A rejected request is answered with a short **422** that
+  names the field and the reason and does not repeat what was sent.
+- The API serves at most 64 connections at a time (`--limit-concurrency` in the
+  `Dockerfile`); beyond that uvicorn answers **503** at once.
+
 Checks:
 
 ```bash
 curl -s https://demo.example.org/api/health          # "public_demo": true
 curl -s -o /dev/null -w "%{http_code}\n" -X POST https://demo.example.org/api/documents/upload
                                                      # 403
+curl -s -o /dev/null -w "%{http_code}\n" https://demo.example.org/api/openapi.json   # 404
+head -c 17000 /dev/zero | curl -s -o /dev/null -w "%{http_code}\n" --data-binary @- \
+  -H 'content-type: application/json' https://demo.example.org/api/ask              # 413
 for i in $(seq 25); do curl -s -o /dev/null -w "%{http_code} " \
   -H 'content-type: application/json' -d '{"question":"Ijara haqi"}' \
   https://demo.example.org/api/ask; done; echo       # the last ones are 429
@@ -255,8 +302,15 @@ docker compose up -d
 New or re-fetched documents: run steps 7 and 8 again, then
 `docker compose restart api` (the API builds its search index once per process).
 
-Logs: `docker compose logs -f api web`. Disk: `docker system df`; remove old images with
+Logs: `docker compose logs -f api web`. Every service keeps at most 5 log files of 10 MB
+(`x-logging` in `docker-compose.yml`), so container logs take at most 50 MB per service;
+older lines are gone, copy them elsewhere if they must be kept. The Caddy access log
+holds visitors' IP addresses. Disk: `docker system df`; remove old images with
 `docker image prune`.
+
+Memory: `docker stats --no-stream`. A container that reaches its limit is killed and
+restarted by Docker (`docker inspect <container> --format '{{.State.OOMKilled}}'`).
+The one-off `ops` jobs (ingest with OCR, model download) have no memory limit.
 
 Backups (the documents in `raw` can be fetched again; the databases cannot be rebuilt
 without them):
@@ -285,7 +339,10 @@ then update `.env` and `docker compose up -d`.
   the demo extractive.
 - Uploads are parsed inside the API process, not in a sandbox; they stay disabled in the
   public demo.
-- The UI is only a placeholder page until stage 4 is finished; until then the demo is
-  used through the API (`/api/ask`, `/api/documents`, `/api/health`). FastAPI's
-  interactive docs (`/docs`) are not reachable through Caddy: they expect to be served at
-  the root and load scripts from a CDN, which the Content-Security-Policy blocks.
+- Nothing here has been verified on the target server: see the status note at the top
+  and [`docs/arm64-verification.md`](arm64-verification.md).
+- No monitoring or alerting: Docker restarts a container that exits, not one that is
+  merely unhealthy. Watch `/api/health` from outside.
+- FastAPI's interactive docs are off in demo mode. In private mode `/api/docs` answers
+  but does not work through Caddy (it loads scripts from a CDN, which the
+  Content-Security-Policy blocks); use `/api/openapi.json`, or the API directly.

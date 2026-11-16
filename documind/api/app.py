@@ -7,11 +7,14 @@ its thread pool and they do not block the event loop.
 
 from __future__ import annotations
 
+import logging
 import tempfile
 from pathlib import Path
 from typing import Annotated, Literal
 
-from fastapi import FastAPI, File, HTTPException, Query, Response, UploadFile
+from fastapi import FastAPI, File, HTTPException, Query, Request, Response, UploadFile
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from ..config import Settings, get_settings
 from ..ingestion.uploads import (
@@ -39,10 +42,17 @@ UPLOAD_PATH = "/documents/upload"
 # multipart framing around the file (boundaries, part headers)
 MULTIPART_OVERHEAD = 64 * 1024
 
+log = logging.getLogger("documind.api")
+
 
 def create_app(settings: Settings | None = None, service: QAService | None = None) -> FastAPI:
     settings = settings or get_settings()
-    demo = settings.public_demo
+    # read-only when asked for, and whenever the service is published beyond loopback
+    demo = settings.read_only_demo
+    if demo and not settings.public_demo:
+        log.warning("DOCUMIND_PUBLIC_DEMO is not set, but %s: running as a read-only "
+                    "public demo (uploads refused, no user corpus, no API docs)",
+                    settings.exposure())
     if service is None and demo:  # read-only corpus, no user corpus
         service = QAService(make_session_factory(settings.database_url, read_only=True),
                             settings)
@@ -51,10 +61,23 @@ def create_app(settings: Settings | None = None, service: QAService | None = Non
         user_session_factory=make_session_factory(settings.user_database_url))
     app = FastAPI(title="DocuMind UZ", version="0.1.0",
                   description="Question answering with exact-quote citations over Uzbek and "
-                              "Russian legal documents.")
+                              "Russian legal documents.",
+                  # the schema and the interactive docs are for development
+                  docs_url=None if demo else "/docs", redoc_url=None if demo else "/redoc",
+                  openapi_url=None if demo else "/openapi.json")
     app.state.service = service
-    app.add_middleware(MaxBodySize, max_bytes=settings.upload_max_bytes + MULTIPART_OVERHEAD,
-                       paths={UPLOAD_PATH})
+    # small bodies everywhere; only the upload path may be large (in demo mode that route
+    # answers 403 without reading the body, so its limit is never reached)
+    app.add_middleware(MaxBodySize, max_bytes=settings.api_max_body_bytes,
+                       path_limits={UPLOAD_PATH: settings.upload_max_bytes + MULTIPART_OVERHEAD})
+
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(_: Request, exc: RequestValidationError) -> JSONResponse:
+        """422 with where and why, but without FastAPI's copy of the rejected input: a
+        response must not grow with what the client sent."""
+        errors = [{"type": e.get("type"), "loc": e.get("loc"), "msg": e.get("msg")}
+                  for e in exc.errors()]
+        return JSONResponse({"detail": errors}, status_code=422)
 
     @app.get("/health", response_model=HealthOut)
     def health() -> HealthOut:

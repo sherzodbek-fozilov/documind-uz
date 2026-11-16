@@ -24,7 +24,10 @@ def make_engine(url: str, read_only: bool = False) -> Engine:
     if read_only:
         parsed, connect_args = _read_only_args(make_url(url))
         url = parsed.render_as_string(hide_password=False)
-    engine = create_engine(url, future=True, connect_args=connect_args)
+    # PostgreSQL: test a pooled connection before using it, so a database restart costs
+    # one reconnect instead of a failed request
+    pre_ping = make_url(url).get_backend_name() == "postgresql"
+    engine = create_engine(url, future=True, connect_args=connect_args, pool_pre_ping=pre_ping)
     if engine.dialect.name == "sqlite":
         @event.listens_for(engine, "connect")
         def _fk_on(dbapi_conn, _):  # SQLite ignores foreign keys unless asked

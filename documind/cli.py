@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from collections import Counter
 from dataclasses import asdict
@@ -11,7 +12,7 @@ from pathlib import Path
 
 from sqlalchemy import func, select
 
-from .config import get_settings
+from .config import get_settings, is_loopback
 from .ingestion.pipeline import SUPPORTED_SUFFIXES, ingest_file
 from .split import check_no_leakage, document_split, load_overrides, stratified_split
 from .storage import models
@@ -156,9 +157,19 @@ def cmd_split(args) -> int:
     return 0
 
 
+def announce_bind(host: str) -> None:
+    """Tell the app that it listens beyond this machine, so it starts read-only
+    (Settings.read_only_demo). A loopback host changes nothing: an exposure already
+    declared in the environment stays."""
+    if not is_loopback(host):
+        os.environ["DOCUMIND_WEB_BIND"] = host
+        get_settings.cache_clear()
+
+
 def cmd_serve(args) -> int:
     import uvicorn
 
+    announce_bind(args.host)
     uvicorn.run("documind.api.app:create_app", factory=True, host=args.host, port=args.port)
     return 0
 
