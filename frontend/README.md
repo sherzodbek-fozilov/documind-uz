@@ -78,6 +78,7 @@ become links.
 | `src/components/AnswerMessage.tsx`, `SourceCard.tsx`, `CopyButton.tsx` | one result: answer (if any), source cards, technical details |
 | `src/components/SourceViewer.tsx` | the cited passage in its context |
 | `src/components/DocumentLibrary.tsx`, `DocumentDetails.tsx` | document cards with search and filters; one document and its structure |
+| `src/components/Select.tsx` | select control (Radix Select: listbox with keyboard navigation and type-ahead) |
 | `src/components/ErrorMessage.tsx`, `Skeleton.tsx` | error and loading states |
 | `src/state/history.ts`, `src/state/theme.ts` | query history and theme, both remembered in the browser |
 | `src/lib/highlight.ts` | splits a passage around its exact quote; never highlights a non-exact span |
@@ -86,7 +87,8 @@ become links.
 | `src/styles.css` | design tokens (two themes) and all styles; no CSS framework |
 | `src/test/` | handwritten sample passages and documents, test helpers |
 
-Dependencies: React and `lucide-react` (icons). Styling is plain CSS on custom
+Dependencies: React, `lucide-react` (icons) and `@radix-ui/react-select` (the select
+controls). Styling is plain CSS on custom
 properties, and motion is CSS only.
 
 ## Not done yet

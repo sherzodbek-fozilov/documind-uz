@@ -67,7 +67,7 @@ export function SourceCard({ passage, title, active = false, cited = false, onVi
         <p className="source__text" lang={passage.language}>
           {tidy(h.before).replace(/^…\s+/, "…")}
           <mark className="quote">{h.quote}</mark>
-          {tidy(h.after)}
+          {tidy(h.after).replace(/\s+…$/, "…")}
         </p>
       ) : (
         <>

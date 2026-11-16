@@ -5,6 +5,7 @@ import { useI18n } from "../i18n/context";
 import { kindKey, languageKey } from "../i18n/messages";
 import { safeHttpUrl } from "../lib/url";
 import { ErrorMessage } from "./ErrorMessage";
+import { Select } from "./Select";
 import { SkeletonLines } from "./Skeleton";
 
 interface Props {
@@ -21,6 +22,8 @@ interface Props {
   corpus?: Corpus;
   onCorpusChange?: (corpus: Corpus) => void;
 }
+
+const ALL = "__all__"; // "no filter" (Radix has no empty value)
 
 function unique(values: (string | null | undefined)[]): string[] {
   return [...new Set(values.filter((v): v is string => Boolean(v)))].sort();
@@ -80,22 +83,22 @@ export function DocumentLibrary(props: Props) {
                    onChange={(e) => setQuery(e.target.value)} />
           </label>
           {languages.length > 1 && (
-            <label className="field">
-              <span>{t("docs.filterLang")}</span>
-              <select value={lang} onChange={(e) => setLanguage(e.target.value)}>
-                <option value="">{t("docs.all")}</option>
-                {languages.map((l) => <option key={l} value={l}>{languageName(l)}</option>)}
-              </select>
-            </label>
+            <div className="field">
+              <span aria-hidden="true">{t("docs.filterLang")}</span>
+              <Select label={t("docs.filterLang")} value={lang || ALL} align="end"
+                      onChange={(v) => setLanguage(v === ALL ? "" : v)}
+                      options={[{ value: ALL, label: t("docs.all") },
+                                ...languages.map((l) => ({ value: l, label: languageName(l) }))]} />
+            </div>
           )}
           {kinds.length > 1 && (
-            <label className="field">
-              <span>{t("docs.filterKind")}</span>
-              <select value={type} onChange={(e) => setKind(e.target.value)}>
-                <option value="">{t("docs.all")}</option>
-                {kinds.map((k) => <option key={k} value={k}>{kindName(k)}</option>)}
-              </select>
-            </label>
+            <div className="field">
+              <span aria-hidden="true">{t("docs.filterKind")}</span>
+              <Select label={t("docs.filterKind")} value={type || ALL} align="end"
+                      onChange={(v) => setKind(v === ALL ? "" : v)}
+                      options={[{ value: ALL, label: t("docs.all") },
+                                ...kinds.map((k) => ({ value: k, label: kindName(k) }))]} />
+            </div>
           )}
         </div>
 
@@ -161,13 +164,13 @@ export function DocumentLibrary(props: Props) {
         <h2 id="docs-heading" className="page-head__title">{t("docs.heading")}</h2>
         <p className="page-head__sub">{t("docs.subtitle")}</p>
         {corpus && onCorpusChange && (
-          <label className="field page-head__tool">
-            <span>{t("ask.corpus")}</span>
-            <select value={corpus} onChange={(e) => onCorpusChange(e.target.value as Corpus)}>
-              <option value="real">{t("corpus.real")}</option>
-              <option value="synthetic">{t("corpus.synthetic")}</option>
-            </select>
-          </label>
+          <div className="field page-head__tool">
+            <span aria-hidden="true">{t("ask.corpus")}</span>
+            <Select label={t("ask.corpus")} value={corpus} align="end"
+                    onChange={(v) => onCorpusChange(v as Corpus)}
+                    options={[{ value: "real", label: t("corpus.real") },
+                              { value: "synthetic", label: t("corpus.synthetic") }]} />
+          </div>
         )}
       </header>
       {body}

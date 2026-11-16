@@ -1,11 +1,13 @@
 import { ArrowUp, FileText, FolderOpen, LoaderCircle } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import type { Corpus, DocumentInfo } from "../api/types";
 import { useI18n } from "../i18n/context";
+import { Select } from "./Select";
 
 export const MAX_QUESTION = 1000; // same limit as the API (AskRequest.question)
 const COUNTER_FROM = 800; // the character counter appears near the limit
+const ALL = "__all__"; // "all documents" in the scope select (Radix has no empty value)
 
 interface Props {
   corpus: Corpus;
@@ -37,12 +39,28 @@ export function QueryComposer(props: Props) {
   }, [focusKey]);
 
   // grow with the text, up to the max-height set in the stylesheet
-  useEffect(() => {
+  const fit = useCallback(() => {
     const el = input.current;
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
-  }, [question]);
+  }, []);
+
+  useEffect(fit, [fit, question]);
+
+  // the text wraps differently when the box changes width (window, sidebar, viewer)
+  useEffect(() => {
+    const el = input.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    let width = el.clientWidth;
+    const observer = new ResizeObserver(() => {
+      if (el.clientWidth === width) return; // our own height change
+      width = el.clientWidth;
+      fit();
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [fit]);
 
   function submit(e?: FormEvent) {
     e?.preventDefault();
@@ -68,22 +86,16 @@ export function QueryComposer(props: Props) {
                   aria-describedby={`${id}-hint`}
                   onChange={(e) => setQuestion(e.target.value)} onKeyDown={onKeyDown} />
         <div className="composer__bar">
-          <label className="pill-select">
-            <FolderOpen size={15} aria-hidden="true" />
-            <span className="visually-hidden">{t("ask.corpus")}</span>
-            <select value={corpus} onChange={(e) => onCorpusChange(e.target.value as Corpus)}>
-              <option value="real">{t("corpus.real")}</option>
-              <option value="synthetic">{t("corpus.synthetic")}</option>
-            </select>
-          </label>
-          <label className={scope ? "pill-select is-set" : "pill-select"}>
-            <FileText size={15} aria-hidden="true" />
-            <span className="visually-hidden">{t("ask.scope")}</span>
-            <select value={scope ?? ""} onChange={(e) => onScopeChange(e.target.value || null)}>
-              <option value="">{t("ask.scopeAll")}</option>
-              {documents.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}
-            </select>
-          </label>
+          <Select variant="pill" label={t("ask.corpus")} value={corpus}
+                  icon={<FolderOpen size={15} aria-hidden="true" />}
+                  onChange={(v) => onCorpusChange(v as Corpus)}
+                  options={[{ value: "real", label: t("corpus.real") },
+                            { value: "synthetic", label: t("corpus.synthetic") }]} />
+          <Select variant="pill" label={t("ask.scope")} value={scope ?? ALL} highlighted={scope !== null}
+                  icon={<FileText size={15} aria-hidden="true" />}
+                  onChange={(v) => onScopeChange(v === ALL ? null : v)}
+                  options={[{ value: ALL, label: t("ask.scopeAll") },
+                            ...documents.map((d) => ({ value: d.id, label: d.title, lang: d.language }))]} />
           {question.length >= COUNTER_FROM && (
             <span className="composer__count" aria-hidden="true">
               {question.length} / {MAX_QUESTION}

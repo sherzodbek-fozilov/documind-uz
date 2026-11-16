@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../api/client";
 import { renderIn } from "../test/render";
 import { DOCUMENTS } from "../test/samples";
+import { choose } from "../test/select";
 import { DocumentLibrary } from "./DocumentLibrary";
 
 describe("DocumentLibrary", () => {
@@ -66,13 +67,13 @@ describe("DocumentLibrary", () => {
     await userEvent.type(screen.getByRole("searchbox", { name: "Search by title" }), "договор");
     expect(titles()).toEqual(["Образец договора аренды"]);
 
-    await userEvent.selectOptions(screen.getByLabelText("Language"), "uz-Cyrl");
+    await choose("Language", "Uzbek (Cyrillic)");
     expect(titles()).toEqual([]);
     expect(screen.getByRole("status").textContent).toContain("No documents match these filters.");
     await userEvent.click(screen.getByRole("button", { name: "Reset filters" }));
     expect(titles()).toHaveLength(3);
 
-    await userEvent.selectOptions(screen.getByLabelText("Language"), "uz-Cyrl");
+    await choose("Language", "Uzbek (Cyrillic)");
     expect(titles()).toEqual(["SINOV SHARTNOMASI (SYNTHETIC)"]);
     // one type in the data: a type filter would have nothing to choose from
     expect(screen.queryByLabelText("Type")).toBeNull();
@@ -85,7 +86,7 @@ describe("DocumentLibrary", () => {
                               onOpenDetails={onOpenDetails} corpus="real" onCorpusChange={onCorpusChange} />);
     await userEvent.click(screen.getAllByRole("button", { name: "Structure" })[1]);
     expect(onOpenDetails).toHaveBeenCalledWith("obrazets-ru");
-    await userEvent.selectOptions(screen.getByLabelText("Collection"), "synthetic");
+    await choose("Collection", "Synthetic (test) documents");
     expect(onCorpusChange).toHaveBeenCalledWith("synthetic");
   });
 });

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { renderIn } from "../test/render";
 import { DOCUMENTS } from "../test/samples";
+import { choose, selected } from "../test/select";
 import { QueryComposer } from "./QueryComposer";
 
 function setup(over: Partial<Parameters<typeof QueryComposer>[0]> = {}) {
@@ -44,13 +45,29 @@ describe("QueryComposer", () => {
 
   it("changes the collection and the document scope", async () => {
     const p = setup();
-    await userEvent.selectOptions(screen.getByLabelText("Collection"), "synthetic");
+    expect(selected("Collection")).toBe("Real documents");
+    await choose("Collection", "Synthetic (test) documents");
     expect(p.onCorpusChange).toHaveBeenCalledWith("synthetic");
-    const scope = screen.getByLabelText("Search in");
-    expect([...scope.querySelectorAll("option")].map((o) => o.textContent))
+
+    expect(selected("Search in")).toBe("All documents");
+    await userEvent.click(screen.getByRole("combobox", { name: "Search in" }));
+    expect(screen.getAllByRole("option").map((o) => o.textContent))
       .toEqual(["All documents", "01.02.2003. Namuna kodeksi", "Образец договора аренды"]);
-    await userEvent.selectOptions(scope, "obrazets-ru");
+    await userEvent.click(screen.getByRole("option", { name: "Образец договора аренды" }));
     expect(p.onScopeChange).toHaveBeenLastCalledWith("obrazets-ru");
+    expect(screen.queryByRole("option")).toBeNull(); // the list closes after a choice
+  });
+
+  it("opens the scope list from the keyboard and lifts the scope", async () => {
+    const p = setup({ scope: "obrazets-ru" });
+    const scope = screen.getByRole("combobox", { name: "Search in" });
+    expect(scope.textContent).toBe("Образец договора аренды");
+    scope.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(screen.getByRole("listbox")).toBeTruthy();
+    await userEvent.keyboard("{Home}{Enter}");
+    expect(p.onScopeChange).toHaveBeenLastCalledWith(null);
+    expect(document.activeElement).toBe(scope); // the focus returns to the control
   });
 
   it("disables asking while a request is running", async () => {

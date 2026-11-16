@@ -10,6 +10,7 @@ import { renderIn } from "./test/render";
 import {
   DOCUMENTS, OUTLINE, PASSAGE_SYNTHETIC, PASSAGE_UZ, askResponse, passagesWindow,
 } from "./test/samples";
+import { choose, selected } from "./test/select";
 
 const HEALTH = {
   status: "ok" as const, mode: "extractive", retriever: "bm25", documents: 3, chunks: 9, public_demo: false,
@@ -68,8 +69,7 @@ describe("App", () => {
     const buttons = await within(docs).findAllByRole("button", { name: "Search only here" });
     await userEvent.click(buttons[0]);
     // back in the workspace, with the scope set and the question box focused
-    const scope = screen.getByLabelText("Search in") as HTMLSelectElement;
-    expect(scope.value).toBe("namuna-uz");
+    expect(selected("Search in")).toBe("01.02.2003. Namuna kodeksi");
     expect(document.activeElement).toBe(screen.getByLabelText("Your question"));
     await askQuestion("Ijara haqi?");
     expect(api.ask).toHaveBeenLastCalledWith(expect.objectContaining({ document_id: "namuna-uz" }),
@@ -82,10 +82,10 @@ describe("App", () => {
       ask: vi.fn(async (req) => ({ ...askResponse(req.question, [PASSAGE_SYNTHETIC]), corpus: "synthetic" })),
     });
     renderIn(<App api={api} />);
-    await screen.findByRole("option", { name: "01.02.2003. Namuna kodeksi" });
-    await userEvent.selectOptions(screen.getByLabelText("Search in"), "namuna-uz");
-    await userEvent.selectOptions(screen.getByLabelText("Collection"), "synthetic");
-    expect((screen.getByLabelText("Search in") as HTMLSelectElement).value).toBe("");
+    await choose("Search in", "01.02.2003. Namuna kodeksi");
+    expect(selected("Search in")).toBe("01.02.2003. Namuna kodeksi");
+    await choose("Collection", "Synthetic (test) documents");
+    expect(selected("Search in")).toBe("All documents");
 
     const docs = await openLibrary();
     expect(within(docs).getAllByRole("listitem")).toHaveLength(1);
@@ -110,8 +110,7 @@ describe("App", () => {
     const ask = vi.fn(async (req: { question: string; document_id?: string | null }) =>
       askResponse(req.question, req.document_id ? [] : [PASSAGE_UZ]));
     renderIn(<App api={fakeApi({ ask })} />);
-    await screen.findByRole("option", { name: "Образец договора аренды" });
-    await userEvent.selectOptions(screen.getByLabelText("Search in"), "obrazets-ru");
+    await choose("Search in", "Образец договора аренды");
     await askQuestion("Penya?");
     await userEvent.click(await screen.findByRole("button", { name: "Search all documents" }));
     expect(await screen.findByRole("article")).toBeTruthy();
