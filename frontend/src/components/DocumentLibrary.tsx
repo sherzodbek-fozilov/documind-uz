@@ -1,6 +1,6 @@
 import { CalendarDays, Check, ExternalLink, ListTree, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { Corpus, DocumentInfo } from "../api/types";
+import type { DocumentInfo } from "../api/types";
 import { useI18n } from "../i18n/context";
 import { kindKey, languageKey } from "../i18n/messages";
 import { safeHttpUrl } from "../lib/url";
@@ -18,9 +18,6 @@ interface Props {
   onRetry?: () => void;
   /** open the structure of a document; no button without it */
   onOpenDetails?: (id: string) => void;
-  /** the collection shown; with onCorpusChange, the library has a collection switch */
-  corpus?: Corpus;
-  onCorpusChange?: (corpus: Corpus) => void;
 }
 
 const ALL = "__all__"; // "no filter" (Radix has no empty value)
@@ -32,7 +29,7 @@ function unique(values: (string | null | undefined)[]): string[] {
 /** The documents of the current collection, with a title search and filters. Filter
  * options come from the documents themselves; a filter with one option is not shown. */
 export function DocumentLibrary(props: Props) {
-  const { documents, error, selectedId, onSelect, onRetry, onOpenDetails, corpus, onCorpusChange } = props;
+  const { documents, error, selectedId, onSelect, onRetry, onOpenDetails } = props;
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [language, setLanguage] = useState("");
@@ -163,15 +160,6 @@ export function DocumentLibrary(props: Props) {
       <header className="page-head">
         <h2 id="docs-heading" className="page-head__title">{t("docs.heading")}</h2>
         <p className="page-head__sub">{t("docs.subtitle")}</p>
-        {corpus && onCorpusChange && (
-          <div className="field page-head__tool">
-            <span aria-hidden="true">{t("ask.corpus")}</span>
-            <Select label={t("ask.corpus")} value={corpus} align="end"
-                    onChange={(v) => onCorpusChange(v as Corpus)}
-                    options={[{ value: "real", label: t("corpus.real") },
-                              { value: "synthetic", label: t("corpus.synthetic") }]} />
-          </div>
-        )}
       </header>
       {body}
     </section>

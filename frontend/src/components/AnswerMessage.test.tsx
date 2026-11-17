@@ -55,15 +55,23 @@ describe("AnswerMessage", () => {
     expect(screen.getByText("Quotes verified against the source text: 1 of 2")).toBeTruthy();
   });
 
-  it("keeps the mode, retriever and chunk ids in a closed technical panel", () => {
-    renderIn(<AnswerMessage response={askResponse("Penya?", [PASSAGE_UZ])} titles={TITLES} />);
-    const tech = screen.getByText("Technical details").closest("details")!;
-    expect(tech.open).toBe(false);
-    expect(within(tech).getByText("extractive")).toBeTruthy();
-    expect(within(tech).getByText("bm25")).toBeTruthy();
-    expect(within(tech).getByText("namuna-uz:0001")).toBeTruthy();
-    expect(within(tech).getByText("1 of 1 valid")).toBeTruthy();
-    expect(screen.getByRole("article").textContent).not.toContain("namuna-uz:0001");
+  it("has no technical panel and shows no implementation details", () => {
+    const response = {
+      ...askResponse("Penya?", [PASSAGE_UZ]),
+      citation_check: { checked: 1, valid: 1, failures: { "quote is not in the chunk": 0 } },
+    };
+    const { container } = renderIn(<AnswerMessage response={response} titles={TITLES} />);
+    expect(screen.queryByText("Technical details")).toBeNull();
+    expect(container.querySelector("details")).toBeNull();
+    for (const internal of ["extractive", "bm25", "namuna-uz:0001", "real", "1 of 1 valid",
+                            "quote is not in the chunk"]) {
+      expect(container.textContent).not.toContain(internal);
+    }
+    // the result itself is unchanged: quote, source link, context and copy actions
+    const card = screen.getByRole("article");
+    expect(within(card).getByText(PASSAGE_UZ.quote, { selector: "mark" })).toBeTruthy();
+    expect(within(card).getByRole("link").getAttribute("href")).toBe(PASSAGE_UZ.link);
+    expect(screen.getByRole("button", { name: "Copy" })).toBeTruthy();
   });
 
   it("copies the quotes with their documents, articles and links", async () => {

@@ -22,18 +22,20 @@ interface Props {
   /** the value is not the default one: draw attention to it */
   highlighted?: boolean;
   align?: "start" | "end";
+  /** tooltip of the closed control (useful when it is shown as an icon only) */
+  title?: string;
 }
 
 /** A select built on Radix: a button that opens a listbox, with arrow keys, Home / End,
  * type-ahead, Escape and focus return handled by the library. */
 export function Select(props: Props) {
   const { label, value, options, onChange, icon, variant = "field", highlighted = false,
-          align = "start" } = props;
+          align = "start", title } = props;
   const selected = options.find((o) => o.value === value);
   const cls = ["select", `select--${variant}`, highlighted ? "is-set" : ""].filter(Boolean).join(" ");
   return (
     <RadixSelect.Root value={value} onValueChange={onChange}>
-      <RadixSelect.Trigger className={cls} aria-label={label}>
+      <RadixSelect.Trigger className={cls} aria-label={label} title={title}>
         {icon}
         <span className="select__value" lang={selected?.lang}>
           <RadixSelect.Value>{selected?.label ?? ""}</RadixSelect.Value>

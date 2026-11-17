@@ -16,13 +16,12 @@ const en = {
   "nav.workspace": "Workspace",
   "nav.library": "Document library",
   "nav.collapse": "Collapse sidebar",
-  "nav.expand": "Expand sidebar",
+  "nav.expand": "Open sidebar",
   "nav.open": "Open menu",
   "nav.close": "Close menu",
 
   "history.heading": "History",
-  "history.empty": "Your queries will appear here.",
-  "history.note": "Saved only in this browser.",
+  "history.empty": "Your history will appear after your first query",
   "history.delete": "Delete “{title}”",
   "history.clear": "Clear",
   "history.clearConfirm": "Delete all?",
@@ -36,6 +35,9 @@ const en = {
   "welcome.title": "What do you want to find in the legislation?",
   "welcome.subtitle": "DocuMind searches the legislation of Uzbekistan and returns the exact passages that match your question, each with a link to its source.",
   "welcome.examples": "Try an example",
+  "welcome.moreExamples": "Show more",
+  "welcome.fewerExamples": "Show less",
+  "welcome.about": "About DocuMind",
   "feature.quotes.title": "Exact quotes",
   "feature.quotes.text": "Every result is a verbatim excerpt, checked against the source text.",
   "feature.languages.title": "Uzbek and Russian",
@@ -44,16 +46,12 @@ const en = {
   "feature.sources.text": "Read any excerpt in its context and open the original.",
 
   "ask.label": "Your question",
-  "ask.placeholder": "e.g. Ijara haqi qachon toʻlanadi? / Когда вносится арендная плата?",
+  "ask.placeholder": "What would you like to ask?",
   "ask.hint": "Ask in Uzbek (Latin or Cyrillic) or Russian. Enter sends, Shift+Enter adds a line.",
-  "ask.corpus": "Collection",
   "ask.scope": "Search in",
   "ask.scopeAll": "All documents",
   "ask.submit": "Ask",
   "ask.loading": "Searching…",
-
-  "corpus.real": "Real documents",
-  "corpus.synthetic": "Synthetic (test) documents",
 
   "chat.thread": "Questions and results",
   "chat.you": "Your question",
@@ -72,14 +70,6 @@ const en = {
   "results.copied": "Copied",
   "results.copyFailed": "Could not copy",
   "results.searchAll": "Search all documents",
-  "results.tech": "Technical details",
-
-  "tech.mode": "Answer mode",
-  "tech.retriever": "Retriever",
-  "tech.corpus": "Collection",
-  "tech.check": "Citation check",
-  "tech.checkValue": "{valid} of {checked} valid",
-  "tech.chunks": "Passage identifiers",
 
   "result.article": "Article",
   "result.source": "Open original",
@@ -143,10 +133,7 @@ const en = {
   "error.detail": "Details: {detail}",
   "error.retry": "Try again",
 
-  "health.online": "API online",
-  "health.ok": "{documents} documents, {chunks} chunks · {mode} · {retriever}",
-  "health.down": "API offline",
-  "health.checking": "Connecting…",
+  "health.down": "The service is temporarily unavailable. Please try again in a moment.",
 } as const;
 
 export type MessageKey = keyof typeof en;
@@ -162,13 +149,12 @@ const ru: Messages = {
   "nav.workspace": "Рабочая область",
   "nav.library": "Библиотека документов",
   "nav.collapse": "Свернуть боковую панель",
-  "nav.expand": "Развернуть боковую панель",
+  "nav.expand": "Открыть боковую панель",
   "nav.open": "Открыть меню",
   "nav.close": "Закрыть меню",
 
   "history.heading": "История",
-  "history.empty": "Здесь появятся ваши запросы.",
-  "history.note": "Хранится только в этом браузере.",
+  "history.empty": "История появится после первого запроса",
   "history.delete": "Удалить «{title}»",
   "history.clear": "Очистить",
   "history.clearConfirm": "Удалить всё?",
@@ -182,6 +168,9 @@ const ru: Messages = {
   "welcome.title": "Что вы хотите найти в законодательстве?",
   "welcome.subtitle": "DocuMind ищет по законодательству Узбекистана и возвращает точные фрагменты, соответствующие вопросу, со ссылкой на источник.",
   "welcome.examples": "Попробуйте пример",
+  "welcome.moreExamples": "Показать ещё",
+  "welcome.fewerExamples": "Свернуть",
+  "welcome.about": "О DocuMind",
   "feature.quotes.title": "Точные цитаты",
   "feature.quotes.text": "Каждый результат — дословная выдержка, сверенная с текстом источника.",
   "feature.languages.title": "Узбекский и русский",
@@ -190,16 +179,12 @@ const ru: Messages = {
   "feature.sources.text": "Читайте выдержку в контексте и открывайте оригинал.",
 
   "ask.label": "Ваш вопрос",
-  "ask.placeholder": "например: Когда вносится арендная плата? / Ijara haqi qachon toʻlanadi?",
+  "ask.placeholder": "О чём хотите спросить?",
   "ask.hint": "Спрашивайте на узбекском (латиница или кириллица) или русском. Enter — отправить, Shift+Enter — новая строка.",
-  "ask.corpus": "Коллекция",
   "ask.scope": "Искать в",
   "ask.scopeAll": "Во всех документах",
   "ask.submit": "Спросить",
   "ask.loading": "Поиск…",
-
-  "corpus.real": "Реальные документы",
-  "corpus.synthetic": "Синтетические (тестовые) документы",
 
   "chat.thread": "Вопросы и результаты",
   "chat.you": "Ваш вопрос",
@@ -218,14 +203,6 @@ const ru: Messages = {
   "results.copied": "Скопировано",
   "results.copyFailed": "Не удалось скопировать",
   "results.searchAll": "Искать во всех документах",
-  "results.tech": "Техническая информация",
-
-  "tech.mode": "Режим ответа",
-  "tech.retriever": "Ретривер",
-  "tech.corpus": "Коллекция",
-  "tech.check": "Проверка цитат",
-  "tech.checkValue": "корректны {valid} из {checked}",
-  "tech.chunks": "Идентификаторы фрагментов",
 
   "result.article": "Статья",
   "result.source": "Открыть оригинал",
@@ -289,10 +266,7 @@ const ru: Messages = {
   "error.detail": "Подробности: {detail}",
   "error.retry": "Повторить",
 
-  "health.online": "API доступен",
-  "health.ok": "Документов: {documents}, фрагментов: {chunks} · {mode} · {retriever}",
-  "health.down": "API недоступен",
-  "health.checking": "Подключение…",
+  "health.down": "Сервис временно недоступен. Попробуйте ещё раз чуть позже.",
 };
 
 const uz: Messages = {
@@ -305,13 +279,12 @@ const uz: Messages = {
   "nav.workspace": "Ish maydoni",
   "nav.library": "Hujjatlar kutubxonasi",
   "nav.collapse": "Yon panelni yigʻish",
-  "nav.expand": "Yon panelni yoyish",
+  "nav.expand": "Yon panelni ochish",
   "nav.open": "Menyuni ochish",
   "nav.close": "Menyuni yopish",
 
   "history.heading": "Tarix",
-  "history.empty": "Soʻrovlaringiz shu yerda koʻrinadi.",
-  "history.note": "Faqat shu brauzerda saqlanadi.",
+  "history.empty": "Tarix birinchi soʻrovingizdan keyin paydo boʻladi",
   "history.delete": "“{title}”ni oʻchirish",
   "history.clear": "Tozalash",
   "history.clearConfirm": "Hammasi oʻchirilsinmi?",
@@ -325,6 +298,9 @@ const uz: Messages = {
   "welcome.title": "Qonunchilikdan nimani topmoqchisiz?",
   "welcome.subtitle": "DocuMind Oʻzbekiston qonunchiligi boʻyicha qidiradi va savolingizga mos aniq parchalarni manbaga havola bilan qaytaradi.",
   "welcome.examples": "Misolni sinab koʻring",
+  "welcome.moreExamples": "Yana koʻrsatish",
+  "welcome.fewerExamples": "Yigʻish",
+  "welcome.about": "DocuMind haqida",
   "feature.quotes.title": "Aniq iqtiboslar",
   "feature.quotes.text": "Har bir natija — manba matni bilan tekshirilgan soʻzma-soʻz parcha.",
   "feature.languages.title": "Oʻzbek va rus tillari",
@@ -333,16 +309,12 @@ const uz: Messages = {
   "feature.sources.text": "Parchani kontekstda oʻqing va asl manbani oching.",
 
   "ask.label": "Savolingiz",
-  "ask.placeholder": "masalan: Ijara haqi qachon toʻlanadi? / Когда вносится арендная плата?",
+  "ask.placeholder": "Nima haqida soʻramoqchisiz?",
   "ask.hint": "Oʻzbek (lotin yoki kirill) yoki rus tilida soʻrang. Enter — yuborish, Shift+Enter — yangi qator.",
-  "ask.corpus": "Toʻplam",
   "ask.scope": "Qayerda qidirish",
   "ask.scopeAll": "Barcha hujjatlarda",
   "ask.submit": "Soʻrash",
   "ask.loading": "Qidirilmoqda…",
-
-  "corpus.real": "Haqiqiy hujjatlar",
-  "corpus.synthetic": "Sintetik (sinov) hujjatlar",
 
   "chat.thread": "Savollar va natijalar",
   "chat.you": "Savolingiz",
@@ -361,14 +333,6 @@ const uz: Messages = {
   "results.copied": "Nusxalandi",
   "results.copyFailed": "Nusxalab boʻlmadi",
   "results.searchAll": "Barcha hujjatlarda qidirish",
-  "results.tech": "Texnik maʼlumot",
-
-  "tech.mode": "Javob rejimi",
-  "tech.retriever": "Retriver",
-  "tech.corpus": "Toʻplam",
-  "tech.check": "Iqtiboslarni tekshirish",
-  "tech.checkValue": "{checked} tadan {valid} tasi toʻgʻri",
-  "tech.chunks": "Parcha identifikatorlari",
 
   "result.article": "Modda",
   "result.source": "Asl manbani ochish",
@@ -432,10 +396,7 @@ const uz: Messages = {
   "error.detail": "Tafsilotlar: {detail}",
   "error.retry": "Qayta urinish",
 
-  "health.online": "API ishlayapti",
-  "health.ok": "Hujjatlar: {documents}, parchalar: {chunks} · {mode} · {retriever}",
-  "health.down": "API ishlamayapti",
-  "health.checking": "Ulanmoqda…",
+  "health.down": "Xizmat vaqtincha ishlamayapti. Birozdan soʻng qayta urinib koʻring.",
 };
 
 export const MESSAGES: Record<Lang, Messages> = { uz, ru, en };

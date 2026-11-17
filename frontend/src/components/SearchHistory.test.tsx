@@ -17,12 +17,31 @@ function session(id: string, title: string): Session {
 const SESSIONS = [session("a", "Penya qachon hisoblanadi?"), session("b", "Когда вносится плата?")];
 
 describe("SearchHistory", () => {
-  it("says where the history is kept, also when it is empty", () => {
-    renderIn(<SearchHistory sessions={[]} activeId={null} onOpen={() => {}} onDelete={() => {}}
-                            onClear={() => {}} />, "ru");
-    expect(screen.getByText("Здесь появятся ваши запросы.")).toBeTruthy();
-    expect(screen.getByText("Хранится только в этом браузере.")).toBeTruthy();
+  it("shows a single sentence while the history is empty", () => {
+    const { container } = renderIn(<SearchHistory sessions={[]} activeId={null} onOpen={() => {}}
+                                                  onDelete={() => {}} onClear={() => {}} />, "ru");
+    expect(screen.getByText("История появится после первого запроса")).toBeTruthy();
+    expect(container.querySelectorAll("p")).toHaveLength(1);
+    expect(screen.queryByText("Хранится только в этом браузере.")).toBeNull();
     expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it.each([
+    ["uz", "Tarix birinchi soʻrovingizdan keyin paydo boʻladi"],
+    ["en", "Your history will appear after your first query"],
+  ] as const)("has the empty-history sentence in %s", (lang, text) => {
+    renderIn(<SearchHistory sessions={[]} activeId={null} onOpen={() => {}} onDelete={() => {}}
+                            onClear={() => {}} />, lang);
+    expect(screen.getByText(text)).toBeTruthy();
+  });
+
+  it("shows the sessions instead of the empty message once there are any", () => {
+    renderIn(<SearchHistory sessions={SESSIONS} activeId={null} onOpen={() => {}} onDelete={() => {}}
+                            onClear={() => {}} />);
+    expect(screen.queryByText("Your history will appear after your first query")).toBeNull();
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    // the list only: no empty message and no storage note
+    expect(screen.queryByText(/browser/)).toBeNull();
   });
 
   it("opens and deletes a session and marks the open one", async () => {

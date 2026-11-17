@@ -1,7 +1,7 @@
-import { ArrowUp, FileText, FolderOpen, LoaderCircle } from "lucide-react";
+import { ArrowUp, FileText, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
-import type { Corpus, DocumentInfo } from "../api/types";
+import type { DocumentInfo } from "../api/types";
 import { useI18n } from "../i18n/context";
 import { Select } from "./Select";
 
@@ -10,22 +10,20 @@ const COUNTER_FROM = 800; // the character counter appears near the limit
 const ALL = "__all__"; // "all documents" in the scope select (Radix has no empty value)
 
 interface Props {
-  corpus: Corpus;
-  onCorpusChange: (corpus: Corpus) => void;
-  /** documents of the current corpus, for the scope selector */
+  /** documents of the public (real) corpus, for the scope selector */
   documents: DocumentInfo[];
   scope: string | null;
   onScopeChange: (id: string | null) => void;
   loading: boolean;
   onAsk: (question: string) => void;
-  /** larger input, for the start screen */
+  /** "large" on the start screen (shows the keyboard hint); same layout otherwise */
   size?: "default" | "large";
   /** changes whenever the input should take the focus (new query, scope picked) */
   focusKey?: number;
 }
 
 export function QueryComposer(props: Props) {
-  const { corpus, onCorpusChange, documents, scope, onScopeChange, loading, onAsk,
+  const { documents, scope, onScopeChange, loading, onAsk,
           size = "default", focusKey } = props;
   const { t } = useI18n();
   const [question, setQuestion] = useState("");
@@ -33,12 +31,15 @@ export function QueryComposer(props: Props) {
   const id = useId();
   const trimmed = question.trim();
   const canAsk = trimmed.length > 0 && !loading;
+  const scopeLabel = scope ? documents.find((d) => d.id === scope)?.title ?? t("ask.scopeAll")
+                           : t("ask.scopeAll");
 
   useEffect(() => {
     if (focusKey !== undefined) input.current?.focus();
   }, [focusKey]);
 
-  // grow with the text, up to the max-height set in the stylesheet
+  // grow with the text, up to the max-height set in the stylesheet; past it the
+  // textarea scrolls on its own
   const fit = useCallback(() => {
     const el = input.current;
     if (!el) return;
@@ -77,6 +78,8 @@ export function QueryComposer(props: Props) {
     }
   }
 
+  // one row: [question] [document scope] [send]; the row grows with the question and
+  // the controls stay on its bottom edge
   return (
     <form className={`composer composer--${size}`} onSubmit={submit} aria-busy={loading}>
       <div className="composer__box">
@@ -85,29 +88,25 @@ export function QueryComposer(props: Props) {
                   maxLength={MAX_QUESTION} value={question} placeholder={t("ask.placeholder")}
                   aria-describedby={`${id}-hint`}
                   onChange={(e) => setQuestion(e.target.value)} onKeyDown={onKeyDown} />
-        <div className="composer__bar">
-          <Select variant="pill" label={t("ask.corpus")} value={corpus}
-                  icon={<FolderOpen size={15} aria-hidden="true" />}
-                  onChange={(v) => onCorpusChange(v as Corpus)}
-                  options={[{ value: "real", label: t("corpus.real") },
-                            { value: "synthetic", label: t("corpus.synthetic") }]} />
+        <div className="composer__scope">
           <Select variant="pill" label={t("ask.scope")} value={scope ?? ALL} highlighted={scope !== null}
-                  icon={<FileText size={15} aria-hidden="true" />}
+                  title={`${t("ask.scope")}: ${scopeLabel}`} align="end"
+                  icon={<FileText size={16} aria-hidden="true" />}
                   onChange={(v) => onScopeChange(v === ALL ? null : v)}
                   options={[{ value: ALL, label: t("ask.scopeAll") },
                             ...documents.map((d) => ({ value: d.id, label: d.title, lang: d.language }))]} />
-          {question.length >= COUNTER_FROM && (
-            <span className="composer__count" aria-hidden="true">
-              {question.length} / {MAX_QUESTION}
-            </span>
-          )}
-          <button type="submit" className="composer__send" disabled={!canAsk}
-                  aria-label={loading ? t("ask.loading") : t("ask.submit")}
-                  title={loading ? t("ask.loading") : t("ask.submit")}>
-            {loading ? <LoaderCircle size={18} className="spin" aria-hidden="true" />
-                     : <ArrowUp size={18} aria-hidden="true" />}
-          </button>
         </div>
+        {question.length >= COUNTER_FROM && (
+          <span className="composer__count" aria-hidden="true">
+            {question.length} / {MAX_QUESTION}
+          </span>
+        )}
+        <button type="submit" className="composer__send" disabled={!canAsk}
+                aria-label={loading ? t("ask.loading") : t("ask.submit")}
+                title={loading ? t("ask.loading") : t("ask.submit")}>
+          {loading ? <LoaderCircle size={18} className="spin" aria-hidden="true" />
+                   : <ArrowUp size={19} strokeWidth={2.4} aria-hidden="true" />}
+        </button>
       </div>
       <p id={`${id}-hint`} className="composer__hint">{t("ask.hint")}</p>
     </form>
