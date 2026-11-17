@@ -1,4 +1,4 @@
-import { Menu, Plus } from "lucide-react";
+import { Menu, Plus, Scale } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "./api/client";
 import type { ApiClient } from "./api/client";
@@ -13,7 +13,8 @@ import { Sidebar } from "./components/Sidebar";
 import type { View } from "./components/Sidebar";
 import { SourceViewer } from "./components/SourceViewer";
 import type { ViewerTarget } from "./components/SourceViewer";
-import type { HealthState } from "./components/StatusBar";
+import { ServiceNotice } from "./components/ServiceNotice";
+import type { HealthState } from "./components/ServiceNotice";
 import { WelcomeScreen } from "./components/WelcomeScreen";
 import { useI18n } from "./i18n/context";
 import { loadHistory, newId, saveHistory, upsertSession } from "./state/history";
@@ -34,13 +35,17 @@ function readCollapsed(): boolean {
 
 const defaultClient = createClient();
 
+/** The public interface always searches the real legal corpus. The API still takes a
+ * corpus (the synthetic test collection is used by the backend tests), but it is not
+ * offered here. */
+export const PUBLIC_CORPUS: Corpus = "real";
+
 export function App({ api = defaultClient }: { api?: ApiClient }) {
   const { t } = useI18n();
   const [theme, setTheme] = useTheme();
   const [health, setHealth] = useState<HealthState>({ state: "checking" });
   const [docs, setDocs] = useState<DocumentInfo[] | null>(null);
   const [docsError, setDocsError] = useState<unknown>(null);
-  const [corpus, setCorpus] = useState<Corpus>("real");
   const [scope, setScope] = useState<string | null>(null);
 
   const [view, setView] = useState<View>("workspace");
@@ -70,18 +75,19 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
     return () => inFlight.current?.abort();
   }, [loadDocs]);
 
-  const corpusDocs = useMemo(() => (docs ?? []).filter((d) => d.corpus === corpus), [docs, corpus]);
+  const corpusDocs = useMemo(() => (docs ?? []).filter((d) => d.corpus === PUBLIC_CORPUS), [docs]);
   const byId = useMemo(() => new Map((docs ?? []).map((d) => [d.id, d])), [docs]);
   const titles = useMemo(() => Object.fromEntries((docs ?? []).map((d) => [d.id, d.title])), [docs]);
 
   const run = useCallback((question: string,
-                           over?: { corpus: Corpus; documentId: string | null; replace?: string }) => {
+                           over?: { documentId: string | null; replace?: string }) => {
     inFlight.current?.abort(); // a new question replaces the one in flight
     const ctrl = new AbortController();
     inFlight.current = ctrl;
     const turn: Turn = {
       id: over?.replace ?? newId(), question, state: "loading",
-      corpus: over ? over.corpus : corpus, documentId: over ? over.documentId : scope,
+      // always the public corpus, also when retrying a turn saved by an older version
+      corpus: PUBLIC_CORPUS, documentId: over ? over.documentId : scope,
     };
     setView("workspace");
     setTurns((prev) => {
@@ -100,7 +106,7 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
         if (!ctrl.signal.aborted) settle({ ...turn, state: "error", error });
       },
     );
-  }, [api, corpus, scope]);
+  }, [api, scope]);
 
   // keep the current session in the history once a question is answered
   useEffect(() => {
@@ -156,18 +162,12 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
     setSessionId(newId()); // the thread on screen, if any, is a new session from now on
   }
 
-  function changeCorpus(next: Corpus) {
-    setCorpus(next);
-    if (scope && byId.get(scope)?.corpus !== next) setScope(null);
-    if (detailsId && byId.get(detailsId)?.corpus !== next) setDetailsId(null);
-  }
-
   /** Limit the search to a document (and go and ask), or lift the limit. */
   function selectScope(id: string | null) {
+    // only a document of the public corpus can limit a search
+    if (id && byId.get(id)?.corpus !== PUBLIC_CORPUS) return;
     setScope(id);
     if (!id) return;
-    const doc = byId.get(id);
-    if (doc) setCorpus(doc.corpus);
     setView("workspace");
     setDrawerOpen(false);
     setFocusKey((n) => n + 1);
@@ -191,7 +191,7 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
   const loading = turns.some((x) => x.state === "loading");
   const detailsDoc = detailsId ? byId.get(detailsId) : undefined;
   const composer = (
-    <QueryComposer corpus={corpus} onCorpusChange={changeCorpus} documents={corpusDocs}
+    <QueryComposer documents={corpusDocs}
                    scope={scope} onScopeChange={setScope} loading={loading} onAsk={run}
                    size={turns.length === 0 ? "large" : "default"} focusKey={focusKey} />
   );
@@ -203,7 +203,7 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
       <Sidebar view={view} onNavigate={(v) => { setView(v); setDrawerOpen(false); }}
                onNewQuery={newQuery} collapsed={collapsed} onToggleCollapsed={toggleCollapsed}
                drawerOpen={drawerOpen} onCloseDrawer={() => setDrawerOpen(false)}
-               health={health} theme={theme} onThemeChange={setTheme}>
+               theme={theme} onThemeChange={setTheme}>
         <SearchHistory sessions={history} activeId={turns.length ? sessionId : null}
                        onOpen={openSession} onDelete={deleteSession} onClear={clearHistory} />
       </Sidebar>
@@ -215,11 +215,16 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
                   aria-expanded={drawerOpen} onClick={() => setDrawerOpen(true)}>
             <Menu size={20} aria-hidden="true" />
           </button>
-          <span className="topbar__name">DocuMind UZ</span>
+          <span className="topbar__brand">
+            <span className="logo logo--sm" aria-hidden="true"><Scale size={15} /></span>
+            <span className="topbar__name">DocuMind UZ</span>
+          </span>
           <button type="button" className="icon-btn" aria-label={t("nav.newQuery")} onClick={newQuery}>
             <Plus size={20} aria-hidden="true" />
           </button>
         </header>
+
+        <ServiceNotice status={health} onRetry={loadDocs} />
 
         {view === "workspace" && turns.length === 0 && (
           <WelcomeScreen onExample={(q) => run(q)} disabled={loading}>{composer}</WelcomeScreen>
@@ -228,8 +233,8 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
           <ChatWorkspace turns={turns} titles={titles}
                          activeChunkId={viewer?.passage?.chunk_id ?? null}
                          onViewSource={viewSource}
-                         onRetry={(x) => run(x.question, { corpus: x.corpus, documentId: x.documentId, replace: x.id })}
-                         onSearchAll={(x) => run(x.question, { corpus: x.corpus, documentId: null })}>
+                         onRetry={(x) => run(x.question, { documentId: x.documentId, replace: x.id })}
+                         onSearchAll={(x) => run(x.question, { documentId: null })}>
             {composer}
           </ChatWorkspace>
         )}
@@ -244,8 +249,7 @@ export function App({ api = defaultClient }: { api?: ApiClient }) {
             ) : (
               <DocumentLibrary documents={docs === null ? null : corpusDocs} error={docsError}
                                selectedId={scope} onSelect={selectScope} onRetry={loadDocs}
-                               onOpenDetails={setDetailsId}
-                               corpus={corpus} onCorpusChange={changeCorpus} />
+                               onOpenDetails={setDetailsId} />
             )}
           </div>
         )}

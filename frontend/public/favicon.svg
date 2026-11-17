@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- DocuMind UZ: scales of justice on the brand periwinkle. Original artwork. -->
+  <rect width="32" height="32" rx="7.5" fill="#7c8cff"/>
+  <g fill="none" stroke="#0a0f1e" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="2.4" d="M16 8v15.5M11.25 24.5h9.5M7.5 10.75h17"/>
+    <path stroke-width="1.6" d="M7.5 10.75 4.9 17.5M7.5 10.75l2.6 6.75M24.5 10.75l-2.6 6.75M24.5 10.75l2.6 6.75"/>
+  </g>
+  <g fill="#0a0f1e">
+    <circle cx="16" cy="7.25" r="2.1"/>
+    <path d="M3.9 17.5h7.2a3.6 3.6 0 0 1-7.2 0z"/>
+    <path d="M20.9 17.5h7.2a3.6 3.6 0 0 1-7.2 0z"/>
+  </g>
+</svg>

@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { renderIn } from "../test/render";
@@ -8,7 +8,7 @@ import { QueryComposer } from "./QueryComposer";
 
 function setup(over: Partial<Parameters<typeof QueryComposer>[0]> = {}) {
   const props = {
-    corpus: "real" as const, onCorpusChange: vi.fn(), documents: DOCUMENTS.slice(0, 2),
+    documents: DOCUMENTS.slice(0, 2),
     scope: null, onScopeChange: vi.fn(), loading: false, onAsk: vi.fn(), ...over,
   };
   renderIn(<QueryComposer {...props} />);
@@ -43,11 +43,10 @@ describe("QueryComposer", () => {
     expect(box.maxLength).toBe(1000);
   });
 
-  it("changes the collection and the document scope", async () => {
+  it("changes the document scope and has no collection switch", async () => {
     const p = setup();
-    expect(selected("Collection")).toBe("Real documents");
-    await choose("Collection", "Synthetic (test) documents");
-    expect(p.onCorpusChange).toHaveBeenCalledWith("synthetic");
+    expect(screen.queryByRole("combobox", { name: "Collection" })).toBeNull();
+    expect(screen.getAllByRole("combobox")).toHaveLength(1);
 
     expect(selected("Search in")).toBe("All documents");
     await userEvent.click(screen.getByRole("combobox", { name: "Search in" }));
@@ -78,9 +77,68 @@ describe("QueryComposer", () => {
     expect(p.onAsk).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ["ru", "О чём хотите спросить?"],
+    ["en", "What would you like to ask?"],
+    ["uz", "Nima haqida soʻramoqchisiz?"],
+  ] as const)("has a short placeholder in %s", (lang, text) => {
+    renderIn(<QueryComposer documents={[]} scope={null} onScopeChange={vi.fn()} loading={false}
+                            onAsk={vi.fn()} />, lang);
+    expect(screen.getByPlaceholderText(text)).toBeTruthy();
+  });
+
+  it("puts the question, then the scope, then the send button in one row", () => {
+    setup({ scope: "obrazets-ru" });
+    const row = document.querySelector(".composer__box")!;
+    expect([...row.children].map((el) => el.className.split(" ")[0]))
+      .toEqual(["visually-hidden", "composer__input", "composer__scope", "composer__send"]);
+    // keyboard order follows the visual order
+    const focusable = [...row.querySelectorAll("textarea, button")];
+    expect(focusable.map((el) => el.getAttribute("aria-label") ?? el.tagName))
+      .toEqual(["TEXTAREA", "Search in", "Ask"]);
+    // the scope keeps an accessible name and a tooltip saying what is selected
+    const scope = screen.getByRole("combobox", { name: "Search in" });
+    expect(scope.getAttribute("title")).toBe("Search in: Образец договора аренды");
+  });
+
+  it("keeps a multiline question and the text when the scope changes", async () => {
+    const p = setup();
+    const box = screen.getByLabelText("Your question") as HTMLTextAreaElement;
+    expect(box.rows).toBe(1);
+    await userEvent.type(box, "Birinchi qator{Shift>}{Enter}{/Shift}ikkinchi qator");
+    expect(box.value).toBe("Birinchi qator\nikkinchi qator");
+    await choose("Search in", "Образец договора аренды");
+    expect(p.onScopeChange).toHaveBeenLastCalledWith("obrazets-ru");
+    expect(box.value).toBe("Birinchi qator\nikkinchi qator");
+    await userEvent.type(box, "{Enter}");
+    expect(p.onAsk).toHaveBeenCalledWith("Birinchi qator\nikkinchi qator");
+  });
+
+  it("keeps a long unbroken word as typed (the stylesheet wraps it)", async () => {
+    const p = setup();
+    const box = screen.getByLabelText("Your question") as HTMLTextAreaElement;
+    const word = "Oʻzbekistonrespublikasiningfuqarolikkodeksiningikkinchiqismi".repeat(3);
+    await userEvent.click(box);
+    await userEvent.paste(word);
+    expect(box.value).toBe(word);
+    expect(box.getAttribute("wrap")).toBeNull(); // default soft wrapping, no "off"
+    await userEvent.keyboard("{Enter}");
+    expect(p.onAsk).toHaveBeenCalledWith(word);
+  });
+
+  it("does not send while an input method is composing", () => {
+    const p = setup();
+    const box = screen.getByLabelText("Your question") as HTMLTextAreaElement;
+    fireEvent.change(box, { target: { value: "Ijara" } });
+    fireEvent.keyDown(box, { key: "Enter", isComposing: true });
+    expect(p.onAsk).not.toHaveBeenCalled();
+    fireEvent.keyDown(box, { key: "Enter" });
+    expect(p.onAsk).toHaveBeenCalledWith("Ijara");
+  });
+
   it("takes the focus when asked to and counts characters near the limit", async () => {
     const props = {
-      corpus: "real" as const, onCorpusChange: vi.fn(), documents: [], scope: null,
+      documents: [], scope: null,
       onScopeChange: vi.fn(), loading: false, onAsk: vi.fn(),
     };
     const { rerender } = renderIn(<QueryComposer {...props} />);

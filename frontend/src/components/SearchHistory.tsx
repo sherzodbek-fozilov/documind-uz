@@ -63,7 +63,6 @@ export function SearchHistory({ sessions, activeId, onOpen, onDelete, onClear }:
           ))}
         </ul>
       )}
-      <p className="history__note">{t("history.note")}</p>
     </section>
   );
 }

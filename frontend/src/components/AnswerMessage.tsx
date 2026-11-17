@@ -35,6 +35,9 @@ function asText(response: AskResponse, titles: Record<string, string>): string {
  * - The API returned an `answer` (LLM mode): the answer text, then its sources.
  * - Otherwise (extractive mode): the passages are shown as search results. No answer
  *   text is composed in the browser.
+ *
+ * Implementation details of the response (mode, retriever, corpus, chunk ids, citation
+ * check failures) stay in the API response and are not shown in the public interface.
  */
 export function AnswerMessage({ response, titles, activeChunkId, onViewSource, onSearchAll }: Props) {
   const { t } = useI18n();
@@ -92,37 +95,6 @@ export function AnswerMessage({ response, titles, activeChunkId, onViewSource, o
           </li>
         ))}
       </ol>
-
-      <details className="tech">
-        <summary>{t("results.tech")}</summary>
-        <dl className="tech__list">
-          <div><dt>{t("tech.mode")}</dt><dd>{response.mode}</dd></div>
-          <div><dt>{t("tech.retriever")}</dt><dd>{response.retriever}</dd></div>
-          <div><dt>{t("tech.corpus")}</dt><dd>{response.corpus}</dd></div>
-          <div>
-            <dt>{t("tech.check")}</dt>
-            <dd>
-              {t("tech.checkValue", { valid: check.valid, checked: check.checked })}
-              {Object.entries(check.failures).map(([reason, n]) => (
-                <span key={reason} className="tech__failure"> · {reason}: {n}</span>
-              ))}
-            </dd>
-          </div>
-          <div>
-            <dt>{t("tech.chunks")}</dt>
-            <dd>
-              <ol className="tech__chunks">
-                {passages.map((p) => (
-                  <li key={p.chunk_id}>
-                    <code>{p.chunk_id}</code>
-                    {p.anchor && <code className="tech__anchor"> #{p.anchor}</code>}
-                  </li>
-                ))}
-              </ol>
-            </dd>
-          </div>
-        </dl>
-      </details>
     </section>
   );
 }

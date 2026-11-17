@@ -7,9 +7,7 @@ import { ApiError } from "./api/client";
 import type { ApiClient } from "./api/client";
 import type { AskResponse } from "./api/types";
 import { renderIn } from "./test/render";
-import {
-  DOCUMENTS, OUTLINE, PASSAGE_SYNTHETIC, PASSAGE_UZ, askResponse, passagesWindow,
-} from "./test/samples";
+import { DOCUMENTS, OUTLINE, PASSAGE_UZ, askResponse, passagesWindow } from "./test/samples";
 import { choose, selected } from "./test/select";
 
 const HEALTH = {
@@ -37,13 +35,14 @@ async function openLibrary() {
 }
 
 describe("App", () => {
-  it("shows the API status and the real documents, then answers with a highlighted quote", async () => {
+  it("shows the real documents without an API status, then answers with a highlighted quote", async () => {
     const api = fakeApi();
     renderIn(<App api={api} />);
-    expect(await screen.findByText("API online")).toBeTruthy();
-    // counts, mode and retriever are technical details, behind the status disclosure
-    const technical = screen.getByText("3 documents, 9 chunks · extractive · bm25");
-    expect(technical.closest("details")).toBeTruthy();
+    await waitFor(() => expect(api.health).toHaveBeenCalled());
+    // normal connectivity is not displayed anywhere
+    expect(screen.queryByText(/API/)).toBeNull();
+    expect(screen.queryByText(/3 documents, 9 chunks/)).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
     expect(screen.getByRole("heading", { name: "What do you want to find in the legislation?" }))
       .toBeTruthy();
 
@@ -77,26 +76,47 @@ describe("App", () => {
     expect(await screen.findByText("In: 01.02.2003. Namuna kodeksi")).toBeTruthy();
   });
 
-  it("switches to the synthetic collection and drops a scope from the other one", async () => {
-    const api = fakeApi({
-      ask: vi.fn(async (req) => ({ ...askResponse(req.question, [PASSAGE_SYNTHETIC]), corpus: "synthetic" })),
-    });
+  it("always searches the real corpus and never offers the synthetic test documents", async () => {
+    const api = fakeApi();
     renderIn(<App api={api} />);
-    await choose("Search in", "01.02.2003. Namuna kodeksi");
-    expect(selected("Search in")).toBe("01.02.2003. Namuna kodeksi");
-    await choose("Collection", "Synthetic (test) documents");
-    expect(selected("Search in")).toBe("All documents");
+    // no collection switch, in the composer or in the library
+    expect(screen.queryByRole("combobox", { name: "Collection" })).toBeNull();
+    await waitFor(() => expect(api.documents).toHaveBeenCalled());
+    await userEvent.click(screen.getByRole("combobox", { name: "Search in" }));
+    expect((await screen.findAllByRole("option")).map((o) => o.textContent))
+      .toEqual(["All documents", "01.02.2003. Namuna kodeksi", "Образец договора аренды"]);
+    await userEvent.keyboard("{Escape}");
 
     const docs = await openLibrary();
-    expect(within(docs).getAllByRole("listitem")).toHaveLength(1);
+    await waitFor(() => expect(within(docs).getAllByRole("listitem")).toHaveLength(2));
+    expect(docs.textContent).not.toMatch(/synthetic|SINOV/i);
+    expect(within(docs).queryByRole("combobox", { name: "Collection" })).toBeNull();
     await userEvent.click(screen.getByRole("button", { name: "Workspace" }));
 
     await askQuestion("Шартнома муддати?");
-    const card = await screen.findByRole("article", { name: "SINOV SHARTNOMASI (SYNTHETIC)" });
-    expect(within(card).getByText("No online source")).toBeTruthy();
+    await screen.findByRole("article");
     expect(api.ask).toHaveBeenLastCalledWith(
-      { question: "Шартнома муддати?", corpus: "synthetic", document_id: null },
+      { question: "Шартнома муддати?", corpus: "real", document_id: null },
       expect.any(AbortSignal));
+  });
+
+  it("asks the real corpus when retrying a turn saved with another corpus", async () => {
+    window.localStorage.setItem("documind.history.v1", JSON.stringify([{
+      id: "old", title: "Eski savol", updatedAt: 1,
+      turns: [{ id: "t1", question: "Eski savol", corpus: "synthetic", documentId: null,
+                response: askResponse("Eski savol", []) }],
+    }]));
+    const ask = vi.fn()
+      .mockRejectedValueOnce(new ApiError("server", 500, "boom"))
+      .mockImplementation(async (req) => askResponse(req.question, [PASSAGE_UZ]));
+    renderIn(<App api={fakeApi({ ask })} />);
+    const history = screen.getByRole("region", { name: "History" });
+    await userEvent.click(within(history).getByRole("button", { name: /^Eski savol/ }));
+    await askQuestion("Yangi savol");
+    const alert = await screen.findByRole("alert");
+    await userEvent.click(within(alert).getByRole("button", { name: "Try again" }));
+    await screen.findByRole("article");
+    for (const call of ask.mock.calls) expect(call[0].corpus).toBe("real");
   });
 
   it("shows the empty state when no passage is found", async () => {
@@ -136,11 +156,25 @@ describe("App", () => {
     expect(screen.getAllByRole("heading", { level: 2, name: /Когда платить\?/ })).toHaveLength(1);
   });
 
-  it("reports an unreachable API in the status line and the document library", async () => {
+  it("reports an unreachable service with a notice that goes away once it is back", async () => {
+    const down = async () => { throw new ApiError("network", null, "Failed to fetch"); };
+    const api = fakeApi({ health: vi.fn(down), documents: vi.fn(down) });
+    renderIn(<App api={api} />, "ru");
+    const text = await screen.findByText("Сервис временно недоступен. Попробуйте ещё раз чуть позже.");
+    const notice = text.closest("[role=alert]") as HTMLElement;
+    expect(notice).toBeTruthy();
+
+    (api.documents as ReturnType<typeof vi.fn>).mockResolvedValue(DOCUMENTS);
+    (api.health as ReturnType<typeof vi.fn>).mockResolvedValue(HEALTH);
+    await userEvent.click(within(notice).getByRole("button", { name: "Повторить" }));
+    // back to normal: nothing about the connection is shown
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
+  });
+
+  it("explains an unreachable API in the document library and retries", async () => {
     const down = async () => { throw new ApiError("network", null, "Failed to fetch"); };
     const api = fakeApi({ health: vi.fn(down), documents: vi.fn(down) });
     renderIn(<App api={api} />);
-    expect(await screen.findByText("API offline")).toBeTruthy();
     const docs = await openLibrary();
     expect(within(docs).getByRole("alert").textContent).toContain("The API cannot be reached");
 
@@ -148,7 +182,7 @@ describe("App", () => {
     (api.health as ReturnType<typeof vi.fn>).mockResolvedValue(HEALTH);
     await userEvent.click(within(docs).getByRole("button", { name: "Try again" }));
     await waitFor(() => expect(within(docs).getAllByRole("listitem")).toHaveLength(2));
-    expect(await screen.findByText(/3 documents/)).toBeTruthy();
+    await waitFor(() => expect(screen.queryByText(/temporarily unavailable/)).toBeNull());
   });
 
   it("cancels the request in flight when the page goes away", async () => {
@@ -200,16 +234,23 @@ describe("App", () => {
     expect(screen.getByText(/This is a search result, not a generated answer or legal advice/)).toBeTruthy();
   });
 
-  it("keeps internal identifiers out of the result and inside the technical details", async () => {
-    renderIn(<App api={fakeApi()} />);
+  it.each([
+    ["en", "Technical details"],
+    ["ru", "Техническая информация"],
+    ["uz", "Texnik maʼlumot"],
+  ] as const)("shows no technical panel or internal details in the results (%s)", async (lang, title) => {
+    renderIn(<App api={fakeApi()} />, lang);
     await askQuestion("Penya?");
-    const card = await screen.findByRole("article");
-    expect(card.textContent).not.toContain(PASSAGE_UZ.chunk_id);
-    expect(card.textContent).not.toContain("bm25");
-    const tech = screen.getByText("Technical details").closest("details")!;
-    expect(tech.open).toBe(false);
-    expect(within(tech).getByText(PASSAGE_UZ.chunk_id)).toBeTruthy();
-    expect(within(tech).getByText("bm25")).toBeTruthy();
+    await screen.findByRole("article");
+    const results = document.querySelector(".chat__thread")!;
+    expect(screen.queryByText(title)).toBeNull();
+    expect(results.querySelector("details")).toBeNull();
+    for (const internal of [PASSAGE_UZ.chunk_id, "bm25", "extractive", "real"]) {
+      expect(results.textContent).not.toContain(internal);
+    }
+    // what users need is still there
+    expect(within(results as HTMLElement).getByRole("link").getAttribute("href")).toBe(PASSAGE_UZ.link);
+    expect(results.querySelector("mark")?.textContent).toBe(PASSAGE_UZ.quote);
   });
 
   it("opens a quote in the source viewer with its context and the link to the original", async () => {
@@ -261,15 +302,18 @@ describe("App", () => {
     const api = fakeApi();
     const { unmount } = renderIn(<App api={api} />);
     const history = screen.getByRole("region", { name: "History" });
-    expect(within(history).getByText("Your queries will appear here.")).toBeTruthy();
-    expect(within(history).getByText("Saved only in this browser.")).toBeTruthy();
+    // empty: exactly one sentence
+    expect(history.querySelectorAll("p")).toHaveLength(1);
+    expect(within(history).getByText("Your history will appear after your first query")).toBeTruthy();
 
     await askQuestion("Penya qachon hisoblanadi?");
     await screen.findByRole("article");
     await askQuestion("Ijara haqi?");
     await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(2));
-    // one session, titled with its first question
+    // one session, titled with its first question; the empty-state message is gone
     expect(within(history).getAllByRole("listitem")).toHaveLength(1);
+    expect(within(history).queryByText("Your history will appear after your first query")).toBeNull();
+    expect(within(history).queryByText(/browser/)).toBeNull();
 
     // (the sidebar and the phone top bar both have this button)
     await userEvent.click(screen.getAllByRole("button", { name: "New query" })[0]);
@@ -301,7 +345,35 @@ describe("App", () => {
     await userEvent.click(screen.getByRole("button", { name: "Collapse sidebar" }));
     expect(screen.queryByRole("region", { name: "History" })).toBeNull();
     expect(screen.getAllByRole("button", { name: "New query" }).length).toBeGreaterThan(0);
-    await userEvent.click(screen.getByRole("button", { name: "Expand sidebar" }));
+    expect(window.localStorage.getItem("documind.sidebar.collapsed")).toBe("1");
+    await userEvent.click(screen.getByRole("button", { name: "Open sidebar" }));
     expect(screen.getByRole("region", { name: "History" })).toBeTruthy();
+  });
+
+  it("keeps the results, history and scope while the sidebar collapses and expands", async () => {
+    const api = fakeApi();
+    renderIn(<App api={api} />);
+    await choose("Search in", "Образец договора аренды");
+    await askQuestion("Penya?");
+    await screen.findByRole("article");
+
+    await userEvent.click(screen.getByRole("button", { name: "Collapse sidebar" }));
+    // the rail navigates with the same handlers
+    const rail = screen.getByRole("complementary", { name: "DocuMind UZ" });
+    await userEvent.click(within(rail).getByRole("button", { name: "Document library" }));
+    expect(await screen.findByRole("region", { name: "Documents" })).toBeTruthy();
+    const workspace = within(rail).getByRole("button", { name: "Workspace" });
+    workspace.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(workspace.getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("article")).toBeTruthy(); // the results are still there
+
+    await userEvent.click(within(rail).getByRole("button", { name: "Open sidebar" }));
+    const history = screen.getByRole("region", { name: "History" });
+    expect(within(history).getAllByRole("listitem")).toHaveLength(1);
+    expect(selected("Search in")).toBe("Образец договора аренды");
+    expect(api.ask).toHaveBeenCalledTimes(1);
+    expect(api.ask).toHaveBeenCalledWith(
+      { question: "Penya?", corpus: "real", document_id: "obrazets-ru" }, expect.any(AbortSignal));
   });
 });

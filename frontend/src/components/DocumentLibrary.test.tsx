@@ -79,14 +79,12 @@ describe("DocumentLibrary", () => {
     expect(screen.queryByLabelText("Type")).toBeNull();
   });
 
-  it("opens the structure of a document and switches the collection", async () => {
+  it("opens the structure of a document and has no collection switch", async () => {
     const onOpenDetails = vi.fn();
-    const onCorpusChange = vi.fn();
     renderIn(<DocumentLibrary documents={DOCUMENTS.slice(0, 2)} selectedId={null} onSelect={() => {}}
-                              onOpenDetails={onOpenDetails} corpus="real" onCorpusChange={onCorpusChange} />);
+                              onOpenDetails={onOpenDetails} />);
     await userEvent.click(screen.getAllByRole("button", { name: "Structure" })[1]);
     expect(onOpenDetails).toHaveBeenCalledWith("obrazets-ru");
-    await choose("Collection", "Synthetic (test) documents");
-    expect(onCorpusChange).toHaveBeenCalledWith("synthetic");
+    expect(screen.queryByRole("combobox", { name: "Collection" })).toBeNull();
   });
 });
